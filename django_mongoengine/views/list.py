@@ -23,7 +23,6 @@ class MultipleDocumentsMixin(object):
         """
         if self.queryset is not None:
             queryset = self.queryset
-            queryset = queryset.clone()
         elif self.document is not None:
             queryset = self.document.objects()
         else:
@@ -46,6 +45,7 @@ class MultipleDocumentsMixin(object):
                 raise Http404(_(u"Page is not 'last', nor can it be converted to an int."))
         try:
             page = paginator.page(page_number)
+            page.object_list = [x for x in page.object_list]  # convert to list
             return (paginator, page, page.object_list, page.has_other_pages())
         except InvalidPage:
             raise Http404(_(u'Invalid page (%(page_number)s)') % {
@@ -99,6 +99,7 @@ class MultipleDocumentsMixin(object):
                 'object_list': queryset
             }
         else:
+            queryset = [x for x in queryset] # convert to list
             context = {
                 'paginator': None,
                 'page_obj': None,

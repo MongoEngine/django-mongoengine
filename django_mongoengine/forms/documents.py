@@ -10,7 +10,7 @@ from django.core.exceptions import FieldError
 from django.core.validators import EMPTY_VALUES
 from django.forms.util import ErrorList
 from django.forms.formsets import BaseFormSet, formset_factory
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.utils.text import capfirst
 
 from mongoengine.fields import ObjectIdField, ListField, ReferenceField, FileField, ImageField
@@ -75,39 +75,6 @@ def construct_instance(form, instance, fields=None, exclude=None, ignore=None):
             # upload is already the gridfsproxy object we need.
             upload.get()
             setattr(instance, f.name, upload)
-
-    return instance
-
-
-def save_instance(form, instance, fields=None, fail_message='saved',
-                  commit=True, exclude=None, construct=True):
-    """
-    Saves bound Form ``form``'s cleaned_data into document instance ``instance``.
-
-    If commit=True, then the changes to ``instance`` will be saved to the
-    database. Returns ``instance``.
-
-    If construct=False, assume ``instance`` has already been constructed and
-    just needs to be saved.
-    """
-    instance = construct_instance(form, instance, fields, exclude)
-    if form.errors:
-        raise ValueError("The %s could not be %s because the data didn't"
-                         " validate." % (instance.__class__.__name__, fail_message))
-
-    if commit and hasattr(instance, 'save'):
-        # see BaseDocumentForm._post_clean for an explanation
-        if hasattr(form, '_delete_before_save'):
-            fields = instance._fields
-            new_fields = dict([(n, f) for n, f in fields.iteritems() if not n in form._delete_before_save])
-            if hasattr(instance, '_changed_fields'):
-                for field in form._delete_before_save:
-                    instance._changed_fields.remove(field)
-            instance._fields = new_fields
-            instance.save()
-            instance._fields = fields
-        else:
-            instance.save()
 
     return instance
 
@@ -332,48 +299,6 @@ class BaseDocumentForm(BaseForm):
         self._validate_unique = True
         return self.cleaned_data
 
-    def _post_clean(self):
-        opts = self._meta
-        # Update the model instance with self.cleaned_data.
-        self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
-
-        exclude = self._get_validation_exclusions()
-
-        # Clean the model instance's fields.
-        to_delete = []
-        try:
-            for f in self.instance._fields.itervalues():
-                value = getattr(self.instance, f.name)
-                if f.name not in exclude:
-                    f.validate(value)
-                elif value == '':
-                    # mongoengine chokes on empty strings for fields
-                    # that are not required. Clean them up here, though
-                    # this is maybe not the right place :-)
-                    to_delete.append(f.name)
-        except ValidationError, e:
-            err = {f.name: [e.message]}
-            self._update_errors(err)
-
-        # Add to_delete list to instance. It is removed in save instance
-        # The reason for this is, that the field must be deleted from the
-        # instance before the instance gets saved. The changed instance gets
-        # cached and the removed field is then missing on subsequent edits.
-        # To avoid that it has to be added to the instance after the instance
-        # has been saved. Kinda ugly.
-        self._delete_before_save = to_delete
-
-        # Call the model instance's clean method.
-        if hasattr(self.instance, 'clean'):
-            try:
-                self.instance.clean()
-            except ValidationError, e:
-                self._update_errors({NON_FIELD_ERRORS: e.messages})
-
-        # Validate uniqueness if needed.
-        if self._validate_unique:
-            self.validate_unique()
-
     def validate_unique(self):
         """
         Validates unique constrains on the document.
@@ -392,7 +317,7 @@ class BaseDocumentForm(BaseForm):
                 if self.instance.pk is not None:
                     qs = qs.filter(pk__ne=self.instance.pk)
                 if len(qs) > 0:
-                    message = _(u"%(model_name)s with this %(field_label)s already exists.") %  {
+                    message = _("%(model_name)s with this %(field_label)s already exists.") %  {
                                 'model_name': unicode(capfirst(self.instance._meta.verbose_name)),
                                 'field_label': unicode(pretty_name(f.name))
                     }
@@ -401,8 +326,6 @@ class BaseDocumentForm(BaseForm):
                     errors.append(err_dict)
 
         return errors
-
-
 
     def save(self, commit=True):
         """
@@ -419,10 +342,41 @@ class BaseDocumentForm(BaseForm):
                 fail_message = 'changed'
         except (KeyError, AttributeError):
             fail_message = 'embedded document saved'
-        obj = save_instance(self, self.instance, self._meta.fields,
-                             fail_message, commit, construct=False)
 
-        return obj
+        if self.errors:
+            raise ValueError("The %s could not be %s because the data didn't"
+                             " validate." % (instance.__class__.__name__, fail_message))
+
+        if self.instance._created:
+            self.instance = construct_instance(self, self.instance, self.fields, self._meta.exclude)
+
+            # Validate uniqueness if needed.
+            if self._validate_unique:
+                self.validate_unique()
+
+            if commit:
+                self.instance.save()
+        else:
+            update = {}
+            for name, data in self.cleaned_data.iteritems():
+                try:
+                    if getattr(self.instance, name) != data:
+                        update['set__' + name] = data
+                        setattr(self.instance, name, data)
+                except AttributeError:
+                    raise Exception('Model %s has not attr %s but form %s has' \
+                                    % (type(self.instance),
+                                      name,
+                                      type(self)))
+
+            # Validate uniqueness if needed.
+            if self._validate_unique:
+                self.validate_unique()
+
+            if commit and update:
+                self.instance.update(**update)
+
+        return self.instance
     save.alters_data = True
 
 
@@ -479,8 +433,9 @@ class EmbeddedDocumentForm(BaseDocumentForm):
 
 
         if commit:
+            instance = construct_instance(self, self.instance, self.fields, self._meta.exclude)
             l = getattr(self.parent_document, self._meta.embedded_field)
-            l.append(self.instance)
+            l.append(instance)
             setattr(self.parent_document, self._meta.embedded_field, l)
             self.parent_document.save()
 
@@ -558,7 +513,7 @@ class BaseDocumentFormSet(BaseFormSet):
         if errors:
             raise ValidationError(errors)
     def get_date_error_message(self, date_check):
-        return ugettext("Please correct the duplicate data for %(field_name)s "
+        return _("Please correct the duplicate data for %(field_name)s "
             "which must be unique for the %(lookup)s in %(date_field)s.") % {
             'field_name': date_check[2],
             'date_field': date_check[3],
@@ -566,7 +521,7 @@ class BaseDocumentFormSet(BaseFormSet):
         }
 
     def get_form_error(self):
-        return ugettext("Please correct the duplicate values below.")
+        return _("Please correct the duplicate values below.")
 
 def documentformset_factory(document, form=DocumentForm, formfield_callback=None,
                          formset=BaseDocumentFormSet,

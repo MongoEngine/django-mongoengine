@@ -133,16 +133,18 @@ class SingleDocumentTemplateResponseMixin(TemplateResponseMixin):
         # The least-specific option is the default <app>/<document>_detail.html;
         # only use this if the object in question is a document.
         if hasattr(self.object, '_meta'):
-            opts = get_document_options(self.object)
-            names.append("%s/%s%s.html" % (
-                opts.app_label,
-                opts.object_name.lower(),
-                self.template_name_suffix
-            ))
+            doc_cls = self.object.__class__
+        elif hasattr(self, 'document') and hasattr(self.document, '_meta'):
+            doc_cls = self.document
+        else:
+            raise ImproperlyConfigured("No object or document class associated with this view")
 
-        # Include Base document as well
-        if hasattr(self, 'document') and hasattr(self.document, '_meta'):
-            opts = get_document_options(self.document)
+        # Get any superclasses if needed
+        doc_classes = [doc_cls]
+        if hasattr(doc_cls, '_meta') and doc_cls._meta['allow_inheritance']:
+            doc_classes += [v for k, v in doc_cls._superclasses.iteritems() if k != "Document"]
+        for doc_cls in doc_classes:
+            opts = get_document_options(doc_cls)
             name = "%s/%s%s.html" % (
                 opts.app_label,
                 opts.object_name.lower(),

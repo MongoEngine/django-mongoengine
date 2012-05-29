@@ -1,5 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 
+from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _, ugettext
 from django.views.generic.edit import FormMixin, ProcessFormView, DeletionMixin
 
 from django_mongoengine.forms.documents import documentform_factory
@@ -12,6 +14,8 @@ class DocumentFormMixin(FormMixin, SingleDocumentMixin):
     A mixin that provides a way to show and handle a documentform in a request.
     """
 
+    success_message = None
+
     def get_form_class(self):
         """
         Returns the form class to use in this view
@@ -19,18 +23,20 @@ class DocumentFormMixin(FormMixin, SingleDocumentMixin):
         if self.form_class:
             return self.form_class
         else:
-            if self.document is not None:
-                # If a document has been explicitly provided, use it
-                document = self.document
-            elif hasattr(self, 'object') and self.object is not None:
+            if hasattr(self, 'object') and self.object is not None:
                 # If this view is operating on a single object, use
                 # the class of that object
                 document = self.object.__class__
+            elif self.document is not None:
+                # If a document has been explicitly provided, use it
+                document = self.document
             else:
                 # Try to get a queryset and extract the document class
                 # from that
                 document = self.get_queryset()._document
-            return documentform_factory(document)
+
+            exclude = getattr(self, 'form_exclude', ())
+            return documentform_factory(document, exclude=exclude)
 
     def get_form_kwargs(self):
         """
@@ -54,6 +60,10 @@ class DocumentFormMixin(FormMixin, SingleDocumentMixin):
 
     def form_valid(self, form):
         self.object = form.save()
+        msg = _("The %(verbose_name)s was updated successfully.") % {
+                "verbose_name": self.document._meta.verbose_name}
+        msg = self.success_message if self.success_message else msg
+        messages.add_message(self.request, messages.SUCCESS, msg, fail_silently=True)
         return super(DocumentFormMixin, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -148,6 +158,7 @@ class ProcessEmbeddedFormMixin(object):
     Does not implement any GET handling.
     """
     def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         if form.is_valid():

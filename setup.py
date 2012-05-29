@@ -38,9 +38,8 @@ setup(
     packages=['django_mongoengine',
               'django_mongoengine.forms'],
     include_package_data=True,
-    tests_require=[
-        'nose',
-    ],
+    # use python setup.py nosetests to test
+    setup_requires=['nose', 'coverage'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',

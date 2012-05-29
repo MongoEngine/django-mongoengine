@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block page_header %}
+  <div class="page-header">
+    <h1>{{ post.title }}</h1>
+  </div>
+{% endblock %}
+
+{% block top_nav %}
+<ul class="nav pull-right nav-pills">
+  <li class="dropdown active">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+      <li>
+        <a href="{% url 'post_update' slug=post.slug %}"><i class="icon-edit"></i> edit</a>
+      </li>
+      <li>
+        <a href="{% url 'post_delete' slug=post.slug %}"><i class="icon-trash"></i> delete</a>
+      </li>
+    </ul>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+  {% if post.body and not post.author %}
+    <p>{{ post.body|linebreaksbr }}<p>
+  {% endif %}
+  {% if post.embed_code %}
+    {{ post.embed_code|safe }}
+  {% endif %}
+  {% if post.image_url %}
+    <p><img src="{{ post.image_url }}" /><p>
+  {% endif %}
+  {% if post.author %}
+    <blockquote>{{ post.body|linebreaksbr }}</blockquote>
+    <p>{{ post.author }}</p>
+  {% endif %}
+  <p>{{ post.created_at }}</p>
+  <hr>
+  <h2>Comments</h2>
+  {% if post.comments %}
+    {% for comment in post.comments %}
+       <p>{{ comment.body }}</p>
+       <p><strong>{{ comment.author }}</strong> <small>on {{ comment.created_at }}</small></p>
+      {{ comment.text }}
+    {% endfor %}
+  {% else %}
+    <p>No comments, be the first to comment!</p>
+  {% endif %}
+  <h2>Add a comment</h2>
+  <form action="." method="post">
+    {% include "_forms.html" %}
+    <div class="actions">
+      <input type="submit" class="btn primary" value="comment">
+    </div>
+  </form>
+
+  {{ embedded_form }}
+{% endblock %}

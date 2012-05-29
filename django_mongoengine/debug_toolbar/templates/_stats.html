@@ -1,0 +1,111 @@
+<h4>{{ title }}</h4>
+{% if queries %}
+<table class="mongodb-op-table">
+    <thead>
+        <tr>
+            <th>Time (ms)</th>
+            <th>Size</th>
+            {% if title == 'Queries' %}
+            <th>Operation</th>
+            <th>Collection</th>
+            <th>Query</th>
+            <th>Ordering</th>
+            <th>Skip</th>
+            <th>Limit</th>
+            <th>Data</th>
+            {% elif title == 'Inserts' %}
+            <th>Document</th>
+            <th>Safe</th>
+            {% elif title == 'Removes' %}
+            <th>Query / Id</th>
+            <th>Safe</th>
+            {% elif title == 'Updates' %}
+            <th>Query</th>
+            <th>Update</th>
+            <th>Safe</th>
+            <th>Multi</th>
+            <th>Upsert</th>
+            {% endif %}
+            <th>Stack Trace</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for query in queries %}
+            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %}{% if query.internal %} toolbar-query{% endif %}">
+                <td {% if query.time > slow_query_limit %}style="color:red;" {% endif %}>
+                {{ query.time|floatformat:3 }}</td>
+                <td>{{ query.size|floatformat:2 }}Kb</td>
+                {% if title == "Queries" %}
+                    <td>{{ query.operation|title }}</td>
+                    <td>{{ query.collection }}</td>
+                    <td class="code">{% if query.query %}{{ query.query|safe }}{% endif %}</td>
+                    <td class="code">{% if query.ordering %}{{ query.ordering }}{% endif %}</td>
+                    <td>{% if query.skip %}{{ query.skip }}{% endif %}</td>
+                    <td>{% if query.limit %}{{ query.limit }}{% endif %}</td>
+                    <td><a href="javascript:void(0);" class="mongodb-toggle-data" data-row="mongodb-data-{{ forloop.counter }}">Toggle</a></td>
+                {% elif title == "Inserts" %}
+                <td class="code fifty"></pre>{{ query.document|safe }}</pre>
+                </td>
+                <td>{{ query.safe }}</td>
+                {% elif title == 'Removes' %}
+                <td class="code thirty">
+                    <pre>{{ query.spec_or_id|safe }}</pre>
+                </td>
+                <td class="code thirty"><pre>{{ query.safe }}</pre></td>
+                {% elif title == 'Updates' %}
+                <td class="code thirty">
+                    <pre>{{ query.spec|safe }}</pre>
+                </td>
+                <td class="code thirty">
+                    <pre>{{ query.document|safe }}</pre>
+                </td>
+                <td>{{ query.safe }}</td>
+                <td>{{ query.multi }}</td>
+                <td>{{ query.upsert }}</td>
+                {% endif %}
+                <td><a href="javascript:void(0);" class="mongodb-toggle-trace" data-row="mongodb-{{ title|lower }}-{{ forloop.counter }}">Toggle</a></td>
+            </tr>
+            {% if title == "Queries" %}
+            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %} mongodb-data" id="mongodb-data-{{ forloop.counter }}">
+                <td colspan="10">
+                    <code><pre>{{ query.data|pprint }}</pre></code>
+                </td>
+            </tr>
+            {% endif %}
+            <tr class="{% cycle 'djDebugOdd' 'djDebugEven' %} mongodb-stack-trace" id="mongodb-{{  title|lower }}-{{ forloop.counter }}">
+                <td colspan="10">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Line</th>
+                                <th>File</th>
+                                <th>Function</th>
+                                <th>Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for line in query.stack_trace %}
+                            <tr {% if line.4 %}class="mongodb-stack-trace-hide" {% endif %}>
+                                <td class="lineno">{{ line.1 }}</td>
+                                <td class="file">{{ line.0 }}</td>
+                                <td class="function">{{ line.2 }}</td>
+                                <td class="code">{{ line.3|safe }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4">
+                                    <a href="javascript:void(0);" class="mongodb-toggle-full-trace">Toggle full trace</a>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No {{ title|lower }} recorded</p>
+{% endif %}

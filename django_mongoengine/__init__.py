@@ -1,18 +1,9 @@
-# -*- coding: utf-8 -*-
 """
-    werkzeug
-    ~~~~~~~~
+    django_mongoengine
+    ~~~~~~~~~~~~~~~~~~
 
-    Werkzeug is the Swiss Army knife of Python web development.
-
-    It provides useful classes and functions for any WSGI application to make
-    the life of a python web developer much easier.  All of the provided
-    classes are independent from each other so you can mix it with any other
-    library.
-
-
-    :copyright: (c) 2011 by the Werkzeug Team, see AUTHORS for more details.
-    :license: BSD, see LICENSE for more details.
+    Django and MongoEngine integration giving easy forms and generic views
+    integration.
 """
 from types import ModuleType
 import sys
