@@ -36,7 +36,10 @@ setup(
         'mongoengine'
     ],
     packages=['django_mongoengine',
-              'django_mongoengine.forms'],
+              'django_mongoengine.debug_toolbar',
+              'django_mongoengine.forms',
+              'django_mongoengine.utils',
+              'django_mongoengine.views'],
     include_package_data=True,
     # use python setup.py nosetests to test
     setup_requires=['nose', 'coverage'],

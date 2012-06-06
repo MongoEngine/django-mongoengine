@@ -109,7 +109,7 @@ ROOT_URLCONF = 'tumblelog.urls'
 WSGI_APPLICATION = 'tumblelog.wsgi.application'
 
 TEMPLATE_DIRS = (
-    os.path.join(os.path.realpath(__file__), '../templates'),
+    os.path.join(os.path.realpath(os.path.dirname(__file__)), '../templates'),
 )
 
 INSTALLED_APPS = (
