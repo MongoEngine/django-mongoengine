@@ -2,7 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _, ugettext
-from django.views.generic.edit import FormMixin, ProcessFormView, DeletionMixin
+from django.views.generic.edit import FormMixin, ProcessFormView, DeletionMixin, FormView
 
 from django_mongoengine.forms.documents import documentform_factory
 from django_mongoengine.views.detail import (SingleDocumentMixin, DetailView,
@@ -48,7 +48,7 @@ class DocumentFormMixin(FormMixin, SingleDocumentMixin):
 
     def get_success_url(self):
         if self.success_url:
-            url = self.success_url % self.object.__dict__
+            url = self.success_url % self.object._data
         else:
             try:
                 url = self.object.get_absolute_url()
@@ -60,8 +60,9 @@ class DocumentFormMixin(FormMixin, SingleDocumentMixin):
 
     def form_valid(self, form):
         self.object = form.save()
+        document = self.document or form.Meta.document
         msg = _("The %(verbose_name)s was updated successfully.") % {
-                "verbose_name": self.document._meta.verbose_name}
+                "verbose_name": document._meta.verbose_name}
         msg = self.success_message if self.success_message else msg
         messages.add_message(self.request, messages.SUCCESS, msg, fail_silently=True)
         return super(DocumentFormMixin, self).form_valid(form)

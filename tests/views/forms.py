@@ -1,13 +1,13 @@
 from __future__ import absolute_import
 
-from django import forms
+from django_mongoengine import forms
 
 from .models import Author
 
 
-class AuthorForm(forms.ModelForm):
+class AuthorForm(forms.DocumentForm):
     name = forms.CharField()
     slug = forms.SlugField()
 
     class Meta:
-        model = Author
+        document = Author

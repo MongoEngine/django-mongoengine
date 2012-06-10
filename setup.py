@@ -12,6 +12,9 @@ Links
 
 """
 from setuptools import setup
+import sys, os
+
+sys.path.insert(0, os.path.dirname(__file__))
 
 # Stops exit traceback on tests
 try:

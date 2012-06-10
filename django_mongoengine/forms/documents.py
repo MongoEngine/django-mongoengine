@@ -157,7 +157,7 @@ def fields_for_document(document, fields=None, exclude=None, widgets=None,
     return field_dict
 
 
-class ModelFormOptions(object):
+class DocumentFormOptions(object):
     def __init__(self, options=None):
         self.document = getattr(options, 'document', None)
         self.model = self.document
@@ -188,7 +188,7 @@ class DocumentFormMetaclass(type):
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
 
-        opts = new_class._meta = ModelFormOptions(getattr(new_class, 'Meta', None))
+        opts = new_class._meta = DocumentFormOptions(getattr(new_class, 'Meta', None))
         if opts.document:
             formfield_generator = getattr(opts, 'formfield_generator', MongoFormFieldGenerator)
 

@@ -222,7 +222,7 @@ class TemplateViewTest(TestCase):
         """
         response = self.client.get('/template/simple/bar/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context_data['params'], {'foo': 'bar'})
+        self.assertEqual(response.context['params'], {'foo': 'bar'})
 
     def test_extra_template_params(self):
         """
@@ -230,8 +230,8 @@ class TemplateViewTest(TestCase):
         """
         response = self.client.get('/template/custom/bar/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context_data['params'], {'foo': 'bar'})
-        self.assertEqual(response.context_data['key'], 'value')
+        self.assertEqual(response.context['params'], {'foo': 'bar'})
+        self.assertEqual(response.context['key'], 'value')
 
     def test_cached_views(self):
         """

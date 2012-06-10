@@ -137,6 +137,8 @@ class SingleDocumentTemplateResponseMixin(TemplateResponseMixin):
         elif hasattr(self, 'document') and hasattr(self.document, '_meta'):
             doc_cls = self.document
         else:
+            if names:
+                return names
             raise ImproperlyConfigured("No object or document class associated with this view")
 
         # Get any superclasses if needed

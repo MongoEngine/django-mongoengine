@@ -1,44 +1,58 @@
-from django.db import models
+from bson import ObjectId
+from django.db.models import permalink
+
+from django_mongoengine import Document
+from django_mongoengine import fields
 
 
-class Artist(models.Model):
-    name = models.CharField(max_length=100)
+class Artist(Document):
+    id = fields.StringField(primary_key=True, default=ObjectId)
+    name = fields.StringField(max_length=100)
 
     class Meta:
-        ordering = ['name']
-        verbose_name = 'professional artist'
+        ordering = ['name'],
+        verbose_name = 'professional artist',
         verbose_name_plural = 'professional artists'
 
     def __unicode__(self):
         return self.name
 
-    @models.permalink
+    @permalink
     def get_absolute_url(self):
         return ('artist_detail', (), {'pk': self.id})
 
-class Author(models.Model):
-    name = models.CharField(max_length=100)
-    slug = models.SlugField()
 
-    class Meta:
-        ordering = ['name']
+class Author(Document):
+    id = fields.StringField(primary_key=True, default=ObjectId)
+    name = fields.StringField(max_length=100)
+    slug = fields.StringField()
 
-    def __unicode__(self):
-        return self.name
-
-class Book(models.Model):
-    name = models.CharField(max_length=300)
-    slug = models.SlugField()
-    pages = models.IntegerField()
-    authors = models.ManyToManyField(Author)
-    pubdate = models.DateField()
-
-    class Meta:
-        ordering = ['-pubdate']
+    _meta = {
+        "ordering": ['name'],
+        "exclude": 'id'
+    }
 
     def __unicode__(self):
         return self.name
 
-class Page(models.Model):
-    content = models.TextField()
-    template = models.CharField(max_length=300)
+
+class Book(Document):
+    id = fields.StringField(primary_key=True, default=ObjectId)
+    name = fields.StringField(max_length=300)
+    slug = fields.StringField()
+    pages = fields.IntField()
+    authors = fields.ListField(fields.ReferenceField(Author))
+    pubdate = fields.DateTimeField()
+
+    _meta = {
+        "ordering": ['-pubdate']
+    }
+
+    def __unicode__(self):
+        return self.name
+
+
+class Page(Document):
+    id = fields.StringField(primary_key=True, default=ObjectId)
+    content = fields.StringField()
+    template = fields.StringField(max_length=300)

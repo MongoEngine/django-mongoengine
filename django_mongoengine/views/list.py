@@ -5,10 +5,11 @@ from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateResponseMixin, View
 
+from mongoengine.queryset import QuerySet
 from django_mongoengine.forms.utils import get_document_options
 
 
-class MultipleDocumentsMixin(object):
+class MultipleDocumentMixin(object):
     allow_empty = True
     queryset = None
     document = None
@@ -22,7 +23,10 @@ class MultipleDocumentsMixin(object):
         be a queryset (in which qs-specific behavior will be enabled).
         """
         if self.queryset is not None:
-            queryset = self.queryset
+            if isinstance(self.queryset, QuerySet):
+                queryset = self.queryset.clone()
+            else:
+                queryset = self.queryset
         elif self.document is not None:
             queryset = self.document.objects()
         else:
@@ -112,7 +116,7 @@ class MultipleDocumentsMixin(object):
         return context
 
 
-class BaseListView(MultipleDocumentsMixin, View):
+class BaseListView(MultipleDocumentMixin, View):
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         allow_empty = self.get_allow_empty()
@@ -123,7 +127,7 @@ class BaseListView(MultipleDocumentsMixin, View):
         return self.render_to_response(context)
 
 
-class MultipleDocumentsTemplateResponseMixin(TemplateResponseMixin):
+class MultipleDocumentTemplateResponseMixin(TemplateResponseMixin):
     template_name_suffix = '_list'
 
     def get_template_names(self):
@@ -132,7 +136,7 @@ class MultipleDocumentsTemplateResponseMixin(TemplateResponseMixin):
         a list. May not be called if get_template is overridden.
         """
         try:
-            names = super(MultipleDocumentsTemplateResponseMixin, self).get_template_names()
+            names = super(MultipleDocumentTemplateResponseMixin, self).get_template_names()
         except ImproperlyConfigured:
             # If template_name isn't specified, it's not a problem --
             # we just start with an empty list.
@@ -149,7 +153,7 @@ class MultipleDocumentsTemplateResponseMixin(TemplateResponseMixin):
         return names
 
 
-class ListView(MultipleDocumentsTemplateResponseMixin, BaseListView):
+class ListView(MultipleDocumentTemplateResponseMixin, BaseListView):
     """
     Render some list of objects, set by `self.document` or `self.queryset`.
     `self.queryset` can actually be any iterable of items, not just a queryset.

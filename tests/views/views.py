@@ -4,13 +4,14 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
-from django.views import generic
+
+from django_mongoengine import views
 
 from .forms import AuthorForm
 from .models import Artist, Author, Book, Page
 
 
-class CustomTemplateView(generic.TemplateView):
+class CustomTemplateView(views.TemplateView):
     template_name = 'views/about.html'
 
     def get_context_data(self, **kwargs):
@@ -20,27 +21,27 @@ class CustomTemplateView(generic.TemplateView):
         }
 
 
-class ObjectDetail(generic.DetailView):
+class ObjectDetail(views.DetailView):
     template_name = 'views/detail.html'
 
     def get_object(self):
         return {'foo': 'bar'}
 
 
-class ArtistDetail(generic.DetailView):
+class ArtistDetail(views.DetailView):
     queryset = Artist.objects.all()
 
 
-class AuthorDetail(generic.DetailView):
+class AuthorDetail(views.DetailView):
     queryset = Author.objects.all()
 
 
-class PageDetail(generic.DetailView):
+class PageDetail(views.DetailView):
     queryset = Page.objects.all()
     template_name_field = 'template'
 
 
-class DictList(generic.ListView):
+class DictList(views.ListView):
     """A ListView that doesn't use a model."""
     queryset = [
         {'first': 'John', 'last': 'Lennon'},
@@ -49,13 +50,13 @@ class DictList(generic.ListView):
     template_name = 'views/list.html'
 
 
-class ArtistList(generic.ListView):
+class ArtistList(views.ListView):
     template_name = 'views/list.html'
     queryset = Artist.objects.all()
 
 
-class AuthorList(generic.ListView):
-    queryset = Author.objects.all()
+class AuthorList(views.ListView):
+    queryset = Author.objects.all().order_by('name')
 
 
 class CustomPaginator(Paginator):
@@ -76,21 +77,21 @@ class AuthorListCustomPaginator(AuthorList):
             orphans=2,
             allow_empty_first_page=allow_empty_first_page)
 
-class ArtistCreate(generic.CreateView):
-    model = Artist
+class ArtistCreate(views.CreateView):
+    document = Artist
 
 
-class NaiveAuthorCreate(generic.CreateView):
+class NaiveAuthorCreate(views.CreateView):
     queryset = Author.objects.all()
 
 
-class AuthorCreate(generic.CreateView):
-    model = Author
+class AuthorCreate(views.CreateView):
+    document = Author
     success_url = '/list/authors/'
 
 
-class SpecializedAuthorCreate(generic.CreateView):
-    model = Author
+class SpecializedAuthorCreate(views.CreateView):
+    document = Author
     form_class = AuthorForm
     template_name = 'views/form.html'
     context_object_name = 'thingy'
@@ -103,28 +104,28 @@ class AuthorCreateRestricted(AuthorCreate):
     post = method_decorator(login_required)(AuthorCreate.post)
 
 
-class ArtistUpdate(generic.UpdateView):
-    model = Artist
+class ArtistUpdate(views.UpdateView):
+    document = Artist
 
 
-class NaiveAuthorUpdate(generic.UpdateView):
+class NaiveAuthorUpdate(views.UpdateView):
     queryset = Author.objects.all()
 
 
-class AuthorUpdate(generic.UpdateView):
-    model = Author
+class AuthorUpdate(views.UpdateView):
+    document = Author
     success_url = '/list/authors/'
 
 
-class OneAuthorUpdate(generic.UpdateView):
+class OneAuthorUpdate(views.UpdateView):
     success_url = '/list/authors/'
 
     def get_object(self):
-        return Author.objects.get(pk=1)
+        return Author.objects.get(pk='1')
 
 
-class SpecializedAuthorUpdate(generic.UpdateView):
-    model = Author
+class SpecializedAuthorUpdate(views.UpdateView):
+    document = Author
     form_class = AuthorForm
     template_name = 'views/form.html'
     context_object_name = 'thingy'
@@ -133,16 +134,16 @@ class SpecializedAuthorUpdate(generic.UpdateView):
         return reverse('author_detail', args=[self.object.id,])
 
 
-class NaiveAuthorDelete(generic.DeleteView):
+class NaiveAuthorDelete(views.DeleteView):
     queryset = Author.objects.all()
 
 
-class AuthorDelete(generic.DeleteView):
-    model = Author
+class AuthorDelete(views.DeleteView):
+    document = Author
     success_url = '/list/authors/'
 
 
-class SpecializedAuthorDelete(generic.DeleteView):
+class SpecializedAuthorDelete(views.DeleteView):
     queryset = Author.objects.all()
     template_name = 'views/confirm_delete.html'
     context_object_name = 'thingy'
@@ -155,32 +156,32 @@ class BookConfig(object):
     queryset = Book.objects.all()
     date_field = 'pubdate'
 
-class BookArchive(BookConfig, generic.ArchiveIndexView):
+class BookArchive(BookConfig, views.ArchiveIndexView):
     pass
 
-class BookYearArchive(BookConfig, generic.YearArchiveView):
+class BookYearArchive(BookConfig, views.YearArchiveView):
     pass
 
-class BookMonthArchive(BookConfig, generic.MonthArchiveView):
+class BookMonthArchive(BookConfig, views.MonthArchiveView):
     pass
 
-class BookWeekArchive(BookConfig, generic.WeekArchiveView):
+class BookWeekArchive(BookConfig, views.WeekArchiveView):
     pass
 
-class BookDayArchive(BookConfig, generic.DayArchiveView):
+class BookDayArchive(BookConfig, views.DayArchiveView):
     pass
 
-class BookTodayArchive(BookConfig, generic.TodayArchiveView):
+class BookTodayArchive(BookConfig, views.TodayArchiveView):
     pass
 
-class BookDetail(BookConfig, generic.DateDetailView):
+class BookDetail(BookConfig, views.DateDetailView):
     pass
 
-class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
+class AuthorGetQuerySetFormView(views.edit.DocumentFormMixin):
     def get_queryset(self):
         return Author.objects.all()
 
 class BookDetailGetObjectCustomQueryset(BookDetail):
     def get_object(self, queryset=None):
         return super(BookDetailGetObjectCustomQueryset,self).get_object(
-            queryset=Book.objects.filter(pk=2))
+            queryset=Book.objects.filter(pk='2'))

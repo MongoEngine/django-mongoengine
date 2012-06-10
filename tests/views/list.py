@@ -1,25 +1,24 @@
 from __future__ import absolute_import
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
 
+from .tests import TestCase
 from .models import Author, Artist
 
 
 class ListViewTests(TestCase):
-    fixtures = ['generic-views-test-data.json']
-    urls = 'regressiontests.generic_views.urls'
+    urls = 'tests.views.urls'
 
     def test_items(self):
         res = self.client.get('/list/dict/')
         self.assertEqual(res.status_code, 200)
-        self.assertTemplateUsed(res, 'generic_views/list.html')
+        self.assertTemplateUsed(res, 'views/list.html')
         self.assertEqual(res.context['object_list'][0]['first'], 'John')
 
     def test_queryset(self):
         res = self.client.get('/list/authors/')
         self.assertEqual(res.status_code, 200)
-        self.assertTemplateUsed(res, 'generic_views/author_list.html')
+        self.assertTemplateUsed(res, 'views/author_list.html')
         self.assertEqual(list(res.context['object_list']), list(Author.objects.all()))
         self.assertIs(res.context['author_list'], res.context['object_list'])
         self.assertIsNone(res.context['paginator'])
@@ -30,7 +29,7 @@ class ListViewTests(TestCase):
         self._make_authors(100)
         res = self.client.get('/list/authors/paginated/')
         self.assertEqual(res.status_code, 200)
-        self.assertTemplateUsed(res, 'generic_views/author_list.html')
+        self.assertTemplateUsed(res, 'views/author_list.html')
         self.assertEqual(len(res.context['object_list']), 30)
         self.assertIs(res.context['author_list'], res.context['object_list'])
         self.assertTrue(res.context['is_paginated'])
@@ -43,7 +42,7 @@ class ListViewTests(TestCase):
         # Test that short datasets ALSO result in a paginated view.
         res = self.client.get('/list/authors/paginated/')
         self.assertEqual(res.status_code, 200)
-        self.assertTemplateUsed(res, 'generic_views/author_list.html')
+        self.assertTemplateUsed(res, 'views/author_list.html')
         self.assertEqual(list(res.context['object_list']), list(Author.objects.all()))
         self.assertIs(res.context['author_list'], res.context['object_list'])
         self.assertEqual(res.context['page_obj'].number, 1)
@@ -54,7 +53,7 @@ class ListViewTests(TestCase):
         self._make_authors(100)
         res = self.client.get('/list/authors/paginated/', {'page': '2'})
         self.assertEqual(res.status_code, 200)
-        self.assertTemplateUsed(res, 'generic_views/author_list.html')
+        self.assertTemplateUsed(res, 'views/author_list.html')
         self.assertEqual(len(res.context['object_list']), 30)
         self.assertIs(res.context['author_list'], res.context['object_list'])
         self.assertEqual(res.context['author_list'][0].name, 'Author 30')
@@ -73,7 +72,7 @@ class ListViewTests(TestCase):
         self._make_authors(100)
         res = self.client.get('/list/authors/paginated/3/')
         self.assertEqual(res.status_code, 200)
-        self.assertTemplateUsed(res, 'generic_views/author_list.html')
+        self.assertTemplateUsed(res, 'views/author_list.html')
         self.assertEqual(len(res.context['object_list']), 30)
         self.assertIs(res.context['author_list'], res.context['object_list'])
         self.assertEqual(res.context['author_list'][0].name, 'Author 60')
@@ -112,7 +111,7 @@ class ListViewTests(TestCase):
     def test_verbose_name(self):
         res = self.client.get('/list/artists/')
         self.assertEqual(res.status_code, 200)
-        self.assertTemplateUsed(res, 'generic_views/list.html')
+        self.assertTemplateUsed(res, 'views/list.html')
         self.assertEqual(list(res.context['object_list']), list(Artist.objects.all()))
         self.assertIs(res.context['artist_list'], res.context['object_list'])
         self.assertIsNone(res.context['paginator'])
@@ -131,14 +130,14 @@ class ListViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['object_list']), list(Author.objects.all()))
         self.assertIs(res.context['author_list'], res.context['object_list'])
-        self.assertTemplateUsed(res, 'generic_views/list.html')
+        self.assertTemplateUsed(res, 'views/list.html')
 
     def test_template_name_suffix(self):
         res = self.client.get('/list/authors/template_name_suffix/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['object_list']), list(Author.objects.all()))
         self.assertIs(res.context['author_list'], res.context['object_list'])
-        self.assertTemplateUsed(res, 'generic_views/author_objects.html')
+        self.assertTemplateUsed(res, 'views/author_objects.html')
 
     def test_context_object_name(self):
         res = self.client.get('/list/authors/context_object_name/')
@@ -146,7 +145,7 @@ class ListViewTests(TestCase):
         self.assertEqual(list(res.context['object_list']), list(Author.objects.all()))
         self.assertNotIn('authors', res.context)
         self.assertIs(res.context['author_list'], res.context['object_list'])
-        self.assertTemplateUsed(res, 'generic_views/author_list.html')
+        self.assertTemplateUsed(res, 'views/author_list.html')
 
     def test_duplicate_context_object_name(self):
         res = self.client.get('/list/authors/dupe_context_object_name/')
@@ -154,7 +153,7 @@ class ListViewTests(TestCase):
         self.assertEqual(list(res.context['object_list']), list(Author.objects.all()))
         self.assertNotIn('authors', res.context)
         self.assertNotIn('author_list', res.context)
-        self.assertTemplateUsed(res, 'generic_views/author_list.html')
+        self.assertTemplateUsed(res, 'views/author_list.html')
 
     def test_missing_items(self):
         self.assertRaises(ImproperlyConfigured, self.client.get, '/list/authors/invalid/')
@@ -162,5 +161,5 @@ class ListViewTests(TestCase):
     def _make_authors(self, n):
         Author.objects.all().delete()
         for i in range(n):
-            Author.objects.create(name='Author %02i' % i, slug='a%s' % i)
+            Author.objects.create(id='%s' % i, name='Author %02i' % i, slug='a%s' % i)
 
