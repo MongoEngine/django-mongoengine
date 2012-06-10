@@ -131,7 +131,7 @@ class SpecializedAuthorUpdate(views.UpdateView):
     context_object_name = 'thingy'
 
     def get_success_url(self):
-        return reverse('author_detail', args=[self.object.id,])
+        return reverse('author_detail', args=[self.object.id])
 
 
 class NaiveAuthorDelete(views.DeleteView):
@@ -152,36 +152,6 @@ class SpecializedAuthorDelete(views.DeleteView):
         return reverse('authors_list')
 
 
-class BookConfig(object):
-    queryset = Book.objects.all()
-    date_field = 'pubdate'
-
-class BookArchive(BookConfig, views.ArchiveIndexView):
-    pass
-
-class BookYearArchive(BookConfig, views.YearArchiveView):
-    pass
-
-class BookMonthArchive(BookConfig, views.MonthArchiveView):
-    pass
-
-class BookWeekArchive(BookConfig, views.WeekArchiveView):
-    pass
-
-class BookDayArchive(BookConfig, views.DayArchiveView):
-    pass
-
-class BookTodayArchive(BookConfig, views.TodayArchiveView):
-    pass
-
-class BookDetail(BookConfig, views.DateDetailView):
-    pass
-
 class AuthorGetQuerySetFormView(views.edit.DocumentFormMixin):
     def get_queryset(self):
         return Author.objects.all()
-
-class BookDetailGetObjectCustomQueryset(BookDetail):
-    def get_object(self, queryset=None):
-        return super(BookDetailGetObjectCustomQueryset,self).get_object(
-            queryset=Book.objects.filter(pk='2'))
