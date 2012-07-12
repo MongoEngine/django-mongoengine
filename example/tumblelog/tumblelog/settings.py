@@ -16,7 +16,9 @@ ADMINS = (
 MANAGERS = ADMINS
 
 # MongoDB settings
-MONGODB_DB = "django_mongoengine"
+MONGODB_DATABASES = {
+    'default': {'name': 'django_mongoengine'}
+}
 
 DATABASES = {
     'default': {}

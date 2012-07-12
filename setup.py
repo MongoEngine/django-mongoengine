@@ -24,7 +24,7 @@ except:
 
 setup(
     name='django-mongoengine',
-    version='0.3',
+    version='0.1',
     url='https://github.com/mongoengine/django-mongoengine',
     license='BSD',
     author='Ross Lawley',

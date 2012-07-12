@@ -5,6 +5,7 @@ import math
 
 from django.http import Http404
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine.base import ValidationError, TopLevelDocumentMetaclass
@@ -27,18 +28,11 @@ class MongoEngine(object):
         self.Document = Document
         self.DynamicDocument = DynamicDocument
 
-        conn_settings = {
-            'username': getattr(settings, 'MONGODB_USERNAME', None),
-            'password': getattr(settings, 'MONGODB_PASSWORD', None),
-            'host': getattr(settings, 'MONGODB_HOST', None),
-            'port': int(getattr(settings, 'MONGODB_PORT', 0)) or None,
-        }
+        if not hasattr(settings, 'MONGODB_DATABASES'):
+            raise ImproperlyConfigured("Missing `MONGODB_DATABASES` in settings.py")
 
-        conn_settings = dict([(k, v) for k, v in conn_settings.items() if v])
-        alias = self.connection.DEFAULT_CONNECTION_NAME
-        name = getattr(settings, 'MONGODB_DB')
-        self.connection.register_connection(alias, name, **conn_settings)
-
+        for alias, conn_settings in settings.MONGODB_DATABASES.items():
+            self.connection.register_connection(alias, **conn_settings)
 
 class BaseQuerySet(QuerySet):
     """
