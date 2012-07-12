@@ -103,7 +103,7 @@ def document_to_dict(instance, fields=None, exclude=None):
 
 
 def fields_for_document(document, fields=None, exclude=None, widgets=None,
-                        form_field_callback=None,
+                        formfield_callback=None,
                         field_generator=MongoFormFieldGenerator):
     """
     Returns a ``SortedDict`` containing form fields for the given model.
@@ -137,11 +137,12 @@ def fields_for_document(document, fields=None, exclude=None, widgets=None,
         else:
             kwargs = {}
 
-        form_field = field_generator.generate(f, charfield_default=True)
-        if form_field_callback is not None and not callable(form_field_callback):
-            raise TypeError('form_field_callback must be a function or callable')
-        elif form_field_callback is not None:
-            form_field = form_field_callback(f, **kwargs)
+        if formfield_callback is None:
+            form_field = field_generator.generate(f, **kwargs)
+        elif not callable(formfield_callback):
+            raise TypeError('formfield_callback must be a function or callable')
+        else:
+            form_field = formfield_callback(f, **kwargs)
 
         if form_field:
             field_list.append((f.name, form_field))
