@@ -258,3 +258,33 @@ class MongoFormFieldGenerator(object):
 
     def generate_imagefield(self, field, **kwargs):
         return forms.ImageField(**kwargs)
+
+
+class MongoDefaultFormFieldGenerator(MongoFormFieldGenerator):
+    """This class generates Django form-fields for mongoengine-fields."""
+
+    def generate(self, field, **kwargs):
+        """Tries to lookup a matching formfield generator (lowercase
+        field-classname) and raises a NotImplementedError of no generator
+        can be found.
+        """
+        try:
+            return super(MongoDefaultFormFieldGenerator, self).generate(
+                        field, **kwargs)
+        except NotImplementedError:
+            # a normal charfield is always a good guess
+            # for a widget.
+            # TODO: Somehow add a warning
+            defaults = {'required': field.required}
+
+            if hasattr(field, 'min_length'):
+                defaults['min_length'] = field.min_length
+
+            if hasattr(field, 'max_length'):
+                defaults['max_length'] = field.max_length
+
+            if hasattr(field, 'default'):
+                defaults['initial'] = field.default
+
+            defaults.update(kwargs)
+            return forms.CharField(**defaults)

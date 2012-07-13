@@ -21,7 +21,7 @@ MONGODB_DATABASES = {
 }
 
 DATABASES = {
-    'default': {}
+    'default': {'ENGINE': 'django.db.backends.dummy'}
 }
 
 # Local time zone for this installation. Choices can be found here:
@@ -118,14 +118,21 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
     'django_mongoengine.debug_toolbar',
+    'django_mongoengine.admin.sites',
+    'django_mongoengine.admin',
+    'django.contrib.admin',
     'tumblelog'
 )
 
+AUTHENTICATION_BACKENDS = (
+    'django_mongoengine.auth.MongoEngineBackend',
+)
+
+SESSION_ENGINE = 'django_mongoengine.sessions'
 
 DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.version.VersionDebugPanel',
@@ -137,6 +144,10 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.logger.LoggingPanel',
     'django_mongoengine.debug_toolbar.panel.MongoDebugPanel',
 )
+
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False
+}
 
 INTERNAL_IPS = ('127.0.0.1', '10.0.2.2',)
 

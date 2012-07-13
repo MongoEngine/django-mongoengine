@@ -79,6 +79,41 @@ def construct_instance(form, instance, fields=None, exclude=None, ignore=None):
     return instance
 
 
+def save_instance(form, instance, fields=None, fail_message='saved',
+                  commit=True, exclude=None, construct=True):
+    """
+    Saves bound Form ``form``'s cleaned_data into document instance ``instance``.
+
+    If commit=True, then the changes to ``instance`` will be saved to the
+    database. Returns ``instance``.
+
+    If construct=False, assume ``instance`` has already been constructed and
+    just needs to be saved.
+    """
+    instance = construct_instance(form, instance, fields, exclude)
+    if form.errors:
+        raise ValueError("The %s could not be %s because the data didn't"
+                         " validate." % (instance.__class__.__name__,
+                                         fail_message))
+
+    if commit and hasattr(instance, 'save'):
+        # see BaseDocumentForm._post_clean for an explanation
+        if hasattr(form, '_delete_before_save'):
+            fields = instance._fields
+            new_fields = dict([(n, f) for n, f in fields.iteritems()
+                                if not n in form._delete_before_save])
+            if hasattr(instance, '_changed_fields'):
+                for field in form._delete_before_save:
+                    instance._changed_fields.remove(field)
+            instance._fields = new_fields
+            instance.save()
+            instance._fields = fields
+        else:
+            instance.save()
+
+    return instance
+
+
 def document_to_dict(instance, fields=None, exclude=None):
     """
     Returns a dict containing the data in ``instance`` suitable for passing as

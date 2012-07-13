@@ -6,8 +6,8 @@ from django.db.models.options import get_verbose_name
 
 from mongoengine import fields
 
-from django_mongoengine.forms.documentoptions import DocumentMetaWrapper
-from django_mongoengine.forms.util import init_document_options
+from django_mongoengine.forms.document_options import DocumentMetaWrapper
+from django_mongoengine.forms.utils import init_document_options
 
 class RelationWrapper(object):
     """

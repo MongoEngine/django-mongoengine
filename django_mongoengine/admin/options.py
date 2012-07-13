@@ -34,7 +34,7 @@ from django_mongoengine.fields import (DateTimeField, URLField, IntField,
 from django_mongoengine.admin import helpers as mongodb_helpers
 from django_mongoengine.admin.util import RelationWrapper
 
-from django_mongoengine.forms.documentoptions import DocumentMetaWrapper
+from django_mongoengine.forms.document_options import DocumentMetaWrapper
 from django_mongoengine.forms.documents import (
     documentform_factory, DocumentForm,
     inlineformset_factory, BaseInlineDocumentFormSet)

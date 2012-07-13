@@ -11,7 +11,6 @@ from django_mongoengine.utils.module import MongoEngine
 
 __version__ = '0.1'
 
-
 class module(ModuleType):
     """Automatically get attributes from the overloaded MongoEngine class module."""
 
@@ -30,7 +29,6 @@ mongoengine_instance = MongoEngine()
 
 # keep a reference to this module so that it's not garbage collected
 old_module = sys.modules['django_mongoengine']
-
 # setup the new module and patch it into the dict of loaded modules
 new_module = sys.modules['django_mongoengine'] = module('django_mongoengine')
 new_module.__dict__.update({
@@ -42,3 +40,7 @@ new_module.__dict__.update({
     '__all__':          mongoengine_instance.__all__,
     '__docformat__':    'restructuredtext en'
 })
+
+extra_mod_mixins = ('connection', 'document', 'fields', 'queryset', 'signals')
+for mixin in extra_mod_mixins:
+    sys.modules['django_mongoengine.%s' % mixin] = getattr(mongoengine_instance, mixin)

@@ -34,6 +34,7 @@ class MongoEngine(object):
         for alias, conn_settings in settings.MONGODB_DATABASES.items():
             self.connection.register_connection(alias, **conn_settings)
 
+
 class BaseQuerySet(QuerySet):
     """
     A base queryset with handy extras

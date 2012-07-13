@@ -9,7 +9,7 @@ from django.forms.models import BaseModelForm, _get_foreign_key
 from django_mongoengine.forms.documents import (
         DocumentFormMetaclass, fields_for_document, BaseDocumentFormSet
 )
-from django_mongoengine.forms.documentoptions import DocumentMetaWrapper
+from django_mongoengine.forms.document_options import DocumentMetaWrapper
 
 from mongoengine.fields import ListField, EmbeddedDocumentField, ReferenceField
 from mongoengine.base import BaseDocument

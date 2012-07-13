@@ -1,10 +1,13 @@
 from django.conf.urls.defaults import patterns, include, url
 
-from tumblelog.views import PostIndexView, AddPostView, PostDetailView, UpdatePostView, DeletePostView
+from tumblelog.views import (PostIndexView, AddPostView, PostDetailView,
+                             UpdatePostView, DeletePostView)
 
 # # Enable admin
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
+
+from django_mongoengine.admin import site
 
 post_patterns  = patterns('',
     url(r'^$', PostDetailView.as_view(), name="post"),
@@ -14,6 +17,7 @@ post_patterns  = patterns('',
 
 
 urlpatterns = patterns('',
+    url(r'^admin/', include(site.urls)),
     url(r'^$', PostIndexView.as_view(), name="post_index"),
     url(r'^new/$', AddPostView.as_view(), name="post_new"),
     url(r'^new/(?P<post_type>(post|video|image|quote))/$', AddPostView.as_view(), name="post_new"),
