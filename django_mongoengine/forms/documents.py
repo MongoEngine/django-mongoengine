@@ -1,6 +1,7 @@
 import os
 import itertools
 import gridfs
+import datetime
 
 from django.utils.datastructures import SortedDict
 
@@ -395,7 +396,10 @@ class BaseDocumentForm(BaseForm):
         else:
             update = {}
             for name, data in self.cleaned_data.iteritems():
+
                 try:
+                    if isinstance(data, datetime.datetime):
+                        data = data.replace(tzinfo=None)
                     if getattr(self.instance, name) != data:
                         update['set__' + name] = data
                         setattr(self.instance, name, data)
@@ -411,7 +415,6 @@ class BaseDocumentForm(BaseForm):
 
             if commit and update:
                 self.instance.update(**update)
-
         return self.instance
     save.alters_data = True
 

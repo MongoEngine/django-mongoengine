@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
-from django.db import models, transaction, router
+from django.db import models, router
 from django.db.models.related import RelatedObject
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import LOOKUP_SEP, QUERY_TERMS
@@ -280,6 +280,7 @@ class BaseDocumentAdmin(object):
             clean_lookup = LOOKUP_SEP.join(parts)
             return clean_lookup in self.list_filter or clean_lookup == self.date_hierarchy
 
+
 class DocumentAdmin(BaseDocumentAdmin):
     "Encapsulates all admin options and functionality for a given model."
 
@@ -347,6 +348,10 @@ class DocumentAdmin(BaseDocumentAdmin):
         except ImportError:
             pass
 
+        from django.conf import settings
+        self.log = not settings.DATABASES.get('default', {}).get(
+            'ENGINE', 'django.db.backends.dummy').endswith('dummy')
+
     def get_inline_instances(self):
         for f in self.document._fields.itervalues():
             if not (isinstance(f, ListField) and isinstance(getattr(f, 'field', None), EmbeddedDocumentField)) and not isinstance(f, EmbeddedDocumentField):
@@ -379,6 +384,8 @@ class DocumentAdmin(BaseDocumentAdmin):
                 # exclude field from normal form
                 if f.name not in self.exclude:
                     self.exclude.append(f.name)
+            if f.name == 'created_at' and f.name not in self.exclude:
+                self.exclude.append(f.name)
             self.inline_instances.append(inline_instance)
 
     def get_urls(self):
@@ -572,6 +579,8 @@ class DocumentAdmin(BaseDocumentAdmin):
 
         The default implementation creates an admin LogEntry object.
         """
+        if not self.log:
+            return
         from django.contrib.admin.models import LogEntry, ADDITION
         LogEntry.objects.log_action(
             user_id         = request.user.pk,
@@ -587,6 +596,8 @@ class DocumentAdmin(BaseDocumentAdmin):
 
         The default implementation creates an admin LogEntry object.
         """
+        if not self.log:
+            return
         from django.contrib.admin.models import LogEntry, CHANGE
         LogEntry.objects.log_action(
             user_id         = request.user.pk,
@@ -604,6 +615,8 @@ class DocumentAdmin(BaseDocumentAdmin):
 
         The default implementation creates an admin LogEntry object.
         """
+        if not self.log:
+            return
         from django.contrib.admin.models import LogEntry, DELETION
         LogEntry.objects.log_action(
             user_id         = request.user.id,
@@ -771,7 +784,6 @@ class DocumentAdmin(BaseDocumentAdmin):
         Given a model instance save it to the database.
         """
         save_instance(form, obj)
-        #obj.save()
 
     def delete_model(self, request, obj):
         """
@@ -958,7 +970,6 @@ class DocumentAdmin(BaseDocumentAdmin):
 
 
     @csrf_protect_m
-    @transaction.commit_on_success
     def add_view(self, request, form_url='', extra_context=None):
         "The 'add' admin view for this model."
         model = self.model
@@ -1062,7 +1073,6 @@ class DocumentAdmin(BaseDocumentAdmin):
         return self.render_change_form(request, context, form_url=form_url, add=True)
 
     @csrf_protect_m
-    @transaction.commit_on_success
     def change_view(self, request, object_id, extra_context=None):
         "The 'change' admin view for this model."
         model = self.model
@@ -1091,6 +1101,7 @@ class DocumentAdmin(BaseDocumentAdmin):
                 form_validated = False
                 new_object = obj
             prefixes = {}
+            import ipdb; ipdb.set_trace();
             for FormSet, inline in zip(self.get_formsets(request, new_object),
                                        self.inline_instances):
                 prefix = FormSet.get_default_prefix()
@@ -1317,7 +1328,6 @@ class DocumentAdmin(BaseDocumentAdmin):
         ], context, context_instance=context_instance)
 
     @csrf_protect_m
-    @transaction.commit_on_success
     def delete_view(self, request, object_id, extra_context=None):
         "The 'delete' admin view for this model."
         opts = self.model._admin_opts

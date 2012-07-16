@@ -19,6 +19,8 @@ MANAGERS = ADMINS
 MONGODB_DATABASES = {
     'default': {'name': 'django_mongoengine'}
 }
+DJANGO_MONGOENGINE_OVERRIDE_ADMIN = True
+
 
 DATABASES = {
     'default': {'ENGINE': 'django.db.backends.dummy'}

@@ -17,9 +17,9 @@ post_patterns  = patterns('',
 
 
 urlpatterns = patterns('',
-    url(r'^admin/', include(site.urls)),
     url(r'^$', PostIndexView.as_view(), name="post_index"),
     url(r'^new/$', AddPostView.as_view(), name="post_new"),
     url(r'^new/(?P<post_type>(post|video|image|quote))/$', AddPostView.as_view(), name="post_new"),
-    url(r'^(?P<slug>[a-zA-Z0-9-]+)/', include(post_patterns))
+    url(r'^(?P<slug>[a-zA-Z0-9-]+)/', include(post_patterns)),
+    url(r'^admin/', include(site.urls))
 )

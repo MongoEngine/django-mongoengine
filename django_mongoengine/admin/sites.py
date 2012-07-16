@@ -22,6 +22,7 @@ from django_mongoengine.admin import actions, DocumentAdmin
 
 LOGIN_FORM_KEY = 'this_is_the_login_form'
 
+
 class AdminSite(object):
     """
     An AdminSite object encapsulates an instance of the Django admin application, ready
