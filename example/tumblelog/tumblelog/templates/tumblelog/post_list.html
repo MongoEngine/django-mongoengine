@@ -26,16 +26,16 @@
 {% block content %}
     {% for post in posts_list %}
       <h2><a href="{% url 'post' slug=post.slug %}">{{ post.title }}</a></h2>
-      {% if post.post_type == 'p' %}
+      {% if post.post_type == 'BlogPost' %}
         <p>{{ post.body|truncatewords:20 }}</p>
       {% endif %}
-      {% if post.post_type == 'v' %}
+      {% if post.post_type == 'Video' %}
         {{ post.embed_code|safe }}
       {% endif %}
-      {% if post.post_type == 'i' %}
+      {% if post.post_type == 'Image' %}
         <p><img src="{{ post.image_url }}" /><p>
       {% endif %}
-      {% if post.post_type == 'q' %}
+      {% if post.post_type == 'Quote' %}
         <blockquote>{{ post.body|truncatewords:13 }}</blockquote>
         <p>{{ post.author }}</p>
       {% endif %}

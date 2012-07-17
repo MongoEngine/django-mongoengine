@@ -1101,7 +1101,6 @@ class DocumentAdmin(BaseDocumentAdmin):
                 form_validated = False
                 new_object = obj
             prefixes = {}
-            import ipdb; ipdb.set_trace();
             for FormSet, inline in zip(self.get_formsets(request, new_object),
                                        self.inline_instances):
                 prefix = FormSet.get_default_prefix()

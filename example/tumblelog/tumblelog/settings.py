@@ -3,7 +3,7 @@ import sys
 import os
 
 PROJECT_ROOT = os.path.dirname(__file__)
-sys.path.append(os.path.join(PROJECT_ROOT, '../../../'))
+sys.path.insert(0, os.path.realpath(os.path.join(PROJECT_ROOT, '../../../')))
 
 
 DEBUG = True
@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'debug_toolbar',
     'django_mongoengine.debug_toolbar',
+    'django_mongoengine.auth',
     'django_mongoengine.admin.sites',
     'django_mongoengine.admin',
     'django.contrib.admin',
@@ -131,7 +132,7 @@ INSTALLED_APPS = (
 )
 
 AUTHENTICATION_BACKENDS = (
-    'django_mongoengine.auth.MongoEngineBackend',
+    'django_mongoengine.auth.backends.MongoEngineBackend',
 )
 
 SESSION_ENGINE = 'django_mongoengine.sessions'

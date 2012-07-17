@@ -32,9 +32,9 @@ class DocumentMetaWrapper(object):
     """
     _pk = None
     pk_name = None
-    _app_label = None
+    app_label = None
     module_name = None
-    _verbose_name = None
+    verbose_name = None
     has_auto_field = False
     object_name = None
     proxy = []
@@ -46,6 +46,7 @@ class DocumentMetaWrapper(object):
 
     def __init__(self, document):
         self.document = document
+        self.concrete_model = document
         self._meta = document._meta
 
         try:
@@ -54,6 +55,8 @@ class DocumentMetaWrapper(object):
             self.object_name = self.document.__class__.__name__
 
         self.module_name = self.object_name.lower()
+        self.app_label = self.get_app_label()
+        self.verbose_name = self.get_verbose_name()
 
         # EmbeddedDocuments don't have an id field.
         try:
@@ -62,28 +65,21 @@ class DocumentMetaWrapper(object):
         except KeyError:
             pass
 
-    @property
-    def app_label(self):
-        if self._app_label is None:
-            model_module = sys.modules[self.document.__module__]
-            self._app_label = model_module.__name__.split('.')[-2]
-        return self._app_label
+    def get_app_label(self):
+        model_module = sys.modules[self.document.__module__]
+        return model_module.__name__.split('.')[-2]
 
-    @property
-    def verbose_name(self):
+    def get_verbose_name(self):
         """
         Returns the verbose name of the document.
 
         Checks the original meta dict first. If it is not found
         then generates a verbose name from from the object name.
         """
-        if self._verbose_name is None:
-            try:
-                self._verbose_name = capfirst(get_verbose_name(self._meta['verbose_name']))
-            except KeyError:
-                self._verbose_name = capfirst(get_verbose_name(self.object_name))
-
-        return self._verbose_name
+        try:
+            return capfirst(get_verbose_name(self._meta['verbose_name']))
+        except KeyError:
+            return capfirst(get_verbose_name(self.object_name))
 
     @property
     def verbose_name_raw(self):
@@ -158,7 +154,6 @@ class DocumentMetaWrapper(object):
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r'
                     % (self.object_name, name))
-
 
     def _init_field_cache(self):
         if self._field_cache is None:

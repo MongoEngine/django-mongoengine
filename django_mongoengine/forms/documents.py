@@ -58,8 +58,12 @@ def construct_instance(form, instance, fields=None, exclude=None, ignore=None):
         # callable upload_to can use the values from other fields.
         if isinstance(f, FileField) or isinstance(f, ImageField):
             file_field_list.append(f)
-        else:
-            setattr(instance, f.name, cleaned_data[f.name])
+            continue
+
+        if f.primary_key and cleaned_data[f.name] == getattr(instance, f.name):
+            continue
+
+        setattr(instance, f.name, cleaned_data[f.name])
 
     for f in file_field_list:
         upload = cleaned_data[f.name]
