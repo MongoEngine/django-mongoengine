@@ -44,13 +44,22 @@ class BaseQuerySet(QuerySet):
         try:
             return self.get(*args, **kwargs)
         except (MultipleObjectsReturned, DoesNotExist, ValidationError):
-            raise Http404
+            raise Http404('No %s matches the given query.' %
+                            self._document.__name__)
 
-    def first_or_404(self):
-        obj = self.first()
+    def first_or_404(self, *args, **kwargs):
+        obj = self.first(*args, **kwargs)
         if obj is None:
-            raise Http404
+            raise Http404('No %s matches the given query.' %
+                            self._document.__name__)
         return obj
+
+    def get_list_or_404(self, *args, **kwargs):
+        obj_list = list(self.filter(*args, **kwargs))
+        if not obj_list:
+            raise Http404('No %s matches the given query.' %
+                            self._document.__name__)
+        return obj_list
 
     def paginate(self, page, per_page, error_out=True):
         return Pagination(self, page, per_page)
