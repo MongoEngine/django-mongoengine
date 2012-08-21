@@ -3,9 +3,11 @@ from django.core.validators import EMPTY_VALUES
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.translation import ugettext_lazy as _
 
+from django_mongoengine.forms.widgets import Dictionary
+
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
-
+import pdb
 
 class MongoChoiceIterator(object):
     def __init__(self, field):
@@ -141,3 +143,32 @@ class DocumentMultipleChoiceField(ReferenceField):
         if hasattr(value, '__iter__') and not hasattr(value, '_meta'):
             return [super(DocumentMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(DocumentMultipleChoiceField, self).prepare_value(value)
+
+#TODO define a DictField
+class DictField(forms.Field):
+    """
+    DictField for mongo forms
+    """
+
+    #TODO : how to add another row to a Dict ?
+
+    def __init__(self, initial=None, *args, **kwargs):
+        super(DictField,self).__init__(*args, **kwargs)
+        self.initial = initial
+        self.widget = Dictionary(widgets=self.initial.keys())
+        #try with initial ; after it won't be this one that would be another, but which ?
+
+    def prepare_value(self,value):
+        return value
+
+    def to_python(self,value):
+        #pdb.set_trace()
+        return dict(zip(self.initial, value))
+        #return value
+
+    def clean(self, value):
+        #pdb.set_trace()
+        value = self.to_python(value)
+        #self.validate(value)
+        #self.run_validators(value)
+        return value
