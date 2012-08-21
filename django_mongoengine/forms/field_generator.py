@@ -6,7 +6,7 @@ from django.utils.text import capfirst
 
 from mongoengine import ReferenceField as MongoReferenceField
 
-from fields import MongoCharField, ReferenceField, DocumentMultipleChoiceField
+from fields import MongoCharField, ReferenceField, DocumentMultipleChoiceField, DictField
 
 BLANK_CHOICE_DASH = [("", "---------")]
 
@@ -259,6 +259,17 @@ class MongoFormFieldGenerator(object):
     def generate_imagefield(self, field, **kwargs):
         return forms.ImageField(**kwargs)
 
+    #TODO def generate_dictfield
+    def generate_dictfield(self, field, **kwargs):
+        defaults = {
+            'required': field.required,
+            'initial': field.default,
+            'label': self.get_field_label(field),
+            'help_text': self.get_field_help_text(field),
+            #'item_count': field.count(),
+        }
+        return DictField(**defaults)
+        #return CharField(**defaults)
 
 class MongoDefaultFormFieldGenerator(MongoFormFieldGenerator):
     """This class generates Django form-fields for mongoengine-fields."""
