@@ -42,7 +42,8 @@ class DocumentMetaWrapper(object):
     many_to_many = []
     _field_cache = None
     document = None
-    _meta = None
+    #don't know why it bugs for me
+    _meta = {}
 
     def __init__(self, document):
         self.document = document
