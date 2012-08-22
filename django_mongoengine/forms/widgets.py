@@ -8,14 +8,18 @@ class Dictionary(MultiWidget):
 	A widget representing a dictionary field
 	"""
 
-	widgets_names = []
-
-	def __init__(self, widgets, attrs=None):
+	def __init__(self, keys, min_length, attrs=None):
 		#pdb.set_trace()
+		#have a politic here : if widgets, then check if value pairing name/value
+		# if no widget, only one row to begin (or if attribute min_length ?)
 		widget_object = []
-		for k in widgets:
-			widget_object.append(TextInput())
-			self.widgets_names.append(k)
+		if keys:
+			for k in keys:
+				widget_object.append(Pair(key=k,attrs=attrs))
+		else:
+			for i in range(min_length):
+				widget_object.append(Pair(attrs=attrs))
+		self.attrs = attrs
 		super(Dictionary, self).__init__(widget_object,attrs)
 
 	#TODO implement the render method : take a dict as value and display a list of inputs ?
