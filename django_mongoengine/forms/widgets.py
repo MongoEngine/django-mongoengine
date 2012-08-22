@@ -34,6 +34,30 @@ class Dictionary(MultiWidget):
 		if self.is_localized:
 			for widget in self.widgets:
 				widget.is_localized = self.is_localized
+class Pair(MultiWidget):
+	"""
+	A widget representing a key-value pair in a dictionary
+	"""
+
+	#default for a pair
+	key_type = TextInput
+	value_type = TextInput
+
+	def __init__(self, key=None, attrs=None):
+		widgets = [self.key_type(),self.value_type()]
+		super(Pair, self).__init__(widgets,attrs)
+
+	#this method should be overwritten by subclasses
+	def decompress(self, value):
+		if value is not None:
+			return list(value)
+		else:
+			return ['','']
+
+	def render(self, name, value, attrs=None):
+		if self.is_localized:
+			for widget in self.widgets:
+				widgets.is_localized = self.is_localized
 		if not isinstance(value,list):
 			value = self.decompress(value)
 		output = []
@@ -45,16 +69,14 @@ class Dictionary(MultiWidget):
 			except IndexError:
 				widget_value = None
 			if id_:
-				final_attrs = dict(final_attrs, id='%s_%s' % (id_, self.widgets_names[i]))
-			output.append(widget.render(name + '_%s' % self.widgets_names[i], widget_value, final_attrs))
+				final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
+			output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
 		return mark_safe(self.format_output(output))
 
 	def value_from_datadict(self, data, files, name):
-		return [widget.value_from_datadict(data, files, name + '_%s' % self.widgets_names[i]) for i, widget in enumerate(self.widgets)]
+		return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
+	#markup to be added (how?)
 	def format_output(self, rendered_widgets):
 		#pdb.set_trace()
-		format = '<div>'
-		for i, rendered_widget in enumerate(rendered_widgets):
-			format += '<div><br/><label>%s</label>' % self.widgets_names[i] + rendered_widget + '</div>'
-		return format+'</div>'
+		return '<li>'+ ' : '.join(rendered_widgets) +'</li>'
