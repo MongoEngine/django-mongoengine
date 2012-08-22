@@ -29,11 +29,20 @@ class Dictionary(MultiWidget):
 	def decompress(self, value):
 		return [value[name] for name in self.widgets_names]
 
+			#if there are not enough pairs to render the widget, we need to update it, and add pairs
+			delta = len(value) - len(self.widgets)
+			if delta > 0:
+				self.update_widgets(value[1:delta+1])
+			return value
 	def render(self, name, value, attrs=None):
 		#pdb.set_trace()
 		if self.is_localized:
 			for widget in self.widgets:
 				widget.is_localized = self.is_localized
+	def update_widgets(self,keys=1):
+		for k in keys:
+			self.widgets.append(Pair(key=k, attrs=self.attrs))
+
 class Pair(MultiWidget):
 	"""
 	A widget representing a key-value pair in a dictionary
