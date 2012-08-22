@@ -153,10 +153,18 @@ class DictField(forms.Field):
     #TODO : how to add another row to a Dict ?
 
     def __init__(self, initial=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(DictField,self).__init__(*args, **kwargs)
         self.initial = initial
         self.widget = Dictionary(widgets=self.initial.keys())
         #try with initial ; after it won't be this one that would be another, but which ?
+        keys = []
+        #pdb.set_trace()
+        #if no default value is provided, default is callable
+        if not callable(self.initial):
+            if isinstance(self.initial,dict):
+                keys = self.initial.keys()
+        self.widget = Dictionary(keys=keys, min_length=3)
 
     def prepare_value(self,value):
         return value
