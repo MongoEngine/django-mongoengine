@@ -171,8 +171,10 @@ class DictField(forms.Field):
 
     def to_python(self,value):
         #pdb.set_trace()
-        return dict(zip(self.initial, value))
-        #return value
+        #here we do it with initial ; if initial provided, several cases : nothing, only keys or keys+value pairing
+        value = dict(value)
+        value.pop("",True)
+        return value
 
     def clean(self, value):
         #pdb.set_trace()
