@@ -8,6 +8,8 @@ from mongoengine import ReferenceField as MongoReferenceField
 
 from fields import MongoCharField, ReferenceField, DocumentMultipleChoiceField, DictField
 
+import pdb
+
 BLANK_CHOICE_DASH = [("", "---------")]
 
 
@@ -261,6 +263,9 @@ class MongoFormFieldGenerator(object):
 
     #TODO def generate_dictfield
     def generate_dictfield(self, field, **kwargs):
+
+        #pdb.set_trace()
+
         defaults = {
             'required': field.required,
             'initial': field.default,

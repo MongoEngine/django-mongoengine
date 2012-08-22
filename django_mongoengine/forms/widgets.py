@@ -27,18 +27,46 @@ class Dictionary(MultiWidget):
 	#TODO implement the value_from_datadict method if needed : it gets data from POST
 	#TODO : get the value from the different widgets with decompress
 	def decompress(self, value):
-		return [value[name] for name in self.widgets_names]
-
+		#pdb.set_trace()
+		if value and isinstance(value,dict):
+			#we return a list of tuples
+			value = value.items()
+			value.sort()
 			#if there are not enough pairs to render the widget, we need to update it, and add pairs
 			delta = len(value) - len(self.widgets)
 			if delta > 0:
 				self.update_widgets(value[1:delta+1])
 			return value
+		else:
+			return []
 	def render(self, name, value, attrs=None):
 		#pdb.set_trace()
+		if not isinstance(value,list):
+			value = self.decompress(value)
 		if self.is_localized:
 			for widget in self.widgets:
 				widget.is_localized = self.is_localized
+		output = []
+		final_attrs = self.build_attrs(attrs)
+		id_ = final_attrs.get('id',None)
+		for i, widget in enumerate(self.widgets):
+			try:
+				widget_value = value[i]
+			except IndexError:
+				widget_value = None
+			if id_:
+				final_attrs = dict(final_attrs, id='%s_%s_pair' % (id_, i))
+			output.append(widget.render(name + '_%s_pair' % i, widget_value, final_attrs))
+		return mark_safe(self.format_output(output))
+
+	def value_from_datadict(self, data, files, name):
+		return [widget.value_from_datadict(data, files, name + '_%s_pair' % i) for i, widget in enumerate(self.widgets)]
+
+	#markup to be added (how?)
+	def format_output(self, rendered_widgets):
+		#pdb.set_trace()
+		return '<ul>'+ ''.join(rendered_widgets) +'</ul>'
+
 	def update_widgets(self,keys=1):
 		for k in keys:
 			self.widgets.append(Pair(key=k, attrs=self.attrs))
