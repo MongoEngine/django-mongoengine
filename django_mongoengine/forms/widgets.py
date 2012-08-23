@@ -113,7 +113,25 @@ class Pair(MultiWidget):
 	def value_from_datadict(self, data, files, name):
 		return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
-	#markup to be added (how?)
 	def format_output(self, rendered_widgets):
 		#pdb.set_trace()
-		return '<li>'+ ' : '.join(rendered_widgets) +'</li>'
+		return '<li>'+ ' : '.join(rendered_widgets) +'</li>\n'
+
+class SubDictionary(Pair):
+	"""
+	A widget representing a key-value pair in a dictionary, where value is a dictionary
+	"""
+
+	key_type = TextInput
+	value_type = Dictionary
+	suffix = 'subdict'
+	no_schema = False
+
+	def __init__(self, schema={'key':'value'}, no_schema=False, attrs=None):
+		self.no_schema = no_schema
+		super(SubDictionary, self).__init__(attrs, schema=schema, no_schema=no_schema)
+
+	#TODO
+	#def decompress(self,value):
+		#pdb.set_trace()
+		#pass
