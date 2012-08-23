@@ -150,27 +150,50 @@ class DictField(forms.Field):
     DictField for mongo forms
     """
 
+    #Do we need widget_attrs method ?
     #TODO : how to add another row to a Dict ?
 
     def __init__(self, *args, **kwargs):
         super(DictField,self).__init__(*args, **kwargs)
-        keys = []
+        #keys = []
         #pdb.set_trace()
         #if no default value is provided, default is callable
+        #we don't need the list of keys here, but the schema entered by default
+        schema = {
+            'key':  'value',
+            'key2': {
+                'keykey':'value',
+                'kk' : {
+                    'coco':'kiki',
+                    'coco': 'caca'
+                    }
+                },
+            'key3': 'value'
+            }
         if not callable(self.initial):
             if isinstance(self.initial,dict):
-                keys = self.initial.keys()
-        self.widget = Dictionary(keys=keys, min_length=3)
+                schema = self.initial
+        self.widget = Dictionary()
 
     def prepare_value(self,value):
+        #pdb.set_trace()
         return value
 
     def to_python(self,value):
         #pdb.set_trace()
-        #here we do it with initial ; if initial provided, several cases : nothing, only keys or keys+value pairing
-        value = dict(value)
-        value.pop("",True)
+        value = self.get_dict(value)
+        #value.pop("",True)
         return value
+
+    def get_dict(self, a_list):
+        d = {}
+        for k in a_list:
+            if (isinstance(k,list)):
+                if isinstance(k[1],list):
+                    d.update({k[0]: self.get_dict(k[1])})
+                elif k[0]:
+                    d.update({k[0]: k[1]})
+        return d
 
     def clean(self, value):
         #pdb.set_trace()
