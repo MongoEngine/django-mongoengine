@@ -16,6 +16,20 @@ class Dictionary(MultiWidget):
 	#because in this case, we would be able to rebuild it using SubDictionary
 	def __init__(self, schema={'key':'value'}, no_schema=False, attrs=None):
 		#pdb.set_trace()
+	def __init__(self, schema=None, no_schema=1, attrs=None):
+		
+		# schema -- A dictionary representing the future schema of
+		#			the Dictionary widget. It is responsible for the
+		#			creation of subwidgets.
+		# no_schema -- An integer that can take 3 values : 0,1,2.
+		#			   0 means that no schema was passed.
+		#			   1 means that the schema passed was the default
+		#			   one. This is the default value.
+		#			   2 means that the schema passed was given
+		#			   by a parent widget, and that it actually
+		#			   represent data for rendering.
+		#			   3 means that the schema was rebuilt after
+		#			   retrieving form data.
 
 		#PROBLEM HERE : if set to no_schema, it works when displaying but don't save the data correctly
 
