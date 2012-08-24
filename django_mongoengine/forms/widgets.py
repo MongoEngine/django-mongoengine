@@ -4,6 +4,9 @@ from django.utils.safestring import mark_safe
 import re
 import pdb
 
+#the list of JavaScript files to insert to render any Dictionary widget
+MEDIAS = ('jquery-1.8.0.min.js','dict.js')
+
 class Dictionary(MultiWidget):
 	"""
 	A widget representing a dictionary field
