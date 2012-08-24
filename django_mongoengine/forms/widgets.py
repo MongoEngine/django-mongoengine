@@ -14,8 +14,6 @@ class Dictionary(MultiWidget):
 
 	#we shouldn't pass only the keys but the whole default dictionary,
 	#because in this case, we would be able to rebuild it using SubDictionary
-	def __init__(self, schema={'key':'value'}, no_schema=False, attrs=None):
-		#pdb.set_trace()
 	def __init__(self, schema=None, no_schema=1, attrs=None):
 		
 		# schema -- A dictionary representing the future schema of
@@ -31,11 +29,11 @@ class Dictionary(MultiWidget):
 		#			   3 means that the schema was rebuilt after
 		#			   retrieving form data.
 
-		#PROBLEM HERE : if set to no_schema, it works when displaying but don't save the data correctly
+		#pdb.set_trace()
 
 		self.no_schema = no_schema
 		widget_object = []
-		if isinstance(schema,dict) and not self.no_schema:
+		if isinstance(schema,dict) and self.no_schema > 0:
 			for key in schema:
 				if isinstance(schema[key],dict):
 					widget_object.append(SubDictionary(schema=schema[key],attrs=attrs))
@@ -63,25 +61,28 @@ class Dictionary(MultiWidget):
 	def decompress(self, value):
 		#pdb.set_trace()
 		if value and isinstance(value,dict):
-			#we return a list of tuples
+			#'sort' a dict... recursively
+
 			value = value.items()
-			value.sort()
+
 			#if there are not enough pairs to render the widget, we need to update it, and add pairs
 			delta = len(value) - len(self.widgets)
-			#pdb.set_trace()
-			if self.no_schema:
+			#if the schema in place wasn't passed by a parent widget, we need to rebuild it
+			if self.no_schema < 2:
 				self.update_widgets(value,erase=True)
 			else:
-				if delta > 0:
-					self.update_widgets(value[1:delta+1])
+				pass
+			# 	if delta > 0:
+			# 		self.update_widgets(value[1:delta+1])
 			return value
 		else:
 			return []
 
 	def render(self, name, value, attrs=None):
 		#pdb.set_trace()
+		positions = range(len(value))
 		if not isinstance(value,list):
-			value = self.decompress(value)
+			(value, positions) = self.decompress(value)
 		if self.is_localized:
 			for widget in self.widgets:
 				widget.is_localized = self.is_localized
@@ -90,7 +91,7 @@ class Dictionary(MultiWidget):
 		id_ = final_attrs.get('id')
 		for i, widget in enumerate(self.widgets):
 			try:
-				widget_value = value[i]
+				widget_value = value[positions[i]]
 			except IndexError:
 				widget_value = None
 			suffix = widget.suffix
@@ -101,27 +102,28 @@ class Dictionary(MultiWidget):
 		return mark_safe(self.format_output(name, output))
 
 	def value_from_datadict(self, data, files, name):
-		pdb.set_trace()
+		# I think the best solution here is to start from scratch, i mean :
+		# 	- erase every widget ;
+		#	- create the new ones from the data dictionary
+		# It would take into account every modification on the structure, and
+		# make form repopulation automatic
+
+		#pdb.set_trace()
 		data_keys = data.keys()
-		#how initialize no_schema : always tRUE ?
-		base = 0 if self.no_schema else len(self.widgets)
+		self.widgets = []
+		html_indexes = []
 
 		for data_key in data_keys:
-			match = re.match(name+'_(([%s-9])|([1-9]\d+))_pair_0' % base,data_key)
+			match = re.match(name+'_(\d+)_pair_0',data_key)
 			if match is not None:
-				if self.no_schema:
-					self.widgets = []
-					self.no_schema = False
 				self.widgets.append(Pair(attrs=self.attrs))
+				html_indexes.append(match.group(1))
 			else:
-				match = re.match(name+'_(([%s-9])|([1-9]\d+))_subdict_0' % base,data_key)
+				match = re.match(name+'_(\d+)_subdict_0',data_key)
 				if match is not None:
-					if self.no_schema:
-						self.widgets = [SubDictionary(no_schema=True, attrs=self.attrs)]
-						self.no_schema = False
-					else:
-						self.widgets.append(SubDictionary(no_schema=True, attrs=self.attrs))
-		return [widget.value_from_datadict(data, files, name + '_%s_%s' % (i,widget.suffix)) for i, widget in enumerate(self.widgets)]
+						self.widgets.append(SubDictionary(no_schema=0, attrs=self.attrs))
+						html_indexes.append(match.group(1))
+		return [widget.value_from_datadict(data, files, name + '_%s_%s' % (html_indexes[i],widget.suffix)) for i, widget in enumerate(self.widgets)]
 
 	def format_output(self, name, rendered_widgets):
 		#pdb.set_trace()
@@ -129,19 +131,21 @@ class Dictionary(MultiWidget):
 			   '<span id="add_id_%s" class="add_dictionary">Add field</span> - ' % (self.id_for_label(name)) + \
 			   '<span id="add_sub_id_%s" class="add_sub_dictionary">Add subdictionary</span>' % (self.id_for_label(name))
 
-	def update_widgets(self,keys=1,erase=False):
+	def update_widgets(self,keys,erase=False):
 		#pdb.set_trace()
 		if erase:
 			self.widgets = []
 		for k in keys:
 			if (isinstance(k[1],dict)):
-				self.widgets.append(SubDictionary(schema=k[1], attrs=self.attrs))
+				self.widgets.append(SubDictionary(schema=k[1], no_schema=2, attrs=self.attrs))
 			else:
 				self.widgets.append(Pair(attrs=self.attrs))
 
 	def _get_media(self):
-		"Mimic the MultiWidget '_get_media' method, adding other media"
-		media = Media(js=('jquery-1.8.0.min.js','dict.js'))
+		"""
+		Mimic the MultiWidget '_get_media' method, adding other media
+		"""
+		media = Media(js=MEDIAS)
 		for w in self.widgets:
 			media = media + w.media
 		return media
@@ -173,6 +177,7 @@ class Pair(MultiWidget):
 			return ['','']
 
 	def render(self, name, value, attrs=None):
+		#pdb.set_trace()
 		if self.is_localized:
 			for widget in self.widgets:
 				widgets.is_localized = self.is_localized
@@ -204,17 +209,15 @@ class SubDictionary(Pair):
 	"""
 	A widget representing a key-value pair in a dictionary, where value is a dictionary
 	"""
-
 	key_type = TextInput
 	value_type = Dictionary
 	suffix = 'subdict'
-	no_schema = False
 
-	def __init__(self, schema={'key':'value'}, no_schema=False, attrs=None):
-		self.no_schema = no_schema
+	def __init__(self, schema={'key':'value'}, no_schema=1, attrs=None):
 		super(SubDictionary, self).__init__(attrs, schema=schema, no_schema=no_schema)
 
-	#TODO
-	#def decompress(self,value):
-		#pdb.set_trace()
-		#pass
+	def decompress(self,value):
+		if value is not None:
+			return list(value)
+		else:
+			return ['',{}]

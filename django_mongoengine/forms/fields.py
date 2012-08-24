@@ -173,7 +173,7 @@ class DictField(forms.Field):
         if not callable(self.initial):
             if isinstance(self.initial,dict):
                 schema = self.initial
-        self.widget = Dictionary()
+        self.widget = Dictionary(schema=schema)
 
     def prepare_value(self,value):
         #pdb.set_trace()
@@ -185,7 +185,17 @@ class DictField(forms.Field):
         #value.pop("",True)
         return value
 
+    def clean(self, value):
+        #pdb.set_trace()
+        value = self.to_python(value)
+        #self.validate(value)
+        #self.run_validators(value)
+        return value
+
     def get_dict(self, a_list):
+        """
+        A function that return a dictionary from a list of lists, with any depth
+        """
         d = {}
         for k in a_list:
             if (isinstance(k,list)):
@@ -194,10 +204,3 @@ class DictField(forms.Field):
                 elif k[0]:
                     d.update({k[0]: k[1]})
         return d
-
-    def clean(self, value):
-        #pdb.set_trace()
-        value = self.to_python(value)
-        #self.validate(value)
-        #self.run_validators(value)
-        return value
