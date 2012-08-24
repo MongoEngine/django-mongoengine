@@ -1,6 +1,7 @@
 from django.forms.widgets import TextInput, MultiWidget, Media
 from django.utils.safestring import mark_safe
 
+from collections import OrderedDict
 import re
 import pdb
 
@@ -61,8 +62,7 @@ class Dictionary(MultiWidget):
 	def decompress(self, value):
 		#pdb.set_trace()
 		if value and isinstance(value,dict):
-			#'sort' a dict... recursively
-
+			value = self.dict_sort(value)
 			value = value.items()
 
 			#if there are not enough pairs to render the widget, we need to update it, and add pairs
@@ -70,19 +70,14 @@ class Dictionary(MultiWidget):
 			#if the schema in place wasn't passed by a parent widget, we need to rebuild it
 			if self.no_schema < 2:
 				self.update_widgets(value,erase=True)
-			else:
-				pass
-			# 	if delta > 0:
-			# 		self.update_widgets(value[1:delta+1])
 			return value
 		else:
 			return []
 
 	def render(self, name, value, attrs=None):
 		#pdb.set_trace()
-		positions = range(len(value))
 		if not isinstance(value,list):
-			(value, positions) = self.decompress(value)
+			value = self.decompress(value)
 		if self.is_localized:
 			for widget in self.widgets:
 				widget.is_localized = self.is_localized
@@ -91,7 +86,7 @@ class Dictionary(MultiWidget):
 		id_ = final_attrs.get('id')
 		for i, widget in enumerate(self.widgets):
 			try:
-				widget_value = value[positions[i]]
+				widget_value = value[i]
 			except IndexError:
 				widget_value = None
 			suffix = widget.suffix
@@ -150,6 +145,17 @@ class Dictionary(MultiWidget):
 			media = media + w.media
 		return media
 	media = property(_get_media)
+
+	def dict_sort(self,d):
+		if isinstance(d,dict):
+			l = d.items()
+			l.sort()
+			k = OrderedDict()
+			for item in l:
+				k[item[0]] = self.dict_sort(item[1])
+			return k
+		else:
+			return d
 
 class Pair(MultiWidget):
 	"""
