@@ -173,7 +173,7 @@ class DictField(forms.Field):
         if not callable(self.initial):
             if isinstance(self.initial,dict):
                 schema = self.initial
-        self.widget = Dictionary(schema=schema)
+        self.widget = Dictionary()
 
     def prepare_value(self,value):
         #pdb.set_trace()

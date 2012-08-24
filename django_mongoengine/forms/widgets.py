@@ -123,7 +123,7 @@ class Dictionary(MultiWidget):
 	def format_output(self, name, rendered_widgets):
 		#pdb.set_trace()
 		return '<ul id="id_%s" class="dictionary">\n' % (self.id_for_label(name)) + ''.join(rendered_widgets) +'</ul>\n'+ \
-			   '<span id="add_id_%s" class="add_dictionary">Add field</span> - ' % (self.id_for_label(name)) + \
+			   '<span id="add_id_%s" class="add_pair_dictionary">Add field</span> - ' % (self.id_for_label(name)) + \
 			   '<span id="add_sub_id_%s" class="add_sub_dictionary">Add subdictionary</span>' % (self.id_for_label(name))
 
 	def update_widgets(self,keys,erase=False):
