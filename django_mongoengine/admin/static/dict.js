@@ -1,5 +1,7 @@
 $(document).ready(function(){
-	//var dictionaries = new Array();
+	/*
+		Those array are useful to keep track of the different ids
+	*/
 	var prefixes = new Array();
 	var next_pair_ids = new Array();
 	var next_dict_ids = new Array();
@@ -7,17 +9,19 @@ $(document).ready(function(){
 
 	var id;
 
+	/*
+		Initialization
+	*/
 	dictionary_ul.each(function(index){
-		//id = $(this).attr('id');
 		var el = $(this);
 		save_arrays(el);
 		console.log('-----------INIT-----------');
-		//console.log('-dict     : '+dictionaries[el.attr('id')]);
-		console.log('-prefixes : '+prefixes[el.attr('id')]);
-		console.log('-pair id  : '+next_pair_ids[el.attr('id')]);
-		console.log('-dict id  : '+next_dict_ids[el.attr('id')]);
 		console.log('---------END INIT---------');
 	});
+
+	print_array(prefixes,'prefixes');
+	print_array(next_pair_ids,'pairs ids');
+	print_array(next_dict_ids,'dict ids');
 
 	/*
 		Save array information
@@ -36,46 +40,54 @@ $(document).ready(function(){
 		when pair is added
 	*/
 	function pair_update_arrays(id){
+		console.log('--------PAIR UPDATE--------');
 		el = $('#'+id);
 		el.append(get_pair(next_pair_ids[id]));
 		i = parseInt(next_pair_ids[id].substring(prefixes[id].length,next_pair_ids[id].length-5)) + 1;
+		console.log('i = '+i);
 		next_pair_ids[id] = prefixes[id] + i + '_pair_';
 		next_dict_ids[id] = prefixes[id] + i + '_subdict_';
+
+		print_array(prefixes,'prefixes');
+		print_array(next_pair_ids,'pairs ids');
+		print_array(next_dict_ids,'dict ids');
 	}
 
 	/*
 		Update array information and append HTML
 		when subdictionary is added
 	*/
-
-	//TO VERIFY
-
-
 	function dict_update_arrays(id){
+		console.log('--------DICT UPDATE--------');
 		el = $('#'+id);
 		el.append(get_dict(next_dict_ids[id]));
+		i = parseInt(next_dict_ids[id].substring(prefixes[id].length,next_dict_ids[id].length-8)) + 1;
+		console.log('i = '+i);
+
 		var new_id = next_dict_ids[id] + '1_0';
 		
-		//Event Binding
+		prefixes[new_id] = next_dict_ids[id] + '1_';
+		next_pair_ids[new_id] = prefixes[new_id] + '1_pair_';
+		next_dict_ids[new_id] = prefixes[new_id] + '1_subdict_';
+
+		print_array(prefixes,'prefixes');
+		print_array(next_pair_ids,'pairs ids');
+		print_array(next_dict_ids,'dict ids');
+
+		//Event Binding for new dictionary
 		$('#add_pair_'+ new_id).click(function(){
 			console.log('--------CLICK INNER--------');
-			//prefixes[id] = id.substring(0,id.length-1);
-			console.log('next_dicts_ids : ' + next_dict_ids[id]);
-			prefixes[new_id] = next_dict_ids[id] + '1_'
 			pair_update_arrays(new_id);
 			console.log('---------END CLICK---------');
 		});
 		$('#add_sub_'+ new_id).click(function(){
 			console.log('--------CLICK INNER--------');
-			//prefixes[id] = id.substring(0,id.length-1);
-			console.log('next_dicts_ids : ' + next_dict_ids[id]);
-			prefixes[new_id] = next_dict_ids[id] + '1_'
 			dict_update_arrays(new_id);
 			console.log('---------END CLICK---------');
 		});
 
-		next_pair_ids[new_id] = prefixes[new_id] + '1_pair_';
-		next_dict_ids[new_id] = prefixes[new_id] + '1_subdict_';
+		next_pair_ids[id] = prefixes[id] + i + '_pair_';
+		next_dict_ids[id] = prefixes[id] + i + '_subdict_';
 	}
 
 	/*
@@ -87,18 +99,20 @@ $(document).ready(function(){
 		console.log('id     : '+ id);
 		console.log('prefix : '+ prefix);
 		var n_type = id.substring(prefix.length);
+		var first;
 
 		if ((i = n_type.search('pair')) > 0){
-			var first = prefix + (parseInt(n_type.substring(0,i))+1);
+			first = prefix + (parseInt(n_type.substring(0,i))+1);
 			console.log('---------END GET NEXT IDS---------');
 			return Array(first+'_pair_',first+'_subdict_');
 		}
 		else if ((i = n_type.search('subdict')) > 0){
-			var first = prefix + (parseInt(u.substring(0,i))+1);
+			first = prefix + (parseInt(n_type.substring(0,i))+1);
 			console.log('---------END GET NEXT IDS---------');
 			return Array(first+'_pair_',first+'_subdict_');
 		}
 		console.log('--------ERROR GET NEXT IDS--------');
+		return '';
 	}
 
 	/*
@@ -121,7 +135,7 @@ $(document).ready(function(){
 		subdict += '<ul id="'+ id +'1_0" class="dictionary">';
 		subdict += '<li><input type="text" name="'+ id.substring(3) +'1_0_pair_0" id="'+ id +'1_0_pair_0"/> : ';
 		subdict += '<input type="text" name="'+ id.substring(3) +'1_0_pair_1" id="'+ id +'1_0_pair_1"/></li></ul>';
-		subdict += '<span id="add_pair_'+ id +'1_0" class="add_pair_dictionary">Add field</span> -'
+		subdict += '<span id="add_pair_'+ id +'1_0" class="add_pair_dictionary">Add field</span> - '
 		subdict += '<span id="add_sub_'+ id +'1_0" class="add_sub_dictionary">Add subdictionary</span></li>';
 		return subdict;
 	}
@@ -147,4 +161,15 @@ $(document).ready(function(){
 		dict_update_arrays(id);
 		console.log('---------END CLICK---------');
 	});
+
+	function print_array(a,name){
+		console.log('--------------------');
+		if ($.isArray(a)){
+			for (var key in a){
+				if (key === 'length' || !a.hasOwnProperty(key)) continue;
+    			console.log(name+'['+key+'] = '+a[key]);
+			}
+		}
+	}
+
 });
