@@ -201,16 +201,16 @@ class Pair(MultiWidget):
 			if id_:
 				final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
 			output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
-		return mark_safe(self.format_output(output))
+		return mark_safe(self.format_output(output,name))
 
 	def value_from_datadict(self, data, files, name):
 		#pdb.set_trace()
 		## TO CHECK FOR SUBDICT
 		return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
-	def format_output(self, rendered_widgets):
+	def format_output(self, rendered_widgets, name):
 		#pdb.set_trace()
-		return '<li>'+ ' : '.join(rendered_widgets) +'</li>\n'
+		return '<li>'+ ' : '.join(rendered_widgets) +'<span class="del_pair" id="del_%s"> - Delete</span></li>\n' % name
 
 class SubDictionary(Pair):
 	"""
@@ -228,3 +228,7 @@ class SubDictionary(Pair):
 			return list(value)
 		else:
 			return ['', {}]
+
+	def format_output(self, rendered_widgets, name):
+		#pdb.set_trace()
+		return '<li>'+ ' : '.join(rendered_widgets) +'<span class="del_dict" id="del_%s"> - Delete</span></li>\n' % name

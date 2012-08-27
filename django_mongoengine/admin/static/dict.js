@@ -24,6 +24,30 @@ $(document).ready(function(){
 	print_array(next_dict_ids,'dict ids');
 
 	/*
+		Hiding the Delete buttons where dictionaries
+		only have one child
+	*/
+
+	$('.del_pair').each(function(){
+		var id = 'id' + $(this).attr('id').substring(3) + '_0';
+		var parent = $("ul:has(>li >#"+id+")")
+
+		if (parent.children("li").size() == 1){
+			console.log('---------NO DEL---------');
+			$(this).hide();
+		}
+	});	
+
+	$('.del_dict').each(function(){
+		var id = 'id' + $(this).attr('id').substring(3) + '_0';
+		var parent = $("ul:has(>li >#"+id+")")
+		if (parent.children("li").size() == 1){
+			console.log('---------NO DEL---------');
+			$(this).hide();
+		}
+	});
+
+	/*
 		Save array information
 	*/
 	function save_arrays(el){
@@ -122,7 +146,8 @@ $(document).ready(function(){
 		console.log('--------GET PAIR-------->');
 		console.log('id : '+id);
 		return '<li><input type="text" name="'+ id.substring(3) +'0" id="'+ id +'0"/> : '+
-			   '<input type="text" name="'+ id.substring(3) +'1" id="'+ id +'1"/></li>';
+			   '<input type="text" name="'+ id.substring(3) +'1" id="'+ id +'1"/>'+
+			   '<span class="del_pair" id="'+ id.substring(3,id.length-1) +'"> - Delete</span></li>';
 	}
 
 	/*
@@ -171,4 +196,53 @@ $(document).ready(function(){
 			}
 		}
 	}
+
+	/*
+		Delete a sub-dictionary
+	*/
+
+	$('.del_pair').click(function(){
+		console.log('---------DEL CLICK---------');
+		var id = 'id' + $(this).attr('id').substring(3) + '_0';
+		var parent = $("ul:has(>li >#"+id+")")
+		var parent_dict = parent.attr('id');
+
+		console.log('id :' + id);
+		console.log('parent dict :' + parent_dict);
+		if (parent.children("li").size() > 1){
+			$("li:has(>#"+ id +")").remove();
+			next_pair_ids[parent_dict] = id;
+			next_dict_ids[parent_dict] = id.substring(0,id.length-6) + 'subdict_0';
+		}
+		
+		if (parent.children("li").size() == 1){
+			console.log('---------NO DEL---------');
+			parent.children('li').children('span').hide();
+		}
+	});
+
+	/*
+		Delete a sub-dictionary
+	*/
+
+	$('.del_dict').click(function(){
+		console.log('-------DEL CLICK DICT-------');
+		var id = 'id' + $(this).attr('id').substring(3) + '_0';
+		var parent = $("ul:has(>li >#"+id+")")
+		var parent_dict = parent.attr('id');
+
+		console.log('id :' + id);
+		console.log('parent dict :' + parent_dict);
+		if (parent.children("li").size() > 1){
+			$("li:has(>#"+ id +")").remove();
+			next_pair_ids[parent_dict] = id.substring(0,id.length-9) + 'pair_0';
+			next_dict_ids[parent_dict] = id;
+		}
+		
+		if (parent.children("li").size() == 1){
+			console.log('---------NO DEL---------');
+			parent.children('li').children('span').hide();
+		}
+	});
+
 });

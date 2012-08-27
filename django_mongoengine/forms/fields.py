@@ -157,23 +157,23 @@ class DictField(forms.Field):
         super(DictField,self).__init__(*args, **kwargs)
         #keys = []
         #pdb.set_trace()
+        # schema = {
+        #     'key':  'value',
+        #     'key2': {
+        #         'keykey':'value',
+        #         'kk' : {
+        #             'coco':'kiki',
+        #             'coco': 'caca'
+        #             }
+        #         },
+        #     'key3': 'value'
+        #     }
+        schema = None
         #if no default value is provided, default is callable
-        #we don't need the list of keys here, but the schema entered by default
-        schema = {
-            'key':  'value',
-            'key2': {
-                'keykey':'value',
-                'kk' : {
-                    'coco':'kiki',
-                    'coco': 'caca'
-                    }
-                },
-            'key3': 'value'
-            }
         if not callable(self.initial):
             if isinstance(self.initial,dict):
                 schema = self.initial
-        self.widget = Dictionary()
+        self.widget = Dictionary(schema=schema)
 
     def prepare_value(self,value):
         #pdb.set_trace()
@@ -204,3 +204,7 @@ class DictField(forms.Field):
                 elif k[0]:
                     d.update({k[0]: k[1]})
         return d
+
+    #TODO
+    def validate(self,value):
+        pass
