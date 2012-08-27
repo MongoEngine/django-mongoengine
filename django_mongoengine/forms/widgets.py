@@ -3,10 +3,11 @@ from django.utils.safestring import mark_safe
 
 from collections import OrderedDict
 import re
-import pdb
+#import pdb
 
 #the list of JavaScript files to insert to render any Dictionary widget
-MEDIAS = ('jquery-1.8.0.min.js','dict.js')
+MEDIAS = ('jquery-1.8.0.min.js', 'dict.js')
+
 
 class Dictionary(MultiWidget):
 	"""
@@ -34,10 +35,10 @@ class Dictionary(MultiWidget):
 
 		self.no_schema = no_schema
 		widget_object = []
-		if isinstance(schema,dict) and self.no_schema > 0:
+		if isinstance(schema, dict) and self.no_schema > 0:
 			for key in schema:
-				if isinstance(schema[key],dict):
-					widget_object.append(SubDictionary(schema=schema[key],attrs=attrs))
+				if isinstance(schema[key], dict):
+					widget_object.append(SubDictionary(schema=schema[key], attrs=attrs))
 				else:
 					widget_object.append(Pair(attrs=attrs))
 		else:
@@ -57,11 +58,11 @@ class Dictionary(MultiWidget):
 		# correct_subtypes = {'key':'value'}
 		# for subtype in schema:
 		# 	widget_object.append(subtype(schema=correct_subtypes, attrs=attrs))
-		super(Dictionary, self).__init__(widget_object,attrs)
+		super(Dictionary, self).__init__(widget_object, attrs)
 
 	def decompress(self, value):
 		#pdb.set_trace()
-		if value and isinstance(value,dict):
+		if value and isinstance(value, dict):
 			value = self.dict_sort(value)
 			value = value.items()
 
@@ -69,14 +70,14 @@ class Dictionary(MultiWidget):
 			delta = len(value) - len(self.widgets)
 			#if the schema in place wasn't passed by a parent widget, we need to rebuild it
 			if self.no_schema < 2:
-				self.update_widgets(value,erase=True)
+				self.update_widgets(value, erase=True)
 			return value
 		else:
 			return []
 
 	def render(self, name, value, attrs=None):
 		#pdb.set_trace()
-		if not isinstance(value,list):
+		if not isinstance(value, list):
 			value = self.decompress(value)
 		if self.is_localized:
 			for widget in self.widgets:
@@ -109,16 +110,16 @@ class Dictionary(MultiWidget):
 		html_indexes = []
 
 		for data_key in data_keys:
-			match = re.match(name+'_(\d+)_pair_0',data_key)
+			match = re.match(name+'_(\d+)_pair_0', data_key)
 			if match is not None:
 				self.widgets.append(Pair(attrs=self.attrs))
 				html_indexes.append(match.group(1))
 			else:
-				match = re.match(name+'_(\d+)_subdict_0',data_key)
+				match = re.match(name+'_(\d+)_subdict_0', data_key)
 				if match is not None:
 						self.widgets.append(SubDictionary(no_schema=0, attrs=self.attrs))
 						html_indexes.append(match.group(1))
-		return [widget.value_from_datadict(data, files, name + '_%s_%s' % (html_indexes[i],widget.suffix)) for i, widget in enumerate(self.widgets)]
+		return [widget.value_from_datadict(data, files, name + '_%s_%s' % (html_indexes[i], widget.suffix)) for i, widget in enumerate(self.widgets)]
 
 	def format_output(self, name, rendered_widgets):
 		#pdb.set_trace()
@@ -169,10 +170,10 @@ class Pair(MultiWidget):
 
 	def __init__(self, attrs=None, **kwargs):
 		if self.value_type == TextInput:
-			widgets = [self.key_type(),self.value_type()]
+			widgets = [self.key_type(), self.value_type()]
 		elif self.value_type == Dictionary:
-			widgets = [self.key_type(),self.value_type(**kwargs)]
-		super(Pair, self).__init__(widgets,attrs)
+			widgets = [self.key_type(), self.value_type(**kwargs)]
+		super(Pair, self).__init__(widgets, attrs)
 
 	#this method should be overwritten by subclasses
 	def decompress(self, value):
@@ -180,18 +181,18 @@ class Pair(MultiWidget):
 		if value is not None:
 			return list(value)
 		else:
-			return ['','']
+			return ['', '']
 
 	def render(self, name, value, attrs=None):
 		#pdb.set_trace()
 		if self.is_localized:
 			for widget in self.widgets:
 				widgets.is_localized = self.is_localized
-		if not isinstance(value,list):
+		if not isinstance(value, list):
 			value = self.decompress(value)
 		output = []
 		final_attrs = self.build_attrs(attrs)
-		id_ = final_attrs.get('id',None)
+		id_ = final_attrs.get('id', None)
 		for i, widget in enumerate(self.widgets):
 			try:
 				widget_value = value[i]
@@ -226,4 +227,4 @@ class SubDictionary(Pair):
 		if value is not None:
 			return list(value)
 		else:
-			return ['',{}]
+			return ['', {}]

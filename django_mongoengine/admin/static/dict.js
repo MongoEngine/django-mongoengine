@@ -135,7 +135,7 @@ $(document).ready(function(){
 		subdict += '<ul id="'+ id +'1_0" class="dictionary">';
 		subdict += '<li><input type="text" name="'+ id.substring(3) +'1_0_pair_0" id="'+ id +'1_0_pair_0"/> : ';
 		subdict += '<input type="text" name="'+ id.substring(3) +'1_0_pair_1" id="'+ id +'1_0_pair_1"/></li></ul>';
-		subdict += '<span id="add_pair_'+ id +'1_0" class="add_pair_dictionary">Add field</span> - '
+		subdict += '<span id="add_pair_'+ id +'1_0" class="add_pair_dictionary">Add field</span> - ';
 		subdict += '<span id="add_sub_'+ id +'1_0" class="add_sub_dictionary">Add subdictionary</span></li>';
 		return subdict;
 	}
@@ -171,5 +171,4 @@ $(document).ready(function(){
 			}
 		}
 	}
-
 });
