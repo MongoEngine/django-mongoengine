@@ -3,7 +3,7 @@ from django.utils.safestring import mark_safe
 
 from collections import OrderedDict
 import re
-#import pdb
+import pdb
 
 #the list of JavaScript files to insert to render any Dictionary widget
 MEDIAS = ('jquery-1.8.0.min.js', 'dict.js')
@@ -14,8 +14,6 @@ class Dictionary(MultiWidget):
 	A widget representing a dictionary field
 	"""
 
-	#we shouldn't pass only the keys but the whole default dictionary,
-	#because in this case, we would be able to rebuild it using SubDictionary
 	def __init__(self, schema=None, no_schema=1, attrs=None):
 		
 		# schema -- A dictionary representing the future schema of
@@ -43,21 +41,7 @@ class Dictionary(MultiWidget):
 					widget_object.append(Pair(attrs=attrs))
 		else:
 			widget_object.append(Pair(attrs=attrs))
-			# if subtype == 'Pair':
-			# 	direct_children[j] = Pair
-			# elif subtype == 'SubDictionary':
-			# 	direct_children[j] = SubDictionary
 
-		
-		# if keys is not None and keys:
-		# 	for k in keys:
-		# 		widget_object.append(subtypes(attrs=attrs))
-		# else:
-
-		#TODO : give the correct subtypes here : that where we go deeep
-		# correct_subtypes = {'key':'value'}
-		# for subtype in schema:
-		# 	widget_object.append(subtype(schema=correct_subtypes, attrs=attrs))
 		super(Dictionary, self).__init__(widget_object, attrs)
 
 	def decompress(self, value):
@@ -93,7 +77,7 @@ class Dictionary(MultiWidget):
 			suffix = widget.suffix
 			if id_:
 				final_attrs = dict(final_attrs, id='%s_%s_%s' % (id_, i, suffix))
-			output.append(widget.render(name + '_%s_%s' % (i, suffix), widget_value, final_attrs))
+			output.append(widget.render(name + '_%s_%s' % (i, suffix), widget_value))
 		#pdb.set_trace()
 		return mark_safe(self.format_output(name, output))
 
@@ -191,16 +175,12 @@ class Pair(MultiWidget):
 		if not isinstance(value, list):
 			value = self.decompress(value)
 		output = []
-		final_attrs = self.build_attrs(attrs)
-		id_ = final_attrs.get('id', None)
 		for i, widget in enumerate(self.widgets):
 			try:
 				widget_value = value[i]
 			except IndexError:
 				widget_value = None
-			if id_:
-				final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
-			output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
+			output.append(widget.render(name + '_%s' % i, widget_value))
 		return mark_safe(self.format_output(output,name))
 
 	def value_from_datadict(self, data, files, name):
