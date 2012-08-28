@@ -198,7 +198,7 @@ $(document).ready(function(){
 	}
 
 	/*
-		Delete a sub-dictionary
+		Delete a pair
 	*/
 
 	$('.del_pair').click(function(){
