@@ -1,5 +1,6 @@
 from django import forms
 from django.core.validators import EMPTY_VALUES
+from django.core.exceptions import ValidationError
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.translation import ugettext_lazy as _
 
@@ -150,24 +151,26 @@ class DictField(forms.Field):
     DictField for mongo forms
     """
 
-    #Do we need widget_attrs method ?
-    #TODO : how to add another row to a Dict ?
+    error_messages = {
+        'length' : _(u'Ensure the keys length is less than or equal to %s.'),
+        'invalid_key': _(u'Ensure the keys are not : %s.'),
+        'illegal': _(u'Ensure the keys does not contain any illegal character : %s'),
+    }
+
+    #Mongo reserved keywords
+    invalid_keys = ['err', 'errmsg']
+    #Mongo prohibit . in keys
+    illegal_characters = ['.']
+    #limit key length for efficiency
+    key_limit = 30
 
     def __init__(self, *args, **kwargs):
+        if 'error_messages' in kwargs.keys():
+            kwargs['error_messages'].update(self.error_messages)
+        else:
+            kwargs['error_messages'] = self.error_messages
+
         super(DictField,self).__init__(*args, **kwargs)
-        #keys = []
-        #pdb.set_trace()
-        # schema = {
-        #     'key':  'value',
-        #     'key2': {
-        #         'keykey':'value',
-        #         'kk' : {
-        #             'coco':'kiki',
-        #             'coco': 'caca'
-        #             }
-        #         },
-        #     'key3': 'value'
-        #     }
         schema = None
         #if no default value is provided, default is callable
         if not callable(self.initial):
@@ -182,14 +185,12 @@ class DictField(forms.Field):
     def to_python(self,value):
         #pdb.set_trace()
         value = self.get_dict(value)
-        #value.pop("",True)
         return value
 
     def clean(self, value):
         #pdb.set_trace()
         value = self.to_python(value)
-        #self.validate(value)
-        #self.run_validators(value)
+        self.validate(value)
         return value
 
     def get_dict(self, a_list):
@@ -205,6 +206,16 @@ class DictField(forms.Field):
                     d.update({k[0]: k[1]})
         return d
 
-    #TODO
     def validate(self,value):
-        pass
+        #we should not use the super.validate method
+        for k,v in value.items():
+            self.run_validators(k)
+            if k in self.invalid_keys:
+                raise ValidationError(self.error_messages['invalid_key'] % self.invalid_keys)
+            if len(k) > self.key_limit:
+                raise ValidationError(self.error_messages['length'] % self.key_limit)
+            for u in self.illegal_characters:
+                if u in k:
+                    raise ValidationError(self.error_messages['illegal'] % self.illegal_characters)
+            if isinstance(v,dict):
+                self.validate(v)

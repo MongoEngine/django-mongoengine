@@ -1,5 +1,5 @@
 from django import forms
-from django.core.validators import EMPTY_VALUES
+from django.core.validators import EMPTY_VALUES, RegexValidator
 from django.utils.encoding import smart_unicode
 from django.db.models.options import get_verbose_name
 from django.utils.text import capfirst
@@ -260,11 +260,14 @@ class MongoFormFieldGenerator(object):
         return forms.ImageField(**kwargs)
 
     def generate_dictfield(self, field, **kwargs):
+        #remove Mongo reserved words
+        validate = [RegexValidator(regex='^[^$_]', message=u'Ensure the keys do not begin with : ["$","_"]', code='invalid_start')]
         defaults = {
             'required': field.required,
             'initial': field.default,
             'label': self.get_field_label(field),
             'help_text': self.get_field_help_text(field),
+            'validators': validate,
         }
         return DictField(**defaults)
 
