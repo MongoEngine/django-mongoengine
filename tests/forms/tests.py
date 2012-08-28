@@ -5,11 +5,10 @@ from django import test
 test.utils.setup_test_environment()
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from django.forms.widgets import TextInput
 
 from django_mongoengine.tests import MongoTestCase
 from django_mongoengine.forms.fields import DictField
-from django_mongoengine.forms.widgets import Dictionary, SubDictionary, Pair
+
 
 class DictFieldTest(MongoTestCase):
     """
@@ -25,20 +24,20 @@ class DictFieldTest(MongoTestCase):
         self._init_field()
         #valid input/outpout
         valid_input = {
-            '[[key1,value1],[key2,value2],[key3,value3]]' : 
-                [['key1','value1'],['key2','value2'],['key3','value3']],
-            '[[key1,value1],[skey,[[skey1,svalue1],[skey2,svalue2],[skey3,svalue3]]],[key2,value2],[key3,value3]]' : 
-                [['key1','value1'],['skey',[['skey1','svalue1'],['skey2','svalue2'],['skey3','svalue3']]],['key2','value2'],['key3','value3']],
-            '[[a,[[b,[[c,[[d,[[e,[[f,g]]]]]]]]]]]]' : 
-                [['a',[['b',[['c',[['d',[['e',[['f','g']]]]]]]]]]]],
+            '[[key1,value1],[key2,value2],[key3,value3]]':
+                [['key1', 'value1'], ['key2', 'value2'], ['key3', 'value3']],
+            '[[key1,value1],[skey,[[skey1,svalue1],[skey2,svalue2],[skey3,svalue3]]],[key2,value2],[key3,value3]]':
+                [['key1', 'value1'], ['skey', [['skey1', 'svalue1'], ['skey2', 'svalue2'], ['skey3', 'svalue3']]], ['key2', 'value2'], ['key3', 'value3']],
+            '[[a,[[b,[[c,[[d,[[e,[[f,g]]]]]]]]]]]]':
+                [['a', [['b', [['c', [['d', [['e', [['f', 'g']]]]]]]]]]]],
         }
         valid_output = {
-            '[[key1,value1],[key2,value2],[key3,value3]]' : {
+            '[[key1,value1],[key2,value2],[key3,value3]]': {
                 'key1': 'value1',
                 'key2': 'value2',
                 'key3': 'value3'
             },
-            '[[key1,value1],[skey,[[skey1,svalue1],[skey2,svalue2],[skey3,svalue3]]],[key2,value2],[key3,value3]]' : {
+            '[[key1,value1],[skey,[[skey1,svalue1],[skey2,svalue2],[skey3,svalue3]]],[key2,value2],[key3,value3]]': {
                 'key1': 'value1',
                 'skey': {
                         'skey1': 'svalue1',
@@ -48,7 +47,7 @@ class DictFieldTest(MongoTestCase):
                 'key2': 'value2',
                 'key3': 'value3'
             },
-            '[[a,[[b,[[c,[[d,[[e,[[f,g]]]]]]]]]]]]' : {
+            '[[a,[[b,[[c,[[d,[[e,[[f,g]]]]]]]]]]]]': {
                 'a': {
                     'b': {
                         'c': {
@@ -64,12 +63,12 @@ class DictFieldTest(MongoTestCase):
         }
         #invalid input/message
         invalid_input = {
-            '[[key1,value1],[$key2,value2]]': [['key1','value1'],['$key2','value2']],
-            '[[key1,value1],[_key2,value2]]': [['key1','value1'],['_key2','value2']],
-            '[[key1,value1],[k.ey2,value2]]': [['key1','value1'],['k.ey2','value2']],
-            '[[keykeykeykeykeykeykeykeykeykeykey,value1],[key2,value2]]': [['keykeykeykeykeykeykeykeykeykeykey','value1'],['key2','value2']],
-            '[[err,value1],[key2,value2]]': [['err','value1'],['key2','value2']],
-            '[[errmsg,value1],[key2,value2]]': [['errmsg','value1'],['key2','value2']],
+            '[[key1,value1],[$key2,value2]]': [['key1', 'value1'], ['$key2', 'value2']],
+            '[[key1,value1],[_key2,value2]]': [['key1', 'value1'], ['_key2', 'value2']],
+            '[[key1,value1],[k.ey2,value2]]': [['key1', 'value1'], ['k.ey2', 'value2']],
+            '[[keykeykeykeykeykeykeykeykeykeykey,value1],[key2,value2]]': [['keykeykeykeykeykeykeykeykeykeykey', 'value1'], ['key2', 'value2']],
+            '[[err,value1],[key2,value2]]': [['err', 'value1'], ['key2', 'value2']],
+            '[[errmsg,value1],[key2,value2]]': [['errmsg', 'value1'], ['key2', 'value2']],
         }
         invalid_message = {
             '[[key1,value1],[$key2,value2]]': [u'Ensure the keys do not begin with : ["$","_"]'],
@@ -83,7 +82,7 @@ class DictFieldTest(MongoTestCase):
         # test valid inputs
         for input, output in valid_output.items():
             out = self.field.clean(valid_input[input])
-            assert isinstance(out,dict), 'output should be a dictionary'
+            assert isinstance(out, dict), 'output should be a dictionary'
             self.assertDictEqual(out, output)
         # test invalid inputs
         for input, input_list in invalid_input.items():
@@ -108,7 +107,7 @@ class DictFieldTest(MongoTestCase):
         #contains the data dicts
         data_dicts = {
             'data1': {
-                u'a': { 
+                u'a': {
                     u'b': {
                         u'f': u'g'
                     }
@@ -119,11 +118,11 @@ class DictFieldTest(MongoTestCase):
         output_structures = {
             'data1': {
                 'type': 'Dictionary',
-                'widgets': [{'type': 'SubDictionary', 
-                      'widgets': [{'type': 'TextInput'},{'type': 'Dictionary',
-                                                    'widgets': [{'type': 'SubDictionary', 
-                                                          'widgets': [{'type': 'TextInput'},{'type': 'Dictionary',
-                                                                                        'widgets': [{'type': 'Pair', 'widgets':[{'type': 'TextInput'},{'type': 'TextInput'}]}]
+                'widgets': [{'type': 'SubDictionary',
+                      'widgets': [{'type': 'TextInput'}, {'type': 'Dictionary',
+                                                    'widgets': [{'type': 'SubDictionary',
+                                                          'widgets': [{'type': 'TextInput'}, {'type': 'Dictionary',
+                                                                                        'widgets': [{'type': 'Pair', 'widgets':[{'type': 'TextInput'}, {'type': 'TextInput'}]}]
                                                                     }]
                                                             }]
                                 }]
@@ -132,10 +131,10 @@ class DictFieldTest(MongoTestCase):
         }
 
         for data, datadict in data_inputs.items():
-            html = self.field.widget.render('widget_name',self.field.widget.value_from_datadict(datadict,{},'widget_name'))
-            self._check_structure(self.field.widget,output_structures[data])
-            html2 = self.field.widget.render('widget_name',data_dicts[data])
-            self._check_structure(self.field.widget,output_structures[data])
+            self.field.widget.render('widget_name', self.field.widget.value_from_datadict(datadict, {}, 'widget_name'))
+            self._check_structure(self.field.widget, output_structures[data])
+            self.field.widget.render('widget_name', data_dicts[data])
+            self._check_structure(self.field.widget, output_structures[data])
 
     def _init_field(self, attr=None):
         validate = [RegexValidator(regex='^[^$_]', message=u'Ensure the keys do not begin with : ["$","_"]', code='invalid_start')]
@@ -148,11 +147,11 @@ class DictFieldTest(MongoTestCase):
             'validators': validate,
         })
 
-    def _check_structure(self,widget,structure):
-        assert isinstance(structure,dict), 'error, the comparative structure should be a dictionary'
-        assert isinstance(widget,eval(structure['type'])), 'widget should be a %s' % structure['type']
+    def _check_structure(self, widget, structure):
+        assert isinstance(structure, dict), 'error, the comparative structure should be a dictionary'
+        assert isinstance(widget, eval(structure['type'])), 'widget should be a %s' % structure['type']
         if 'widgets' in structure.keys():
-            assert isinstance(structure['widgets'],list), 'structure field "widgets" should be a list'
-            assert isinstance(widget.widgets,list), 'widget.widgets should be a list'
-            for i,w in enumerate(widget.widgets):
-                self._check_structure(w,structure['widgets'][i])
+            assert isinstance(structure['widgets'], list), 'structure field "widgets" should be a list'
+            assert isinstance(widget.widgets, list), 'widget.widgets should be a list'
+            for i, w in enumerate(widget.widgets):
+                self._check_structure(w, structure['widgets'][i])

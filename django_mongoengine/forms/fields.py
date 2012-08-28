@@ -145,14 +145,14 @@ class DocumentMultipleChoiceField(ReferenceField):
             return [super(DocumentMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(DocumentMultipleChoiceField, self).prepare_value(value)
 
-#TODO define a DictField
+
 class DictField(forms.Field):
     """
     DictField for mongo forms
     """
 
     error_messages = {
-        'length' : _(u'Ensure the keys length is less than or equal to %s.'),
+        'length': _(u'Ensure the keys length is less than or equal to %s.'),
         'invalid_key': _(u'Ensure the keys are not : %s.'),
         'illegal': _(u'Ensure the keys does not contain any illegal character : %s'),
     }
@@ -170,19 +170,19 @@ class DictField(forms.Field):
         else:
             kwargs['error_messages'] = self.error_messages
 
-        super(DictField,self).__init__(*args, **kwargs)
+        super(DictField, self).__init__(*args, **kwargs)
         schema = None
         #if no default value is provided, default is callable
         if not callable(self.initial):
-            if isinstance(self.initial,dict):
+            if isinstance(self.initial, dict):
                 schema = self.initial
         self.widget = Dictionary(schema=schema)
 
-    def prepare_value(self,value):
+    def prepare_value(self, value):
         #pdb.set_trace()
         return value
 
-    def to_python(self,value):
+    def to_python(self, value):
         #pdb.set_trace()
         value = self.get_dict(value)
         return value
@@ -199,16 +199,16 @@ class DictField(forms.Field):
         """
         d = {}
         for k in a_list:
-            if (isinstance(k,list)):
-                if isinstance(k[1],list):
+            if (isinstance(k, list)):
+                if isinstance(k[1], list):
                     d.update({k[0]: self.get_dict(k[1])})
                 elif k[0]:
                     d.update({k[0]: k[1]})
         return d
 
-    def validate(self,value):
+    def validate(self, value):
         #we should not use the super.validate method
-        for k,v in value.items():
+        for k, v in value.items():
             self.run_validators(k)
             if k in self.invalid_keys:
                 raise ValidationError(self.error_messages['invalid_key'] % self.invalid_keys)
@@ -217,5 +217,5 @@ class DictField(forms.Field):
             for u in self.illegal_characters:
                 if u in k:
                     raise ValidationError(self.error_messages['illegal'] % self.illegal_characters)
-            if isinstance(v,dict):
+            if isinstance(v, dict):
                 self.validate(v)

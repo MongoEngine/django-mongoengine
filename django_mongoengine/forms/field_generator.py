@@ -271,6 +271,7 @@ class MongoFormFieldGenerator(object):
         }
         return DictField(**defaults)
 
+
 class MongoDefaultFormFieldGenerator(MongoFormFieldGenerator):
     """This class generates Django form-fields for mongoengine-fields."""
 

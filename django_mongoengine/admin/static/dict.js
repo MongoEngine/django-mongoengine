@@ -2,9 +2,9 @@ $(document).ready(function(){
 	/*
 		Those array are useful to keep track of the different ids
 	*/
-	var prefixes = new Array();
-	var next_pair_ids = new Array();
-	var next_dict_ids = new Array();
+	var prefixes = [];
+	var next_pair_ids = [];
+	var next_dict_ids = [];
 	var dictionary_ul = $('.dictionary');
 
 	var id;
@@ -30,17 +30,17 @@ $(document).ready(function(){
 
 	$('.del_pair').each(function(){
 		var id = 'id' + $(this).attr('id').substring(3) + '_0';
-		var parent = $("ul:has(>li >#"+id+")")
+		var parent = $("ul:has(>li >#"+id+")");
 
 		if (parent.children("li").size() == 1){
 			console.log('---------NO DEL---------');
 			$(this).hide();
 		}
-	});	
+	});
 
 	$('.del_dict').each(function(){
 		var id = 'id' + $(this).attr('id').substring(3) + '_0';
-		var parent = $("ul:has(>li >#"+id+")")
+		var parent = $("ul:has(>li >#"+id+")");
 		if (parent.children("li").size() == 1){
 			console.log('---------NO DEL---------');
 			$(this).hide();
@@ -67,7 +67,7 @@ $(document).ready(function(){
 		console.log('--------PAIR UPDATE--------');
 		el = $('#'+id);
 		el.append(get_pair(next_pair_ids[id]));
-		i = parseInt(next_pair_ids[id].substring(prefixes[id].length,next_pair_ids[id].length-5)) + 1;
+		i = parseInt(next_pair_ids[id].substring(prefixes[id].length,next_pair_ids[id].length-5),10) + 1;
 		console.log('i = '+i);
 		next_pair_ids[id] = prefixes[id] + i + '_pair_';
 		next_dict_ids[id] = prefixes[id] + i + '_subdict_';
@@ -85,7 +85,7 @@ $(document).ready(function(){
 		console.log('--------DICT UPDATE--------');
 		el = $('#'+id);
 		el.append(get_dict(next_dict_ids[id]));
-		i = parseInt(next_dict_ids[id].substring(prefixes[id].length,next_dict_ids[id].length-8)) + 1;
+		i = parseInt(next_dict_ids[id].substring(prefixes[id].length,next_dict_ids[id].length-8), 10) + 1;
 		console.log('i = '+i);
 
 		var new_id = next_dict_ids[id] + '1_0';
@@ -126,12 +126,12 @@ $(document).ready(function(){
 		var first;
 
 		if ((i = n_type.search('pair')) > 0){
-			first = prefix + (parseInt(n_type.substring(0,i))+1);
+			first = prefix + (parseInt(n_type.substring(0,i), 10)+1);
 			console.log('---------END GET NEXT IDS---------');
 			return Array(first+'_pair_',first+'_subdict_');
 		}
 		else if ((i = n_type.search('subdict')) > 0){
-			first = prefix + (parseInt(n_type.substring(0,i))+1);
+			first = prefix + (parseInt(n_type.substring(0,i), 10)+1);
 			console.log('---------END GET NEXT IDS---------');
 			return Array(first+'_pair_',first+'_subdict_');
 		}
@@ -146,8 +146,8 @@ $(document).ready(function(){
 		console.log('--------GET PAIR-------->');
 		console.log('id : '+id);
 		return '<li><input type="text" name="'+ id.substring(3) +'0" id="'+ id +'0"/> : '+
-			   '<input type="text" name="'+ id.substring(3) +'1" id="'+ id +'1"/>'+
-			   '<span class="del_pair" id="'+ id.substring(3,id.length-1) +'"> - Delete</span></li>';
+               '<input type="text" name="'+ id.substring(3) +'1" id="'+ id +'1"/>'+
+               '<span class="del_pair" id="'+ id.substring(3,id.length-1) +'"> - Delete</span></li>';
 	}
 
 	/*
@@ -192,7 +192,7 @@ $(document).ready(function(){
 		if ($.isArray(a)){
 			for (var key in a){
 				if (key === 'length' || !a.hasOwnProperty(key)) continue;
-    			console.log(name+'['+key+'] = '+a[key]);
+				console.log(name+'['+key+'] = '+a[key]);
 			}
 		}
 	}
@@ -204,7 +204,7 @@ $(document).ready(function(){
 	$('.del_pair').click(function(){
 		console.log('---------DEL CLICK---------');
 		var id = 'id' + $(this).attr('id').substring(3) + '_0';
-		var parent = $("ul:has(>li >#"+id+")")
+		var parent = $("ul:has(>li >#"+id+")");
 		var parent_dict = parent.attr('id');
 
 		console.log('id :' + id);
@@ -228,7 +228,7 @@ $(document).ready(function(){
 	$('.del_dict').click(function(){
 		console.log('-------DEL CLICK DICT-------');
 		var id = 'id' + $(this).attr('id').substring(3) + '_0';
-		var parent = $("ul:has(>li >#"+id+")")
+		var parent = $("ul:has(>li >#"+id+")");
 		var parent_dict = parent.attr('id');
 
 		console.log('id :' + id);
