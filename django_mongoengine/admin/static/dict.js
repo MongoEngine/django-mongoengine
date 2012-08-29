@@ -13,9 +13,9 @@ $(document).ready(function(){
 		Initialization
 	*/
 	dictionary_ul.each(function(index){
+		console.log('-----------INIT-----------');
 		var el = $(this);
 		save_arrays(el);
-		console.log('-----------INIT-----------');
 		console.log('---------END INIT---------');
 	});
 
@@ -198,7 +198,7 @@ $(document).ready(function(){
 	}
 
 	/*
-		Delete a pair
+		Delete a sub-dictionary
 	*/
 
 	$('.del_pair').click(function(){
