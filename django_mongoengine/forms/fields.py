@@ -86,7 +86,7 @@ class ReferenceField(forms.ChoiceField):
             queryset = self.queryset.clone()
             obj = queryset.get(id=oid)
         except (TypeError, InvalidId, self.queryset._document.DoesNotExist):
-            raise forms.ValidationError(self.error_messages['invalid_choice'] % {'value':value})
+            raise forms.ValidationError(self.error_messages['invalid_choice'] % {'value': value})
         return obj
 
     # Fix for Django 1.4
@@ -98,6 +98,7 @@ class ReferenceField(forms.ChoiceField):
         result.queryset = result.queryset
         result.empty_label = result.empty_label
         return result
+
 
 class DocumentMultipleChoiceField(ReferenceField):
     """A MultipleChoiceField whose choices are a model QuerySet."""
@@ -164,7 +165,7 @@ class DictField(forms.Field):
     #limit key length for efficiency
     key_limit = 30
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, max_depth=5, flags=None, sub_choices=None, *args, **kwargs):
         if 'error_messages' in kwargs.keys():
             kwargs['error_messages'].update(self.error_messages)
         else:
@@ -176,6 +177,9 @@ class DictField(forms.Field):
         if not callable(self.initial):
             if isinstance(self.initial, dict):
                 schema = self.initial
+
+        pdb.set_trace()
+        #here if other parameters are passed, like max_depth, sub_choices and flags, then we hand them to the dict
         self.widget = Dictionary(schema=schema)
 
     def prepare_value(self, value):

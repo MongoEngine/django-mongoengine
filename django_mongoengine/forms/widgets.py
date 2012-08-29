@@ -158,6 +158,7 @@ class Pair(MultiWidget):
             return ['', '']
 
     def render(self, name, value, attrs=None):
+        #pdb.set_trace()
         if self.is_localized:
             for widget in self.widgets:
                 widget.is_localized = self.is_localized
@@ -217,8 +218,8 @@ class ChoicePair(Pair):
     def __init__(self, attrs=None):
         super(ChoicePair, self).__init__()
 
-    def decompress(self, value):
-        pass
+    # def decompress(self, value):
+    #     pass
 
     def format_output(self, rendered_widgets, name):
         #pdb.set_trace()
