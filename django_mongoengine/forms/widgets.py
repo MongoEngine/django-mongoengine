@@ -1,8 +1,10 @@
-from django.forms.widgets import TextInput, MultiWidget, Media
+from django.forms.widgets import TextInput, SelectMultiple, MultiWidget, Media
 from django.utils.safestring import mark_safe
 
 from collections import OrderedDict
 import re
+
+import pdb
 
 #the list of JavaScript files to insert to render any Dictionary widget
 MEDIAS = ('jquery-1.8.0.min.js', 'dict.js')
@@ -36,7 +38,7 @@ class Dictionary(MultiWidget):
                 else:
                     widget_object.append(Pair(attrs=attrs))
         else:
-            widget_object.append(Pair(attrs=attrs))
+            widget_object.append(ChoicePair(attrs=attrs))
 
         super(Dictionary, self).__init__(widget_object, attrs)
 
@@ -142,7 +144,7 @@ class Pair(MultiWidget):
     suffix = 'pair'
 
     def __init__(self, attrs=None, **kwargs):
-        if self.value_type == TextInput:
+        if self.value_type in [TextInput, SelectMultiple]:
             widgets = [self.key_type(), self.value_type()]
         elif self.value_type == Dictionary:
             widgets = [self.key_type(), self.value_type(**kwargs)]
@@ -201,3 +203,23 @@ class SubDictionary(Pair):
     def format_output(self, rendered_widgets, name):
         #pdb.set_trace()
         return '<li>' + ' : '.join(rendered_widgets) + '<span class="del_dict" id="del_%s"> - Delete</span></li>\n' % name
+
+
+class ChoicePair(Pair):
+    """
+    A widget representing a key-value pair in a dictionary, where value is a list of choices
+    """
+
+    key_type = TextInput
+    value_type = SelectMultiple
+    suffix = 'choice'
+
+    def __init__(self, attrs=None):
+        super(ChoicePair, self).__init__()
+
+    def decompress(self, value):
+        pass
+
+    def format_output(self, rendered_widgets, name):
+        #pdb.set_trace()
+        return '<li>' + ' : '.join(rendered_widgets) + '<span class="del_choice" id="del_%s"> - Delete</span></li>\n' % name
