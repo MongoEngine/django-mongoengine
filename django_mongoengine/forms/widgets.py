@@ -169,8 +169,8 @@ class Pair(MultiWidget):
                 widget_value = value[i]
             except IndexError:
                 widget_value = None
-                if id_:
-                    final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
+            if id_:
+                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
             output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
         return mark_safe(self.format_output(output, name))
 
@@ -190,7 +190,7 @@ class SubDictionary(Pair):
     suffix = 'subdict'
 
     def __init__(self, schema={'key': 'value'}, no_schema=1, attrs=None):
-        super(SubDictionary, self).__init__(attrs, schema=schema, no_schema=no_schema)
+        super(SubDictionary, self).__init__(attrs=attrs, schema=schema, no_schema=no_schema)
 
     def decompress(self, value):
         if value is not None:

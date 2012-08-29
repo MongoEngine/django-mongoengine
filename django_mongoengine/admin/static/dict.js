@@ -24,6 +24,18 @@ $(document).ready(function(){
 	print_array(next_dict_ids,'dict ids');
 
 	/*
+		Save array information
+	*/
+	function save_arrays(el){
+		id = el.attr('id');
+		//dictionaries[id] = id;
+		prefixes[id] = id.substring(0,id.length-1);
+		var next_ids = get_next_ids(el.children('li:last-child').children('input:first-child').attr('id'),prefixes[id]);
+		next_pair_ids[id] = next_ids[0];
+		next_dict_ids[id] = next_ids[1];
+	}
+
+	/*
 		Hiding the Delete buttons where dictionaries
 		only have one child
 	*/
@@ -46,18 +58,6 @@ $(document).ready(function(){
 			$(this).hide();
 		}
 	});
-
-	/*
-		Save array information
-	*/
-	function save_arrays(el){
-		id = el.attr('id');
-		//dictionaries[id] = id;
-		prefixes[id] = id.substring(0,id.length-1);
-		var next_ids = get_next_ids(el.children('li:last-child').children('input:first-child').attr('id'),prefixes[id]);
-		next_pair_ids[id] = next_ids[0];
-		next_dict_ids[id] = next_ids[1];
-	}
 
 	/*
 		Update array information and append HTML
@@ -171,7 +171,6 @@ $(document).ready(function(){
 	$('.add_pair_dictionary').click(function(){
 		console.log('-----------CLICK-----------');
 		id = $(this).attr('id').substring(4);
-		console.log('id : '+id);
 		pair_update_arrays(id);
 		console.log('---------END CLICK---------');
 	});
