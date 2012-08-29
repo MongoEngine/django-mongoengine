@@ -200,7 +200,7 @@ class DictField(forms.Field):
         d = {}
         for k in a_list:
             if (isinstance(k, list)):
-                if isinstance(k[1], list):
+                if isinstance(k[1], list) and k[0]:
                     d.update({k[0]: self.get_dict(k[1])})
                 elif k[0]:
                     d.update({k[0]: k[1]})
