@@ -155,7 +155,8 @@ class DictField(forms.Field):
     error_messages = {
         'length': _(u'Ensure the keys length is less than or equal to %s.'),
         'invalid_key': _(u'Ensure the keys are not : %s.'),
-        'illegal': _(u'Ensure the keys does not contain any illegal character : %s'),
+        'illegal': _(u'Ensure the keys does not contain any illegal character : %s.'),
+        'depth': _(u'Ensure the dictionary depth is less than or equal to %s.')
     }
 
     #Mongo reserved keywords
@@ -164,6 +165,8 @@ class DictField(forms.Field):
     illegal_characters = ['.']
     #limit key length for efficiency
     key_limit = 30
+    #limit depth for dictionaries
+    max_depth = None
 
     def __init__(self, max_depth=5, flags=None, sub_choices=None, *args, **kwargs):
         if 'error_messages' in kwargs.keys():
@@ -178,9 +181,9 @@ class DictField(forms.Field):
             if isinstance(self.initial, dict):
                 schema = self.initial
 
-        pdb.set_trace()
+        #pdb.set_trace()
         #here if other parameters are passed, like max_depth, sub_choices and flags, then we hand them to the dict
-        self.widget = Dictionary(schema=schema)
+        self.widget = Dictionary(max_depth=max_depth, flags=flags, sub_choices=sub_choices, schema=schema)
 
     def prepare_value(self, value):
         #pdb.set_trace()
@@ -193,6 +196,7 @@ class DictField(forms.Field):
 
     def clean(self, value):
         #pdb.set_trace()
+        self.max_depth = self.widget.max_depth
         value = self.to_python(value)
         self.validate(value)
         return value
@@ -210,8 +214,10 @@ class DictField(forms.Field):
                     d.update({k[0]: k[1]})
         return d
 
-    def validate(self, value):
+    def validate(self, value, depth=0):
         #we should not use the super.validate method
+        if self.max_depth and depth > self.max_depth:
+            raise ValidationError(self.error_messages['depth'] % self.max_depth)
         for k, v in value.items():
             self.run_validators(k)
             if k in self.invalid_keys:
@@ -222,4 +228,4 @@ class DictField(forms.Field):
                 if u in k:
                     raise ValidationError(self.error_messages['illegal'] % self.illegal_characters)
             if isinstance(v, dict):
-                self.validate(v)
+                self.validate(v, depth + 1)
