@@ -1,8 +1,10 @@
-from django.forms.widgets import TextInput, MultiWidget, Media
+from django.forms.widgets import TextInput, SelectMultiple, MultiWidget, Media
 from django.utils.safestring import mark_safe
 
 from collections import OrderedDict
 import re
+
+import pdb
 
 #the list of JavaScript files to insert to render any Dictionary widget
 MEDIAS = ('jquery-1.8.0.min.js', 'dict.js')
@@ -41,7 +43,6 @@ class Dictionary(MultiWidget):
         super(Dictionary, self).__init__(widget_object, attrs)
 
     def decompress(self, value):
-        #pdb.set_trace()
         if value and isinstance(value, dict):
             value = self.dict_sort(value)
             value = value.items()
@@ -54,7 +55,6 @@ class Dictionary(MultiWidget):
             return []
 
     def render(self, name, value, attrs=None):
-        #pdb.set_trace()
         if not isinstance(value, list):
             value = self.decompress(value)
         if self.is_localized:
@@ -71,8 +71,7 @@ class Dictionary(MultiWidget):
             suffix = widget.suffix
             if id_:
                 final_attrs = dict(final_attrs, id='%s_%s_%s' % (id_, i, suffix))
-            output.append(widget.render(name + '_%s_%s' % (i, suffix), widget_value))
-        #pdb.set_trace()
+            output.append(widget.render(name + '_%s_%s' % (i, suffix), widget_value, final_attrs))
         return mark_safe(self.format_output(name, output))
 
     def value_from_datadict(self, data, files, name):
@@ -82,7 +81,6 @@ class Dictionary(MultiWidget):
         # It would take into account every modification on the structure, and
         # make form repopulation automatic
 
-        #pdb.set_trace()
         data_keys = data.keys()
         self.widgets = []
         html_indexes = []
@@ -100,13 +98,11 @@ class Dictionary(MultiWidget):
         return [widget.value_from_datadict(data, files, name + '_%s_%s' % (html_indexes[i], widget.suffix)) for i, widget in enumerate(self.widgets)]
 
     def format_output(self, name, rendered_widgets):
-        #pdb.set_trace()
         return '<ul id="id_%s" class="dictionary">\n' % (self.id_for_label(name)) + ''.join(rendered_widgets) + '</ul>\n' + \
                '<span id="add_id_%s" class="add_pair_dictionary">Add field</span> - ' % (self.id_for_label(name)) + \
                '<span id="add_sub_id_%s" class="add_sub_dictionary">Add subdictionary</span>' % (self.id_for_label(name))
 
     def update_widgets(self, keys, erase=False):
-        #pdb.set_trace()
         if erase:
             self.widgets = []
         for k in keys:
@@ -148,7 +144,7 @@ class Pair(MultiWidget):
     suffix = 'pair'
 
     def __init__(self, attrs=None, **kwargs):
-        if self.value_type == TextInput:
+        if self.value_type in [TextInput, SelectMultiple]:
             widgets = [self.key_type(), self.value_type()]
         elif self.value_type == Dictionary:
             widgets = [self.key_type(), self.value_type(**kwargs)]
@@ -156,7 +152,6 @@ class Pair(MultiWidget):
 
     #this method should be overwritten by subclasses
     def decompress(self, value):
-        #pdb.set_trace()
         if value is not None:
             return list(value)
         else:
@@ -170,21 +165,22 @@ class Pair(MultiWidget):
         if not isinstance(value, list):
             value = self.decompress(value)
         output = []
+        final_attrs = self.build_attrs(attrs)
+        id_ = final_attrs.get('id')
         for i, widget in enumerate(self.widgets):
             try:
                 widget_value = value[i]
             except IndexError:
                 widget_value = None
-            output.append(widget.render(name + '_%s' % i, widget_value))
+            if id_:
+                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
+            output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
         return mark_safe(self.format_output(output, name))
 
     def value_from_datadict(self, data, files, name):
-        #pdb.set_trace()
-        ## TO CHECK FOR SUBDICT
         return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
     def format_output(self, rendered_widgets, name):
-        #pdb.set_trace()
         return '<li>' + ' : '.join(rendered_widgets) + '<span class="del_pair" id="del_%s"> - Delete</span></li>\n' % name
 
 
@@ -197,7 +193,7 @@ class SubDictionary(Pair):
     suffix = 'subdict'
 
     def __init__(self, schema={'key': 'value'}, no_schema=1, attrs=None):
-        super(SubDictionary, self).__init__(attrs, schema=schema, no_schema=no_schema)
+        super(SubDictionary, self).__init__(attrs=attrs, schema=schema, no_schema=no_schema)
 
     def decompress(self, value):
         if value is not None:
