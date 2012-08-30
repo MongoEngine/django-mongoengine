@@ -261,7 +261,7 @@ class MongoFormFieldGenerator(object):
 
     def generate_dictfield(self, field, **kwargs):
         #remove Mongo reserved words
-        validate = [RegexValidator(regex='^[^$_]', message=u'Ensure the keys do not begin with : ["$","_"]', code='invalid_start')]
+        validate = [RegexValidator(regex='^[^$_]', message=u'Ensure the keys do not begin with : ["$","_"].', code='invalid_start')]
         defaults = {
             'required': field.required,
             'initial': field.default,

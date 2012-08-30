@@ -15,7 +15,7 @@ class Dictionary(MultiWidget):
     A widget representing a dictionary field
     """
 
-    def __init__(self, schema=None, no_schema=1, attrs=None):
+    def __init__(self, schema=None, no_schema=1, max_depth=None, flags=None, sub_choices=None, attrs=None):
         # schema -- A dictionary representing the future schema of
         #            the Dictionary widget. It is responsible for the
         #            creation of subwidgets.
@@ -28,8 +28,25 @@ class Dictionary(MultiWidget):
         #               represent data for rendering.
         #               3 means that the schema was rebuilt after
         #               retrieving form data.
+        # max_depth -- An integer representing the max depth of
+        #              sub-dicts. If passed, the system will
+        #              prevent to save dictionaries with depths
+        #              superior to this parameter.
+        # flags -- A list of flags. Available values :
+        #               - 'NO_LIST_UNIQ' : transform lists with
+        #                 only one element to a string.
+        #               - 'FORCE_SCHEMA' : would force dictionaries
+        #                 to keep a certain schema. Only Pair fields
+        #                 could be added.
+        # sub_choices -- A dictionary describing a list of choices for
+        #                a given key. The first matching key is
+        #                concerned.
 
+        #pdb.set_trace()
         self.no_schema = no_schema
+        self.max_depth = max_depth
+        self.flags = flags
+        self.sub_choices = sub_choices
         widget_object = []
         if isinstance(schema, dict) and self.no_schema > 0:
             for key in schema:
@@ -95,12 +112,21 @@ class Dictionary(MultiWidget):
                 if match is not None:
                         self.widgets.append(SubDictionary(no_schema=0, attrs=self.attrs))
                         html_indexes.append(match.group(1))
+                else:
+                    match = re.match(name + '_(\d+)_choice_0', data_key)
+                    if match is not None:
+                        self.widgets.append(ChoicePair(no_schema=0, attrs=self.attrs))
+                        html_indexes.append(match.group(1))
         return [widget.value_from_datadict(data, files, name + '_%s_%s' % (html_indexes[i], widget.suffix)) for i, widget in enumerate(self.widgets)]
 
     def format_output(self, name, rendered_widgets):
+        span_depth = ''
+        if self.max_depth:
+            span_depth = '<span id="id_%s" class="depth_%s"></span>' % (self.id_for_label(name), self.max_depth)
         return '<ul id="id_%s" class="dictionary">\n' % (self.id_for_label(name)) + ''.join(rendered_widgets) + '</ul>\n' + \
                '<span id="add_id_%s" class="add_pair_dictionary">Add field</span> - ' % (self.id_for_label(name)) + \
-               '<span id="add_sub_id_%s" class="add_sub_dictionary">Add subdictionary</span>' % (self.id_for_label(name))
+               '<span id="add_sub_id_%s" class="add_sub_dictionary">Add subdictionary</span>' % (self.id_for_label(name)) + \
+               span_depth
 
     def update_widgets(self, keys, erase=False):
         if erase:
@@ -158,6 +184,7 @@ class Pair(MultiWidget):
             return ['', '']
 
     def render(self, name, value, attrs=None):
+        #pdb.set_trace()
         if self.is_localized:
             for widget in self.widgets:
                 widget.is_localized = self.is_localized
@@ -203,3 +230,23 @@ class SubDictionary(Pair):
     def format_output(self, rendered_widgets, name):
         #pdb.set_trace()
         return '<li>' + ' : '.join(rendered_widgets) + '<span class="del_dict" id="del_%s"> - Delete</span></li>\n' % name
+
+
+class ChoicePair(Pair):
+    """
+    A widget representing a key-value pair in a dictionary, where value is a list of choices
+    """
+
+    key_type = TextInput
+    value_type = SelectMultiple
+    suffix = 'choice'
+
+    def __init__(self, attrs=None):
+        super(ChoicePair, self).__init__()
+
+    # def decompress(self, value):
+    #     pass
+
+    def format_output(self, rendered_widgets, name):
+        #pdb.set_trace()
+        return '<li>' + ' : '.join(rendered_widgets) + '<span class="del_choice" id="del_%s"> - Delete</span></li>\n' % name

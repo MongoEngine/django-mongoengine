@@ -9,6 +9,8 @@ from django.core.validators import RegexValidator
 from django_mongoengine.tests import MongoTestCase
 from django_mongoengine.forms.fields import DictField
 
+#TODO : test for max_depth
+
 
 class DictFieldTest(MongoTestCase):
     """
@@ -71,8 +73,8 @@ class DictFieldTest(MongoTestCase):
             '[[errmsg,value1],[key2,value2]]': [['errmsg', 'value1'], ['key2', 'value2']],
         }
         invalid_message = {
-            '[[key1,value1],[$key2,value2]]': [u'Ensure the keys do not begin with : ["$","_"]'],
-            '[[key1,value1],[_key2,value2]]': [u'Ensure the keys do not begin with : ["$","_"]'],
+            '[[key1,value1],[$key2,value2]]': [u'Ensure the keys do not begin with : ["$","_"].'],
+            '[[key1,value1],[_key2,value2]]': [u'Ensure the keys do not begin with : ["$","_"].'],
             '[[key1,value1],[k.ey2,value2]]': [self.field.error_messages['illegal'] % self.field.illegal_characters],
             '[[keykeykeykeykeykeykeykeykeykeykey,value1],[key2,value2]]': [self.field.error_messages['length'] % self.field.key_limit],
             '[[err,value1],[key2,value2]]': [self.field.error_messages['invalid_key'] % self.field.invalid_keys],
