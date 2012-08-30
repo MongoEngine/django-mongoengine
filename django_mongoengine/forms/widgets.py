@@ -1,8 +1,10 @@
-from django.forms.widgets import TextInput, MultiWidget, Media
+from django.forms.widgets import TextInput, SelectMultiple, MultiWidget, Media
 from django.utils.safestring import mark_safe
 
 from collections import OrderedDict
 import re
+
+import pdb
 
 #the list of JavaScript files to insert to render any Dictionary widget
 MEDIAS = ('jquery-1.8.0.min.js', 'dict.js')
@@ -142,7 +144,7 @@ class Pair(MultiWidget):
     suffix = 'pair'
 
     def __init__(self, attrs=None, **kwargs):
-        if self.value_type == TextInput:
+        if self.value_type in [TextInput, SelectMultiple]:
             widgets = [self.key_type(), self.value_type()]
         elif self.value_type == Dictionary:
             widgets = [self.key_type(), self.value_type(**kwargs)]
