@@ -26,7 +26,7 @@ $(document).ready(function(){
 	var next_pair_ids = [];
 	var next_dict_ids = [];
 	var dictionary_ul = $('.dictionary');
-
+	var depths = [];
 	var id;
 
 	/************************************************************************
@@ -51,6 +51,7 @@ $(document).ready(function(){
 	print_array(prefixes,'prefixes');
 	print_array(next_pair_ids,'pairs ids');
 	print_array(next_dict_ids,'dict ids');
+	print_array(depths,'depths');
 
 	/************************************************************************
 		Save array information
@@ -62,6 +63,18 @@ $(document).ready(function(){
 		var next_ids = get_next_ids(el.children('li:last-child').children('input:first-child').attr('id'),prefixes[id]);
 		next_pair_ids[id] = next_ids[0];
 		next_dict_ids[id] = next_ids[1];
+		var cl = el.attr('class');
+		var i;
+		if ((i = cl.indexOf('depth_')) != -1){
+			depths[id] = cl.substring(i+6);
+			if (depths[id] == '0'){
+				console.log('depth equal to zero');
+				$('.add_sub_dictionary').remove();
+			}
+		}
+		else{
+			depths[id] = -1;
+		}
 	}
 
 	/************************************************************************
@@ -95,16 +108,23 @@ $(document).ready(function(){
 		Get the next HTML element representing a sub-dictionary
 	************************************************************************/
 
-	function get_dict(id){
+	function get_dict(id, parent){
 		console.log('--------GET DICT-------->');
 		console.log('id : '+id);
+		console.log('depth : '+ depths[parent]);
+		this_depth = id.match(/subdict/igm);
+		this_depth = (this_depth) ? this_depth.length : 0;
+		class_depth = (depths[parent] != -1) ? 'depth_' + depths[parent] : '';
+
 		subdict = '<li><input type="text" name="'+ id.substring(3) +'0" id="'+ id +'0"/> : ';
-		subdict += '<ul id="'+ id +'1_0" class="dictionary">';
+		subdict += '<ul id="'+ id +'1_0" class="dictionary '+ class_depth +'">';
 		subdict += '<li><input type="text" name="'+ id.substring(3) +'1_0_pair_0" id="'+ id +'1_0_pair_0"/> : ';
 		subdict += '<input type="text" name="'+ id.substring(3) +'1_0_pair_1" id="'+ id +'1_0_pair_1"/>';
 		subdict += '<span class="del_pair" id="del_'+ id.substring(3) +'1_0_pair"> - Delete</span></li></ul>';
-		subdict += '<span id="add_pair_'+ id +'1_0" class="add_pair_dictionary">Add field</span> - ';
-		subdict += '<span id="add_sub_'+ id +'1_0" class="add_sub_dictionary">Add subdictionary</span>';
+		subdict += '<span id="add_pair_'+ id +'1_0" class="add_pair_dictionary">Add field</span>';
+		if (this_depth < depths[parent]){
+			subdict += '<span id="add_sub_'+ id +'1_0" class="add_sub_dictionary"> - Add subdictionary</span>';
+		}
 		subdict += '<span class="del_dict" id="del_'+ id.substring(3,id.length-1) +'"> - Delete</span></li>';
 		return subdict;
 	}
@@ -126,7 +146,6 @@ $(document).ready(function(){
 		console.log('i = '+i);
 		next_pair_ids[id] = prefixes[id] + i + '_pair_';
 		next_dict_ids[id] = prefixes[id] + i + '_subdict_';
-
 		print_array(prefixes,'prefixes');
 		print_array(next_pair_ids,'pairs ids');
 		print_array(next_dict_ids,'dict ids');
@@ -148,7 +167,7 @@ $(document).ready(function(){
 		var el, i, del_pair_button, del_dict_button, new_id;
 		console.log('--------DICT UPDATE--------');
 		el = $('#'+id);
-		el.append(get_dict(next_dict_ids[id]));
+		el.append(get_dict(next_dict_ids[id], id));
 		del_pair_button = $('#del_'+ next_dict_ids[id].substring(3) +'1_0_pair');
 		del_dict_button = $('#del_'+ next_dict_ids[id].substring(3, next_dict_ids[id].length-1));
 		el.children('li').children('.del_pair').show();
@@ -163,6 +182,7 @@ $(document).ready(function(){
 		prefixes[new_id] = next_dict_ids[id] + '1_';
 		next_pair_ids[new_id] = prefixes[new_id] + '1_pair_';
 		next_dict_ids[new_id] = prefixes[new_id] + '1_subdict_';
+		depths[new_id] = depths[id];
 
 		print_array(prefixes,'prefixes');
 		print_array(next_pair_ids,'pairs ids');
