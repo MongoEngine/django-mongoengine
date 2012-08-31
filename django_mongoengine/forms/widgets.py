@@ -33,8 +33,6 @@ class Dictionary(MultiWidget):
         #              prevent to save dictionaries with depths
         #              superior to this parameter.
         # flags -- A list of flags. Available values :
-        #               - 'NO_LIST_UNIQ' : transform lists with
-        #                 only one element to a string.
         #               - 'FORCE_SCHEMA' : would force dictionaries
         #                 to keep a certain schema. Only Pair fields
         #                 could be added.
@@ -169,6 +167,7 @@ class Pair(MultiWidget):
     suffix = 'pair'
 
     def __init__(self, attrs=None, **kwargs):
+        widgets = [self.key_type()] if callable(self.key_type) else []
         if self.value_type in [TextInput, SelectMultiple]:
             widgets = [self.key_type(), self.value_type()]
         elif self.value_type == Dictionary:
@@ -231,21 +230,24 @@ class SubDictionary(Pair):
         return '<li>' + ' : '.join(rendered_widgets) + '<span class="del_dict" id="del_%s"> - Delete</span></li>\n' % name
 
 
-class ChoicePair(Pair):
+class StaticPair(Pair):
     """
-    A widget representing a key-value pair in a dictionary, where value is a list of choices
+    A widget representing a key-value pair in a dictionary, where key is just text
     """
 
-    key_type = TextInput
-    value_type = SelectMultiple
-    suffix = 'choice'
+    key_type = ''
+    value_type = TextInput
+    suffix = 'static'
 
     def __init__(self, attrs=None):
-        super(ChoicePair, self).__init__()
+        super(StaticPair, self).__init__(attrs=attrs)
 
-    # def decompress(self, value):
-    #     pass
+    def decompress(self,value):
+        if value is not None:
+            return list(value)
+        else:
+            return ['']
 
     def format_output(self, rendered_widgets, name):
         #pdb.set_trace()
-        return '<li>' + ' : '.join(rendered_widgets) + '<span class="del_choice" id="del_%s"> - Delete</span></li>\n' % name
+        return '<li>%s : ' + rendered_widgets[0] + '<span class="del_static" id="del_%s"> - Delete</span></li>\n' % (self.key_type, name)
