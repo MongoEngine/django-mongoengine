@@ -5,9 +5,11 @@ from django import test
 test.utils.setup_test_environment()
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from django.forms.fields import TextInput
 
 from django_mongoengine.tests import MongoTestCase
 from django_mongoengine.forms.fields import DictField
+from django_mongoengine.forms.widgets import Dictionary, SubDictionary, Pair
 
 #TODO : test for max_depth
 
@@ -24,6 +26,7 @@ class DictFieldTest(MongoTestCase):
         Test the output of a DictField
         """
         self._init_field()
+        max_depth_test = 2
         #valid input/outpout
         valid_input = {
             '[[key1,value1],[key2,value2],[key3,value3]]':
@@ -71,6 +74,7 @@ class DictFieldTest(MongoTestCase):
             '[[keykeykeykeykeykeykeykeykeykeykey,value1],[key2,value2]]': [['keykeykeykeykeykeykeykeykeykeykey', 'value1'], ['key2', 'value2']],
             '[[err,value1],[key2,value2]]': [['err', 'value1'], ['key2', 'value2']],
             '[[errmsg,value1],[key2,value2]]': [['errmsg', 'value1'], ['key2', 'value2']],
+            '[[key1,[key2,[key3,[key4,value4]]]]]': [['key1', [['key2', [['key3', [['key4', 'value4']]]]]]]],
         }
         invalid_message = {
             '[[key1,value1],[$key2,value2]]': [u'Ensure the keys do not begin with : ["$","_"].'],
@@ -79,6 +83,7 @@ class DictFieldTest(MongoTestCase):
             '[[keykeykeykeykeykeykeykeykeykeykey,value1],[key2,value2]]': [self.field.error_messages['length'] % self.field.key_limit],
             '[[err,value1],[key2,value2]]': [self.field.error_messages['invalid_key'] % self.field.invalid_keys],
             '[[errmsg,value1],[key2,value2]]': [self.field.error_messages['invalid_key'] % self.field.invalid_keys],
+            '[[key1,[key2,[key3,[key4,value4]]]]]': [self.field.error_messages['depth'] % max_depth_test],
         }
 
         # test valid inputs
@@ -87,6 +92,7 @@ class DictFieldTest(MongoTestCase):
             assert isinstance(out, dict), 'output should be a dictionary'
             self.assertDictEqual(out, output)
         # test invalid inputs
+        self._init_field(depth=max_depth_test)
         for input, input_list in invalid_input.items():
             with self.assertRaises(ValidationError) as context_manager:
                 self.field.clean(input_list)
@@ -138,8 +144,8 @@ class DictFieldTest(MongoTestCase):
             self.field.widget.render('widget_name', data_dicts[data])
             self._check_structure(self.field.widget, output_structures[data])
 
-    def _init_field(self, attr=None):
-        validate = [RegexValidator(regex='^[^$_]', message=u'Ensure the keys do not begin with : ["$","_"]', code='invalid_start')]
+    def _init_field(self, depth=None):
+        validate = [RegexValidator(regex='^[^$_]', message=u'Ensure the keys do not begin with : ["$","_"].', code='invalid_start')]
         self.field = DictField(**{
             'required': False,
             'initial': {
@@ -148,6 +154,9 @@ class DictFieldTest(MongoTestCase):
             },
             'validators': validate,
         })
+        if depth is not None:
+            self.field.widget = Dictionary(max_depth=depth)
+            self.field.max_depth = depth
 
     def _check_structure(self, widget, structure):
         assert isinstance(structure, dict), 'error, the comparative structure should be a dictionary'

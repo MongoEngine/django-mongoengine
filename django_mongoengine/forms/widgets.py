@@ -233,6 +233,7 @@ class SubDictionary(Pair):
 class StaticPair(Pair):
     """
     A widget representing a key-value pair in a dictionary, where key is just text
+    (this is only relevant when FORCE_SCHEMA flag is used)
     """
 
     key_type = ''
