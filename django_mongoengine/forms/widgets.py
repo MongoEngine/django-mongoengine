@@ -44,14 +44,14 @@ class Dictionary(MultiWidget):
 
         #pdb.set_trace()
         self.no_schema = no_schema
-        self.max_depth = max_depth
+        self.max_depth = max_depth if max_depth is not None and max_depth >= 0 else None
         self.flags = flags
         self.sub_choices = sub_choices
         widget_object = []
         if isinstance(schema, dict) and self.no_schema > 0:
             for key in schema:
                 if isinstance(schema[key], dict):
-                    widget_object.append(SubDictionary(schema=schema[key], attrs=attrs))
+                    widget_object.append(SubDictionary(schema=schema[key], max_depth=max_depth, attrs=attrs))
                 else:
                     widget_object.append(Pair(attrs=attrs))
         else:
@@ -110,7 +110,7 @@ class Dictionary(MultiWidget):
             else:
                 match = re.match(name + '_(\d+)_subdict_0', data_key)
                 if match is not None:
-                        self.widgets.append(SubDictionary(no_schema=0, attrs=self.attrs))
+                        self.widgets.append(SubDictionary(no_schema=0, max_depth=self.max_depth, attrs=self.attrs))
                         html_indexes.append(match.group(1))
                 else:
                     match = re.match(name + '_(\d+)_choice_0', data_key)
@@ -120,20 +120,19 @@ class Dictionary(MultiWidget):
         return [widget.value_from_datadict(data, files, name + '_%s_%s' % (html_indexes[i], widget.suffix)) for i, widget in enumerate(self.widgets)]
 
     def format_output(self, name, rendered_widgets):
-        span_depth = ''
-        if self.max_depth:
-            span_depth = '<span id="id_%s" class="depth_%s"></span>' % (self.id_for_label(name), self.max_depth)
-        return '<ul id="id_%s" class="dictionary">\n' % (self.id_for_label(name)) + ''.join(rendered_widgets) + '</ul>\n' + \
-               '<span id="add_id_%s" class="add_pair_dictionary">Add field</span> - ' % (self.id_for_label(name)) + \
-               '<span id="add_sub_id_%s" class="add_sub_dictionary">Add subdictionary</span>' % (self.id_for_label(name)) + \
-               span_depth
+        class_depth = ''
+        if self.max_depth is not None:
+            class_depth = 'depth_%s' % self.max_depth
+        return '<ul id="id_%s" class="dictionary %s">\n' % (self.id_for_label(name), class_depth) + ''.join(rendered_widgets) + '</ul>\n' + \
+               '<span id="add_id_%s" class="add_pair_dictionary">Add field</span>' % (self.id_for_label(name)) + \
+               '<span id="add_sub_id_%s" class="add_sub_dictionary"> - Add subdictionary</span>' % (self.id_for_label(name))
 
     def update_widgets(self, keys, erase=False):
         if erase:
             self.widgets = []
         for k in keys:
             if (isinstance(k[1], dict)):
-                self.widgets.append(SubDictionary(schema=k[1], no_schema=2, attrs=self.attrs))
+                self.widgets.append(SubDictionary(schema=k[1], no_schema=2, max_depth=self.max_depth, attrs=self.attrs))
             else:
                 self.widgets.append(Pair(attrs=self.attrs))
 
@@ -218,8 +217,8 @@ class SubDictionary(Pair):
     value_type = Dictionary
     suffix = 'subdict'
 
-    def __init__(self, schema={'key': 'value'}, no_schema=1, attrs=None):
-        super(SubDictionary, self).__init__(attrs=attrs, schema=schema, no_schema=no_schema)
+    def __init__(self, schema={'key': 'value'}, no_schema=1, max_depth=None, attrs=None):
+        super(SubDictionary, self).__init__(attrs=attrs, schema=schema, no_schema=no_schema, max_depth=max_depth)
 
     def decompress(self, value):
         if value is not None:
