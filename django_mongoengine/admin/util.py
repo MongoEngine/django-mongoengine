@@ -9,6 +9,7 @@ from mongoengine import fields
 from django_mongoengine.forms.document_options import DocumentMetaWrapper
 from django_mongoengine.forms.utils import init_document_options
 
+
 class RelationWrapper(object):
     """
     Wraps a document referenced from a ReferenceField with an Interface similiar to
@@ -16,6 +17,7 @@ class RelationWrapper(object):
     """
     def __init__(self, document):
         self.to = init_document_options(document)
+
 
 def label_for_field(name, model, model_admin=None, return_attr=False):
     attr = None
@@ -41,7 +43,6 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
                     message += " or %s" % (model_admin.__class__.__name__,)
                 raise AttributeError(message)
 
-
             if hasattr(attr, "short_description"):
                 label = attr.short_description
             elif callable(attr):
@@ -56,15 +57,16 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     else:
         return label
 
+
 def display_for_field(value, field):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
     from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 
-    if field.flatchoices:
-        return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
+    # if field.flatchoices:
+    #     return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
     # NullBooleanField needs special-case null-handling, so it comes
     # before the general null test.
-    elif isinstance(field, fields.BooleanField):
+    if isinstance(field, fields.BooleanField):
         return _boolean_icon(value)
     elif value is None:
         return EMPTY_CHANGELIST_VALUE
@@ -76,3 +78,11 @@ def display_for_field(value, field):
         return formats.number_format(value)
     else:
         return smart_unicode(value)
+
+
+def help_text_for_field(name, model):
+    try:
+        help_text = model._meta.get_field_by_name(name)[0].help_text
+    except FieldDoesNotExist:
+        help_text = ""
+    return smart_unicode(help_text, strings_only=True)
