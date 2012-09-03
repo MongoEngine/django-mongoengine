@@ -168,7 +168,7 @@ class DictField(forms.Field):
     #limit depth for dictionaries
     max_depth = None
 
-    def __init__(self, max_depth=5, flags=None, sub_choices=None, *args, **kwargs):
+    def __init__(self, max_depth=5, flags=None, *args, **kwargs):
         if 'error_messages' in kwargs.keys():
             kwargs['error_messages'].update(self.error_messages)
         else:
@@ -176,6 +176,7 @@ class DictField(forms.Field):
 
         super(DictField, self).__init__(*args, **kwargs)
         schema = None
+        #Here it needs to be clearer, because this is only useful when creating an object, 
         #if no default value is provided, default is callable
         if not callable(self.initial):
             if isinstance(self.initial, dict):
@@ -183,7 +184,7 @@ class DictField(forms.Field):
 
         #pdb.set_trace()
         #here if other parameters are passed, like max_depth, sub_choices and flags, then we hand them to the dict
-        self.widget = Dictionary(max_depth=max_depth, flags=flags, sub_choices=sub_choices, schema=schema)
+        self.widget = Dictionary(max_depth=max_depth, flags=flags, schema=schema)
 
     def prepare_value(self, value):
         #pdb.set_trace()

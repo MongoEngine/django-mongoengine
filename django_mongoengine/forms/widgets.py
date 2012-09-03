@@ -15,7 +15,7 @@ class Dictionary(MultiWidget):
     A widget representing a dictionary field
     """
 
-    def __init__(self, schema=None, no_schema=1, max_depth=None, flags=None, sub_choices=None, attrs=None):
+    def __init__(self, schema=None, no_schema=1, max_depth=None, flags=None, attrs=None):
         # schema -- A dictionary representing the future schema of
         #            the Dictionary widget. It is responsible for the
         #            creation of subwidgets.
@@ -36,15 +36,11 @@ class Dictionary(MultiWidget):
         #               - 'FORCE_SCHEMA' : would force dictionaries
         #                 to keep a certain schema. Only Pair fields
         #                 could be added.
-        # sub_choices -- A dictionary describing a list of choices for
-        #                a given key. The first matching key is
-        #                concerned.
 
         #pdb.set_trace()
         self.no_schema = no_schema
         self.max_depth = max_depth if max_depth is not None and max_depth >= 0 else None
         self.flags = flags
-        self.sub_choices = sub_choices
         widget_object = []
         if isinstance(schema, dict) and self.no_schema > 0:
             for key in schema:
@@ -110,11 +106,11 @@ class Dictionary(MultiWidget):
                 if match is not None:
                         self.widgets.append(SubDictionary(no_schema=0, max_depth=self.max_depth, attrs=self.attrs))
                         html_indexes.append(match.group(1))
-                else:
-                    match = re.match(name + '_(\d+)_choice_0', data_key)
-                    if match is not None:
-                        self.widgets.append(ChoicePair(no_schema=0, attrs=self.attrs))
-                        html_indexes.append(match.group(1))
+                # else:
+                #     match = re.match(name + '_(\d+)_choice_0', data_key)
+                #     if match is not None:
+                #         self.widgets.append(ChoicePair(no_schema=0, attrs=self.attrs))
+                #         html_indexes.append(match.group(1))
         return [widget.value_from_datadict(data, files, name + '_%s_%s' % (html_indexes[i], widget.suffix)) for i, widget in enumerate(self.widgets)]
 
     def format_output(self, name, rendered_widgets):
@@ -243,7 +239,7 @@ class StaticPair(Pair):
     def __init__(self, attrs=None):
         super(StaticPair, self).__init__(attrs=attrs)
 
-    def decompress(self,value):
+    def decompress(self, value):
         if value is not None:
             return list(value)
         else:
