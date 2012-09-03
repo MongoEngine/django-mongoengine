@@ -33,6 +33,7 @@ from django_mongoengine.fields import (DateTimeField, URLField, IntField,
 
 from django_mongoengine.admin import helpers as mongodb_helpers
 from django_mongoengine.admin.util import RelationWrapper
+from django_mongoengine.admin.helpers import AdminForm
 
 from django_mongoengine.forms.document_options import DocumentMetaWrapper
 from django_mongoengine.forms.documents import (
@@ -1044,7 +1045,7 @@ class DocumentAdmin(BaseDocumentAdmin):
                                   queryset=inline.queryset(request))
                 formsets.append(formset)
 
-        adminForm = helpers.AdminForm(form, list(self.get_fieldsets(request)),
+        adminForm = AdminForm(form, list(self.get_fieldsets(request)),
             self.prepopulated_fields, self.get_readonly_fields(request),
             model_admin=self)
         media = self.media + adminForm.media
@@ -1146,7 +1147,7 @@ class DocumentAdmin(BaseDocumentAdmin):
                                   queryset=inline.queryset(request))
                 formsets.append(formset)
 
-        adminForm = helpers.AdminForm(form, self.get_fieldsets(request, obj),
+        adminForm = AdminForm(form, self.get_fieldsets(request, obj),
             self.prepopulated_fields, self.get_readonly_fields(request, obj),
             model_admin=self)
         media = self.media + adminForm.media
