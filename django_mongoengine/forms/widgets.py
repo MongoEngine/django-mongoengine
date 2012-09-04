@@ -7,7 +7,7 @@ import re
 import pdb
 
 #the list of JavaScript files to insert to render any Dictionary widget
-MEDIAS = ('jquery-1.8.0.min.js', 'dict.js')
+MEDIAS = ('jquery-1.8.0.min.js', 'dict.js', 'helper.js')
 
 
 class Dictionary(MultiWidget):
