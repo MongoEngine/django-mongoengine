@@ -1,11 +1,14 @@
 from django import forms
 from django.core.validators import EMPTY_VALUES
+from django.core.exceptions import ValidationError
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.translation import ugettext_lazy as _
 
+from django_mongoengine.forms.widgets import Dictionary
+
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
-
+import pdb
 
 class MongoChoiceIterator(object):
     def __init__(self, field):
@@ -83,7 +86,7 @@ class ReferenceField(forms.ChoiceField):
             queryset = self.queryset.clone()
             obj = queryset.get(id=oid)
         except (TypeError, InvalidId, self.queryset._document.DoesNotExist):
-            raise forms.ValidationError(self.error_messages['invalid_choice'] % {'value':value})
+            raise forms.ValidationError(self.error_messages['invalid_choice'] % {'value': value})
         return obj
 
     # Fix for Django 1.4
@@ -95,6 +98,7 @@ class ReferenceField(forms.ChoiceField):
         result.queryset = result.queryset
         result.empty_label = result.empty_label
         return result
+
 
 class DocumentMultipleChoiceField(ReferenceField):
     """A MultipleChoiceField whose choices are a model QuerySet."""
@@ -141,3 +145,88 @@ class DocumentMultipleChoiceField(ReferenceField):
         if hasattr(value, '__iter__') and not hasattr(value, '_meta'):
             return [super(DocumentMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(DocumentMultipleChoiceField, self).prepare_value(value)
+
+
+class DictField(forms.Field):
+    """
+    DictField for mongo forms
+    """
+
+    error_messages = {
+        'length': _(u'Ensure the keys length is less than or equal to %s.'),
+        'invalid_key': _(u'Ensure the keys are not : %s.'),
+        'illegal': _(u'Ensure the keys does not contain any illegal character : %s.'),
+        'depth': _(u'Ensure the dictionary depth is less than or equal to %s.')
+    }
+
+    #Mongo reserved keywords
+    invalid_keys = ['err', 'errmsg']
+    #Mongo prohibit . in keys
+    illegal_characters = ['.']
+    #limit key length for efficiency
+    key_limit = 30
+    #limit depth for dictionaries
+    max_depth = None
+
+    def __init__(self, max_depth=5, flags=None, *args, **kwargs):
+        if 'error_messages' in kwargs.keys():
+            kwargs['error_messages'].update(self.error_messages)
+        else:
+            kwargs['error_messages'] = self.error_messages
+
+        super(DictField, self).__init__(*args, **kwargs)
+        schema = None
+        #Here it needs to be clearer, because this is only useful when creating an object, 
+        #if no default value is provided, default is callable
+        if not callable(self.initial):
+            if isinstance(self.initial, dict):
+                schema = self.initial
+
+        #pdb.set_trace()
+        #here if other parameters are passed, like max_depth, sub_choices and flags, then we hand them to the dict
+        self.widget = Dictionary(max_depth=max_depth, flags=flags, schema=schema)
+
+    def prepare_value(self, value):
+        #pdb.set_trace()
+        return value
+
+    def to_python(self, value):
+        #pdb.set_trace()
+        value = self.get_dict(value)
+        return value
+
+    def clean(self, value):
+        #pdb.set_trace()
+        self.max_depth = self.widget.max_depth
+        value = self.to_python(value)
+        self.validate(value)
+        return value
+
+    def get_dict(self, a_list):
+        """
+        A function that return a dictionary from a list of lists, with any depth
+        """
+        d = {}
+        for k in a_list:
+            if (isinstance(k, list)):
+                if isinstance(k[1], list) and k[0]:
+                    d.update({k[0]: self.get_dict(k[1])})
+                elif k[0]:
+                    d.update({k[0]: k[1]})
+        return d
+
+    def validate(self, value, depth=0):
+        #we should not use the super.validate method
+        if self.max_depth and depth > self.max_depth:
+            raise ValidationError(self.error_messages['depth'] % self.max_depth)
+        for k, v in value.items():
+            self.run_validators(k)
+            if k in self.invalid_keys:
+                raise ValidationError(self.error_messages['invalid_key'] % self.invalid_keys)
+            if len(k) > self.key_limit:
+                raise ValidationError(self.error_messages['length'] % self.key_limit)
+            for u in self.illegal_characters:
+                if u in k:
+                    raise ValidationError(self.error_messages['illegal'] % self.illegal_characters)
+            if isinstance(v, dict):
+                self.validate(v, depth + 1)
