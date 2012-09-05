@@ -2,7 +2,6 @@ from django.utils.encoding import force_unicode, smart_unicode, smart_str
 from django.forms.forms import pretty_name
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import formats
-from django.db.models.options import get_verbose_name
 
 from mongoengine import fields
 

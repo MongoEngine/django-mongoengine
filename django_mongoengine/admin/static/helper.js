@@ -1,18 +1,14 @@
 $(document).ready(function(){
 
     /*----------------------------------------------------------------------*/
-    var DEBUG = true;
-
-    if (!DEBUG){
-        console.log = function(){};
-    }
+    var DEBUG = false;
 
     function print_array(a,name){
-        console.log('--------------------');
+        debug('--------------------');
         if ($.isArray(a)){
             for (var key in a){
                 if (key === 'length' || !a.hasOwnProperty(key)) continue;
-                console.log(name+'['+key+'] = '+a[key]);
+                debug(name+'['+key+'] = '+a[key]);
             }
         }
     }
@@ -23,7 +19,7 @@ $(document).ready(function(){
     ************************************************************************/
 
     var readonly_dicts = $('p:contains({)');
-    console.log(readonly_dicts);
+    debug(readonly_dicts);
     readonly_dicts.each(function(){
         var text = $(this).text();
         text = text.replace(/u'/g, '');
@@ -32,10 +28,10 @@ $(document).ready(function(){
     });
 
     function get_html(text){
-        console.log('------ENTERING get_html');
+        debug('------ENTERING get_html');
         var html = '<ul>';
         var pairs = get_pairs(text);
-        console.log(pairs);
+        debug(pairs);
         for (var i = 0; i < pairs.length; i++){
             if (pairs[i][1].contains('{')){
                 html += '<li>' + pairs[i][0] + ': ' + get_html(pairs[i][1]) + '</li>';
@@ -55,8 +51,14 @@ $(document).ready(function(){
         for (var i = 0; i < pairs.length; i++){
                 pairs[i] = pairs[i].split(': ');
         }
-        console.log('------PAIRS : ');
-        console.log(pairs);
+        debug('------PAIRS : ');
+        debug(pairs);
         return pairs;
+    }
+
+    function debug(text) {
+        if (DEBUG) {
+            console.log(text)
+        }
     }
 });

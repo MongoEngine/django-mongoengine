@@ -1,13 +1,11 @@
+import re
+
 from django.forms.widgets import TextInput, SelectMultiple, MultiWidget, Media
 from django.utils.safestring import mark_safe
 
 from django_mongoengine.utils import OrderedDict
 
-import re
-
-import pdb
-
-#the list of JavaScript files to insert to render any Dictionary widget
+# The list of JavaScript files to insert to render any Dictionary widget
 MEDIAS = ('jquery-1.8.0.min.js', 'dict.js', 'helper.js')
 
 

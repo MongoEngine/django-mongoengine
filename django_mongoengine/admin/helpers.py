@@ -8,12 +8,13 @@ from django.contrib.admin.helpers import InlineAdminFormSet as DjangoInlineAdmin
 from django.contrib.admin.helpers import InlineFieldset as DjangoInlineFieldset
 from django.contrib.admin.helpers import AdminField
 from django.core.exceptions import ObjectDoesNotExist
-#from django.db.models.fields.related import ManyToManyRel
+
 from django.utils.encoding import smart_unicode
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-from django_mongoengine.admin.util import display_for_field, label_for_field, help_text_for_field
+from django_mongoengine.admin.util import (display_for_field,
+        label_for_field, help_text_for_field)
 
 
 class AdminForm(DjangoAdminForm):
@@ -116,8 +117,6 @@ class InlineAdminForm(DjangoInlineAdminForm, AdminForm):
     """
     def __init__(self, formset, form, fieldsets, prepopulated_fields, original,
       readonly_fields=None, model_admin=None):
-        # import pdb
-        # pdb.set_trace()
         self.formset = formset
         self.model_admin = model_admin
         self.original = original
