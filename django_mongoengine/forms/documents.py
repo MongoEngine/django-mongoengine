@@ -54,16 +54,15 @@ def construct_instance(form, instance, fields=None, exclude=None, ignore=None):
             continue
         if exclude and f.name in exclude:
             continue
+        if f.primary_key and cleaned_data[f.name] == getattr(instance, f.name):
+            continue
+
         # Defer saving file-type fields until after the other fields, so a
         # callable upload_to can use the values from other fields.
         if isinstance(f, FileField) or isinstance(f, ImageField):
             file_field_list.append(f)
-            continue
-
-        if f.primary_key and cleaned_data[f.name] == getattr(instance, f.name):
-            continue
-
-        setattr(instance, f.name, cleaned_data[f.name])
+        else:
+            setattr(instance, f.name, cleaned_data[f.name])
 
     for f in file_field_list:
         upload = cleaned_data[f.name]

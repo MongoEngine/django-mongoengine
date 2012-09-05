@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import patterns, include, url
 
 from tumblelog.views import (PostIndexView, AddPostView, PostDetailView,
-                             UpdatePostView, DeletePostView)
+                             UpdatePostView, DeletePostView, ImageFileView)
 
 # # Enable admin
 from django.contrib import admin
@@ -19,7 +19,10 @@ post_patterns  = patterns('',
 urlpatterns = patterns('',
     url(r'^$', PostIndexView.as_view(), name="post_index"),
     url(r'^new/$', AddPostView.as_view(), name="post_new"),
-    url(r'^new/(?P<post_type>(post|video|image|quote))/$', AddPostView.as_view(), name="post_new"),
+    url(r'^new/(?P<post_type>(post|video|image|quote))/$',
+            AddPostView.as_view(), name="post_new"),
     url(r'^admin/', include(site.urls)),
-    url(r'^(?P<slug>[a-zA-Z0-9-]+)/', include(post_patterns)),
+    url(r'^image-file/(?P<slug>[a-zA-Z0-9-]+)/', ImageFileView.as_view(),
+            name="image_file"),
+    url(r'^(?P<slug>[a-zA-Z0-9-]+)/', include(post_patterns))
 )

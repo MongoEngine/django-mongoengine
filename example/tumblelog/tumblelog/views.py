@@ -1,9 +1,9 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 
 from django_mongoengine.forms.documents import documentform_factory
 from django_mongoengine.views import (CreateView, UpdateView,
                                       DeleteView, ListView, DetailView,
-                                      EmbeddedDetailView)
+                                      EmbeddedDetailView, View)
 
 from tumblelog.models import Post, BlogPost, Video, Image, Quote
 from tumblelog.forms import CommentForm
@@ -42,3 +42,12 @@ class DeletePostView(DeleteView):
 class UpdatePostView(UpdateView):
     document = Post
     form_exclude = ('created_at', 'comments',)
+
+
+class ImageFileView(View):
+
+    def get(self, request, slug, *args, **kwargs):
+        image_doc = Image.objects.get_or_404(slug=slug)
+        image = image_doc.image
+        return HttpResponse(image.read(),
+                            mimetype='image/%s' % image.format.lower())

@@ -30,8 +30,8 @@
   {% if post.embed_code %}
     {{ post.embed_code|safe }}
   {% endif %}
-  {% if post.image_url %}
-    <p><img src="{{ post.image_url }}" /><p>
+  {% if post.image %}
+    <p><img src="{% url 'image_file' slug=post.slug %}" width="{{ post.image.size.0 }}" height="{{ post.image.size.1 }}" /><p>
   {% endif %}
   {% if post.author %}
     <blockquote>{{ post.body|linebreaksbr }}</blockquote>

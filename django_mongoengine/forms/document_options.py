@@ -46,8 +46,8 @@ class DocumentMetaWrapper(object):
 
     def __init__(self, document):
         self.document = document
-        self.concrete_model = document
         self._meta = document._meta
+        self.concrete_model = document
 
         try:
             self.object_name = self.document.__name__

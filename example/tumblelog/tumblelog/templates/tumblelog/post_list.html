@@ -33,7 +33,7 @@
         {{ post.embed_code|safe }}
       {% endif %}
       {% if post.post_type == 'Image' %}
-        <p><img src="{{ post.image_url }}" /><p>
+        <p><img src="{% url 'image_file' slug=post.slug %}" width="100px" height="100px" /><p>
       {% endif %}
       {% if post.post_type == 'Quote' %}
         <blockquote>{{ post.body|truncatewords:13 }}</blockquote>

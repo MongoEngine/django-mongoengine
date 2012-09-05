@@ -38,7 +38,7 @@ class Video(Post):
 
 
 class Image(Post):
-    image_url = fields.StringField(required=True, max_length=255)
+    image = fields.ImageField(required=True)
 
 
 class Quote(Post):
