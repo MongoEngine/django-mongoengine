@@ -22,6 +22,13 @@ try:
 except:
    pass
 
+
+REQUIRES = ['Django>=1.3', 'mongoengine']
+
+if sys.version_info < (2, 7):
+    REQUIRES += ['ordereddict']
+
+
 setup(
     name='django-mongoengine',
     version='0.1',
@@ -34,10 +41,7 @@ setup(
     test_suite='nose.collector',
     zip_safe=False,
     platforms='any',
-    install_requires=[
-        'Django>=1.3',
-        'mongoengine'
-    ],
+    install_requires=REQUIRES,
     packages=['django_mongoengine',
               'django_mongoengine.debug_toolbar',
               'django_mongoengine.forms',

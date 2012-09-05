@@ -42,12 +42,11 @@ class DocumentMetaWrapper(object):
     many_to_many = []
     _field_cache = None
     document = None
-    #don't know why it bugs for me
-    _meta = {}
+    _meta = None
 
     def __init__(self, document):
         self.document = document
-        self._meta = document._meta
+        self._meta = document._meta or {}
         self.concrete_model = document
 
         try:
@@ -191,6 +190,9 @@ class DocumentMetaWrapper(object):
 
     def __getitem__(self, key):
         return self._meta[key]
+
+    def __contains__(self, key):
+        return key in self._meta
 
     def get(self, key, default=None):
         try:

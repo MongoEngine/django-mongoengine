@@ -1,7 +1,8 @@
 from django.forms.widgets import TextInput, SelectMultiple, MultiWidget, Media
 from django.utils.safestring import mark_safe
 
-from collections import OrderedDict
+from django_mongoengine.utils import OrderedDict
+
 import re
 
 import pdb
@@ -16,36 +17,38 @@ class Dictionary(MultiWidget):
     """
 
     def __init__(self, schema=None, no_schema=1, max_depth=None, flags=None, attrs=None):
-        # schema -- A dictionary representing the future schema of
-        #            the Dictionary widget. It is responsible for the
-        #            creation of subwidgets.
-        # no_schema -- An integer that can take 3 values : 0,1,2.
-        #               0 means that no schema was passed.
-        #               1 means that the schema passed was the default
-        #               one. This is the default value.
-        #               2 means that the schema passed was given
-        #               by a parent widget, and that it actually
-        #               represent data for rendering.
-        #               3 means that the schema was rebuilt after
-        #               retrieving form data.
-        # max_depth -- An integer representing the max depth of
-        #              sub-dicts. If passed, the system will
-        #              prevent to save dictionaries with depths
-        #              superior to this parameter.
-        # flags -- A list of flags. Available values :
-        #               - 'FORCE_SCHEMA' : would force dictionaries
-        #                 to keep a certain schema. Only Pair fields
-        #                 could be added.
-
-        #pdb.set_trace()
+        """
+        :param schema: A dictionary representing the future schema of
+                       the Dictionary widget. It is responsible for the
+                       creation of subwidgets.
+        :param no_schema: An integer that can take 3 values : 0,1,2.
+                          0 means that no schema was passed.
+                          1 means that the schema passed was the default
+                          one. This is the default value.
+                          2 means that the schema passed was given
+                          by a parent widget, and that it actually
+                          represent data for rendering.
+                          3 means that the schema was rebuilt after
+                          retrieving form data.
+        :param max_depth: An integer representing the max depth of
+                          sub-dicts. If passed, the system will
+                          prevent to save dictionaries with depths
+                          superior to this parameter.
+        :param flags:    A list of flags. Available values :
+                         - 'FORCE_SCHEMA' : would force dictionaries
+                            to keep a certain schema. Only Pair fields
+                            could be added.
+        """
         self.no_schema = no_schema
-        self.max_depth = max_depth if max_depth is not None and max_depth >= 0 else None
+        self.max_depth = (max_depth if max_depth is not None and max_depth >= 0
+                                    else None)
         self.flags = flags
         widget_object = []
         if isinstance(schema, dict) and self.no_schema > 0:
             for key in schema:
                 if isinstance(schema[key], dict):
-                    widget_object.append(SubDictionary(schema=schema[key], max_depth=max_depth, attrs=attrs))
+                    widget_object.append(SubDictionary(schema=schema[key],
+                                         max_depth=max_depth, attrs=attrs))
                 else:
                     widget_object.append(Pair(attrs=attrs))
         else:
@@ -58,7 +61,8 @@ class Dictionary(MultiWidget):
             value = self.dict_sort(value)
             value = value.items()
 
-            #if the schema in place wasn't passed by a parent widget, we need to rebuild it
+            # If the schema in place wasn't passed by a parent widget
+            # we need to rebuild it
             if self.no_schema < 2:
                 self.update_widgets(value, erase=True)
             return value
@@ -81,16 +85,22 @@ class Dictionary(MultiWidget):
                 widget_value = None
             suffix = widget.suffix
             if id_:
-                final_attrs = dict(final_attrs, id='%s_%s_%s' % (id_, i, suffix))
-            output.append(widget.render(name + '_%s_%s' % (i, suffix), widget_value, final_attrs))
+                final_attrs = dict(final_attrs, id='%s_%s_%s' %
+                                   (id_, i, suffix))
+            output.append(widget.render('%s_%s_%s' % (name, i, suffix),
+                                        widget_value,
+                                        final_attrs))
         return mark_safe(self.format_output(name, output))
 
     def value_from_datadict(self, data, files, name):
-        # I think the best solution here is to start from scratch, i mean :
-        #     - erase every widget ;
-        #    - create the new ones from the data dictionary
-        # It would take into account every modification on the structure, and
-        # make form repopulation automatic
+        """
+        Process is:
+            - erase every widget ;
+            - create the new ones from the data dictionary
+
+        It would take into account every modification on the structure, and
+        make form repopulation automatic
+        """
 
         data_keys = data.keys()
         self.widgets = []
@@ -104,29 +114,48 @@ class Dictionary(MultiWidget):
             else:
                 match = re.match(name + '_(\d+)_subdict_0', data_key)
                 if match is not None:
-                        self.widgets.append(SubDictionary(no_schema=0, max_depth=self.max_depth, attrs=self.attrs))
+                        self.widgets.append(
+                            SubDictionary(no_schema=0,
+                                          max_depth=self.max_depth,
+                                          attrs=self.attrs)
+                        )
                         html_indexes.append(match.group(1))
-                # else:
-                #     match = re.match(name + '_(\d+)_choice_0', data_key)
-                #     if match is not None:
-                #         self.widgets.append(ChoicePair(no_schema=0, attrs=self.attrs))
-                #         html_indexes.append(match.group(1))
-        return [widget.value_from_datadict(data, files, name + '_%s_%s' % (html_indexes[i], widget.suffix)) for i, widget in enumerate(self.widgets)]
+
+        return [widget.value_from_datadict(
+                    data, files,
+                    '%s_%s_%s' % (name, html_indexes[i], widget.suffix))
+                    for i, widget in enumerate(self.widgets)]
 
     def format_output(self, name, rendered_widgets):
         class_depth = ''
         if self.max_depth is not None:
             class_depth = 'depth_%s' % self.max_depth
-        return '<ul id="id_%s" class="dictionary %s">\n' % (self.id_for_label(name), class_depth) + ''.join(rendered_widgets) + '</ul>\n' + \
-               '<span id="add_id_%s" class="add_pair_dictionary">Add field</span>' % (self.id_for_label(name)) + \
-               '<span id="add_sub_id_%s" class="add_sub_dictionary"> - Add subdictionary</span>' % (self.id_for_label(name))
+
+        params = {'id': "id_%s" % self.id_for_label(name),
+         'class_depth': class_depth,
+         'widgets': ''.join(rendered_widgets),
+         'add_id': 'add_id_%s' % self.id_for_label(name),
+         'add_sub_id': 'add_sub_id_%s' % self.id_for_label(name)
+        }
+
+        return """
+<ul id="id_%(id)s" class="dictionary %(class_depth)s">
+  %(widgets)s
+</ul>
+<span id="%(add_id)s" class="add_pair_dictionary">Add field</span>
+<span id="%(add_sub_id)s" class="add_sub_dictionary">
+    - Add subdictionary
+</span>
+""" % params
 
     def update_widgets(self, keys, erase=False):
         if erase:
             self.widgets = []
         for k in keys:
             if (isinstance(k[1], dict)):
-                self.widgets.append(SubDictionary(schema=k[1], no_schema=2, max_depth=self.max_depth, attrs=self.attrs))
+                self.widgets.append(
+                    SubDictionary(schema=k[1], no_schema=2,
+                                 max_depth=self.max_depth, attrs=self.attrs))
             else:
                 self.widgets.append(Pair(attrs=self.attrs))
 
@@ -212,8 +241,14 @@ class SubDictionary(Pair):
     value_type = Dictionary
     suffix = 'subdict'
 
-    def __init__(self, schema={'key': 'value'}, no_schema=1, max_depth=None, attrs=None):
-        super(SubDictionary, self).__init__(attrs=attrs, schema=schema, no_schema=no_schema, max_depth=max_depth)
+    def __init__(self, schema=None, no_schema=1, max_depth=None,
+                 attrs=None):
+        if schema is None:
+            schema = {'key': 'value'}
+
+        super(SubDictionary, self).__init__(attrs=attrs, schema=schema,
+                                            no_schema=no_schema,
+                                            max_depth=max_depth)
 
     def decompress(self, value):
         if value is not None:
@@ -222,14 +257,19 @@ class SubDictionary(Pair):
             return ['', {}]
 
     def format_output(self, rendered_widgets, name):
-        #pdb.set_trace()
-        return '<li>' + ' : '.join(rendered_widgets) + '<span class="del_dict" id="del_%s"> - Delete</span></li>\n' % name
+        params = {
+            "widgets": ' : '.join(rendered_widgets),
+            "del_id": "del_%s" % name
+        }
+        return """
+<li> %(widgets)s <span class="del_dict" id="%(del_id)s"> - Delete</span>
+</li>""" % params
 
 
 class StaticPair(Pair):
     """
-    A widget representing a key-value pair in a dictionary, where key is just text
-    (this is only relevant when FORCE_SCHEMA flag is used)
+    A widget representing a key-value pair in a dictionary, where key is just
+    text (this is only relevant when FORCE_SCHEMA flag is used)
     """
 
     key_type = ''
@@ -246,5 +286,11 @@ class StaticPair(Pair):
             return ['']
 
     def format_output(self, rendered_widgets, name):
-        #pdb.set_trace()
-        return '<li>%s : ' + rendered_widgets[0] + '<span class="del_static" id="del_%s"> - Delete</span></li>\n' % (self.key_type, name)
+        params = {
+            "widget": rendered_widgets[0],
+            "del_id": "del_%s" % name
+        }
+        return """
+<li>%(key_type)s :  %(widget)s
+    <span class="del_dict" id="%(del_id)s"> - Delete</span>
+</li>""" % params
