@@ -2,7 +2,7 @@
 
 {% block page_header %}
   <div class="page-header">
-    <h1>{{ form.instance|yesno:"Edit post,Create new post"|title }}</h1>
+    <h1>{{ form.instance.slug|yesno:"Edit post,Create new post"|title }}</h1>
   </div>
 {% endblock %}
 
@@ -17,7 +17,7 @@
   <form action="." method="post">
     {% include "_forms.html" %}
     <div class="actions">
-      <input type="submit" class="btn primary" value="{{ form.instance|yesno:"Edit post,Create new post" }}">
+      <input type="submit" class="btn primary" value="{{ form.instance.slug|yesno:"Edit post,Create new post" }}">
     </div>
   </form>
 {% endblock %}

@@ -8,7 +8,7 @@ from django_mongoengine.forms.widgets import Dictionary
 
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
-import pdb
+
 
 class MongoChoiceIterator(object):
     def __init__(self, field):
@@ -176,27 +176,23 @@ class DictField(forms.Field):
 
         super(DictField, self).__init__(*args, **kwargs)
         schema = None
-        #Here it needs to be clearer, because this is only useful when creating an object, 
+        #Here it needs to be clearer, because this is only useful when creating an object,
         #if no default value is provided, default is callable
         if not callable(self.initial):
             if isinstance(self.initial, dict):
                 schema = self.initial
 
-        #pdb.set_trace()
         #here if other parameters are passed, like max_depth, sub_choices and flags, then we hand them to the dict
         self.widget = Dictionary(max_depth=max_depth, flags=flags, schema=schema)
 
     def prepare_value(self, value):
-        #pdb.set_trace()
         return value
 
     def to_python(self, value):
-        #pdb.set_trace()
         value = self.get_dict(value)
         return value
 
     def clean(self, value):
-        #pdb.set_trace()
         self.max_depth = self.widget.max_depth
         value = self.to_python(value)
         self.validate(value)

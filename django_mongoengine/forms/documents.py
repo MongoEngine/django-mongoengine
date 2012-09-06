@@ -202,9 +202,12 @@ class DocumentFormOptions(object):
         self.document = getattr(options, 'document', None)
         self.model = self.document
         # set up the document meta wrapper if document meta is a dict
-        if self.document is not None and isinstance(self.document._meta, dict):
-            self.document._meta = DocumentMetaWrapper(self.document)
-            self.document._admin_opts = self.document._meta
+        if self.document is not None:
+            if not hasattr(self.document, '_meta'):
+                self.document._meta = {}
+            if isinstance(self.document._meta, dict):
+                self.document._meta = DocumentMetaWrapper(self.document)
+                self.document._admin_opts = self.document._meta
         self.fields = getattr(options, 'fields', None)
         self.exclude = getattr(options, 'exclude', None)
         self.widgets = getattr(options, 'widgets', None)

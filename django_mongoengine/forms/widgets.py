@@ -205,7 +205,6 @@ class Pair(MultiWidget):
             return ['', '']
 
     def render(self, name, value, attrs=None):
-        #pdb.set_trace()
         if self.is_localized:
             for widget in self.widgets:
                 widget.is_localized = self.is_localized
