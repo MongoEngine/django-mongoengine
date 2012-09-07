@@ -1,6 +1,6 @@
 import re
 
-from django.forms.widgets import TextInput, SelectMultiple, MultiWidget, Media
+from django.forms.widgets import TextInput, HiddenInput, MultiWidget, Media
 from django.utils.safestring import mark_safe
 
 from django_mongoengine.utils import OrderedDict
@@ -38,19 +38,26 @@ class Dictionary(MultiWidget):
                             could be added.
         """
         self.no_schema = no_schema
-        self.max_depth = (max_depth if max_depth is not None and max_depth >= 0
-                                    else None)
-        self.flags = flags
+        self.max_depth = (max_depth if max_depth >= 0 else None)
+        self.flags = flags if flags is not None else []
+
+        if flags is not None and 'FORCE_SCHEMA' in flags:
+            self.pair = StaticPair
+            self.subdict = StaticSubDictionary
+        else:
+            self.pair = Pair
+            self.subdict = SubDictionary
+
         widget_object = []
         if isinstance(schema, dict) and self.no_schema > 0:
             for key in schema:
                 if isinstance(schema[key], dict):
-                    widget_object.append(SubDictionary(schema=schema[key],
+                    widget_object.append(self.subdict(key_value=key, schema=schema[key],
                                          max_depth=max_depth, attrs=attrs))
                 else:
-                    widget_object.append(Pair(attrs=attrs))
+                    widget_object.append(self.pair(key_value=key, attrs=attrs))
         else:
-            widget_object.append(Pair(attrs=attrs))
+            widget_object.append(self.pair(attrs=attrs))
 
         super(Dictionary, self).__init__(widget_object, attrs)
 
@@ -99,22 +106,24 @@ class Dictionary(MultiWidget):
         It would take into account every modification on the structure, and
         make form repopulation automatic
         """
-
+        import pdb
+        pdb.set_trace()
         data_keys = data.keys()
         self.widgets = []
         html_indexes = []
-
+        prefix = 'st' if self.flags is not None and 'FORCE_SCHEMA' in self.flags else ''
         for data_key in data_keys:
-            match = re.match(name + '_(\d+)_pair_0', data_key)
+            match = re.match(name + '_(\d+)_%spair_0' % prefix, data_key)
             if match is not None:
-                self.widgets.append(Pair(attrs=self.attrs))
+                self.widgets.append(self.pair(attrs=self.attrs))
                 html_indexes.append(match.group(1))
             else:
-                match = re.match(name + '_(\d+)_subdict_0', data_key)
+                match = re.match(name + '_(\d+)_%ssubdict_0' % prefix, data_key)
                 if match is not None:
                         self.widgets.append(
-                            SubDictionary(no_schema=0,
+                            self.subdict(no_schema=0,
                                           max_depth=self.max_depth,
+                                          flags=self.flags,
                                           attrs=self.attrs)
                         )
                         html_indexes.append(match.group(1))
@@ -128,10 +137,19 @@ class Dictionary(MultiWidget):
         class_depth = ''
         if self.max_depth is not None:
             class_depth = 'depth_%s' % self.max_depth
-
+        if 'FORCE_SCHEMA' in self.flags:
+            actions = """
+<span id="%(add_id)s" class="add_pair_dictionary">Add field</span>
+<span id="%(add_sub_id)s" class="add_sub_dictionary">
+    - Add subdictionary
+</span>
+"""
+        else:
+            actions = ''
         params = {'id': "id_%s" % self.id_for_label(name),
          'class_depth': class_depth,
          'widgets': ''.join(rendered_widgets),
+         'actions': actions,
          'add_id': 'add_id_%s' % self.id_for_label(name),
          'add_sub_id': 'add_sub_id_%s' % self.id_for_label(name)
         }
@@ -140,22 +158,21 @@ class Dictionary(MultiWidget):
 <ul id="id_%(id)s" class="dictionary %(class_depth)s">
   %(widgets)s
 </ul>
-<span id="%(add_id)s" class="add_pair_dictionary">Add field</span>
-<span id="%(add_sub_id)s" class="add_sub_dictionary">
-    - Add subdictionary
-</span>
+%(actions)s
 """ % params
 
     def update_widgets(self, keys, erase=False):
+        # import pdb
+        # pdb.set_trace()
         if erase:
             self.widgets = []
         for k in keys:
             if (isinstance(k[1], dict)):
                 self.widgets.append(
-                    SubDictionary(schema=k[1], no_schema=2,
-                                 max_depth=self.max_depth, attrs=self.attrs))
+                    self.subdict(key_value=k[0], schema=k[1], no_schema=2,
+                                 max_depth=self.max_depth, flags=self.flags, attrs=self.attrs))
             else:
-                self.widgets.append(Pair(attrs=self.attrs))
+                self.widgets.append(self.pair(key_value=k[1], attrs=self.attrs))
 
     def _get_media(self):
         """
@@ -189,12 +206,13 @@ class Pair(MultiWidget):
     value_type = TextInput
     suffix = 'pair'
 
-    def __init__(self, attrs=None, **kwargs):
+    def __init__(self, key_value=None, attrs=None, **kwargs):
         widgets = [self.key_type()] if callable(self.key_type) else []
-        if self.value_type in [TextInput, SelectMultiple]:
+        if self.value_type in [TextInput, HiddenInput]:
             widgets = [self.key_type(), self.value_type()]
         elif self.value_type == Dictionary:
             widgets = [self.key_type(), self.value_type(**kwargs)]
+        self.key_value = key_value if key_value is not None else ''
         super(Pair, self).__init__(widgets, attrs)
 
     #this method should be overwritten by subclasses
@@ -239,12 +257,14 @@ class SubDictionary(Pair):
     value_type = Dictionary
     suffix = 'subdict'
 
-    def __init__(self, schema=None, no_schema=1, max_depth=None,
-                 attrs=None):
+    def __init__(self, key_value=None, schema=None, no_schema=1,
+                 max_depth=None, flags=None, attrs=None):
         if schema is None:
             schema = {'key': 'value'}
-
-        super(SubDictionary, self).__init__(attrs=attrs, schema=schema,
+        super(SubDictionary, self).__init__(attrs=attrs,
+                                            key_value=key_value,
+                                            schema=schema,
+                                            flags=flags,
                                             no_schema=no_schema,
                                             max_depth=max_depth)
 
@@ -270,25 +290,48 @@ class StaticPair(Pair):
     text (this is only relevant when FORCE_SCHEMA flag is used)
     """
 
-    key_type = ''
+    key_type = HiddenInput
     value_type = TextInput
-    suffix = 'static'
+    suffix = 'stpair'
 
-    def __init__(self, attrs=None):
-        super(StaticPair, self).__init__(attrs=attrs)
+    # def __init__(self, key_value, attrs=None):
+    #     super(StaticPair, self).__init__(key_value=key_value, attrs=attrs)
 
     def decompress(self, value):
-        if value is not None:
-            return list(value)
-        else:
-            return ['']
+        value = super(StaticPair, self).decompress(value)
+        self.key_value = value[0]
+        return value
 
     def format_output(self, rendered_widgets, name):
         params = {
-            "widget": rendered_widgets[0],
-            "del_id": "del_%s" % name
+            "key": self.key_value,
+            "widgets": ''.join(rendered_widgets)
         }
         return """
-<li>%(key_type)s :  %(widget)s
-    <span class="del_dict" id="%(del_id)s"> - Delete</span>
+<li><span class="static_key">%(key)s</span> :  %(widgets)s
 </li>""" % params
+
+
+class StaticSubDictionary(SubDictionary):
+    """
+    A widget representing a key-value pair in a dictionary, where key is just
+    text (this is only relevant when FORCE_SCHEMA flag is used)
+    """
+
+    key_type = HiddenInput
+    value_type = Dictionary
+    suffix = 'stsubdict'
+
+    def decompress(self, value):
+        value = super(StaticSubDictionary, self).decompress(value)
+        self.key_value = value[0]
+        return value
+
+    def format_output(self, rendered_widgets, name):
+        params = {
+            "key": self.key_value,
+            "widgets": ''.join(rendered_widgets)
+        }
+        return """
+<li><span class="static_key">%(key)s</span> :  %(widgets)s</li>
+""" % params
