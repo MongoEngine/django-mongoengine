@@ -168,14 +168,11 @@ class DictField(forms.Field):
     #limit depth for dictionaries
     max_depth = None
 
-    def __init__(self, default=None, max_depth=None, flags=None, *args, **kwargs):
+    def __init__(self, max_depth=None, flags=None, sub_attrs=None, attrs=None, *args, **kwargs):
         if 'error_messages' in kwargs.keys():
             kwargs['error_messages'].update(self.error_messages)
         else:
             kwargs['error_messages'] = self.error_messages
-
-        if default is not None:
-            kwargs['initial'] = default
 
         self.max_depth = (max_depth if max_depth >= 0 else None)
 
@@ -188,7 +185,7 @@ class DictField(forms.Field):
                     schema = kwargs['initial']
 
             #here if other parameters are passed, like max_depth and flags, then we hand them to the dict
-            kwargs['widget'] = Dictionary(max_depth=max_depth, flags=flags, schema=schema)
+            kwargs['widget'] = Dictionary(max_depth=max_depth, flags=flags, schema=schema, sub_attrs=sub_attrs)
 
         super(DictField, self).__init__(*args, **kwargs)
 

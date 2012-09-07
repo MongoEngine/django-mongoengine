@@ -14,7 +14,7 @@ class Dictionary(MultiWidget):
     A widget representing a dictionary field
     """
 
-    def __init__(self, schema=None, no_schema=1, max_depth=None, flags=None, attrs=None):
+    def __init__(self, schema=None, no_schema=1, max_depth=None, flags=None, sub_attrs=None, attrs=None):
         """
         :param schema: A dictionary representing the future schema of
                        the Dictionary widget. It is responsible for the
@@ -36,10 +36,14 @@ class Dictionary(MultiWidget):
                          - 'FORCE_SCHEMA' : would force dictionaries
                             to keep a certain schema. Only Pair fields
                             could be added.
+        :param sub_attrs:   A dictionary that contains the classes
+                            for the keys (key.class) and the values
+                            (value.class) of each pair
         """
         self.no_schema = no_schema
         self.max_depth = (max_depth if max_depth >= 0 else None)
         self.flags = flags if flags is not None else []
+        self.sub_attrs = sub_attrs if sub_attrs is not None else {}
 
         if flags is not None and 'FORCE_SCHEMA' in flags:
             self.pair = StaticPair
@@ -53,11 +57,11 @@ class Dictionary(MultiWidget):
             for key in schema:
                 if isinstance(schema[key], dict):
                     widget_object.append(self.subdict(key_value=key, schema=schema[key],
-                                         max_depth=max_depth, attrs=attrs))
+                                         max_depth=max_depth, sub_attrs=self.sub_attrs, attrs=attrs))
                 else:
-                    widget_object.append(self.pair(key_value=key, attrs=attrs))
+                    widget_object.append(self.pair(key_value=key, sub_attrs=self.sub_attrs, attrs=attrs))
         else:
-            widget_object.append(self.pair(attrs=attrs))
+            widget_object.append(self.pair(sub_attrs=self.sub_attrs, sattrs=attrs))
 
         super(Dictionary, self).__init__(widget_object, attrs)
 
@@ -106,8 +110,6 @@ class Dictionary(MultiWidget):
         It would take into account every modification on the structure, and
         make form repopulation automatic
         """
-        import pdb
-        pdb.set_trace()
         data_keys = data.keys()
         self.widgets = []
         html_indexes = []
@@ -115,16 +117,17 @@ class Dictionary(MultiWidget):
         for data_key in data_keys:
             match = re.match(name + '_(\d+)_%spair_0' % prefix, data_key)
             if match is not None:
-                self.widgets.append(self.pair(attrs=self.attrs))
+                self.widgets.append(self.pair(sub_attrs=self.sub_attrs, attrs=self.attrs))
                 html_indexes.append(match.group(1))
             else:
                 match = re.match(name + '_(\d+)_%ssubdict_0' % prefix, data_key)
                 if match is not None:
                         self.widgets.append(
-                            self.subdict(no_schema=0,
-                                          max_depth=self.max_depth,
-                                          flags=self.flags,
-                                          attrs=self.attrs)
+                            self.subdict(sub_attrs=self.sub_attrs,
+                                         no_schema=0,
+                                         max_depth=self.max_depth,
+                                         flags=self.flags,
+                                         attrs=self.attrs)
                         )
                         html_indexes.append(match.group(1))
 
@@ -137,25 +140,28 @@ class Dictionary(MultiWidget):
         class_depth = ''
         if self.max_depth is not None:
             class_depth = 'depth_%s' % self.max_depth
-        if 'FORCE_SCHEMA' in self.flags:
+
+        params = {'id': "id_%s" % self.id_for_label(name),
+         'class_depth': class_depth,
+         'widgets': ''.join(rendered_widgets),
+         'add_id': 'add_id_%s' % self.id_for_label(name),
+         'add_sub_id': 'add_sub_id_%s' % self.id_for_label(name)
+        }
+
+        if 'FORCE_SCHEMA' not in self.flags:
             actions = """
 <span id="%(add_id)s" class="add_pair_dictionary">Add field</span>
 <span id="%(add_sub_id)s" class="add_sub_dictionary">
     - Add subdictionary
 </span>
-"""
+""" % params
         else:
             actions = ''
-        params = {'id': "id_%s" % self.id_for_label(name),
-         'class_depth': class_depth,
-         'widgets': ''.join(rendered_widgets),
-         'actions': actions,
-         'add_id': 'add_id_%s' % self.id_for_label(name),
-         'add_sub_id': 'add_sub_id_%s' % self.id_for_label(name)
-        }
+
+        params['actions'] = actions
 
         return """
-<ul id="id_%(id)s" class="dictionary %(class_depth)s">
+<ul id="%(id)s" class="dictionary %(class_depth)s">
   %(widgets)s
 </ul>
 %(actions)s
@@ -170,15 +176,22 @@ class Dictionary(MultiWidget):
             if (isinstance(k[1], dict)):
                 self.widgets.append(
                     self.subdict(key_value=k[0], schema=k[1], no_schema=2,
-                                 max_depth=self.max_depth, flags=self.flags, attrs=self.attrs))
+                                 max_depth=self.max_depth, flags=self.flags,
+                                 sub_attrs=self.sub_attrs, attrs=self.attrs))
             else:
-                self.widgets.append(self.pair(key_value=k[1], attrs=self.attrs))
+                self.widgets.append(self.pair(sub_attrs=self.sub_attrs,
+                                              key_value=k[1],
+                                              attrs=self.attrs))
 
     def _get_media(self):
         """
         Mimic the MultiWidget '_get_media' method, adding other media
         """
-        media = Media(js=MEDIAS)
+        if 'FORCE_SCHEMA' in self.flags:
+            media = Media()
+        else:
+            media = Media(js=MEDIAS)
+
         for w in self.widgets:
             media = media + w.media
         return media
@@ -206,12 +219,26 @@ class Pair(MultiWidget):
     value_type = TextInput
     suffix = 'pair'
 
-    def __init__(self, key_value=None, attrs=None, **kwargs):
+    def __init__(self, sub_attrs, key_value=None, attrs=None, **kwargs):
         widgets = [self.key_type()] if callable(self.key_type) else []
         if self.value_type in [TextInput, HiddenInput]:
-            widgets = [self.key_type(), self.value_type()]
+            if sub_attrs:
+                try:
+                    widgets = [self.key_type(attrs=sub_attrs['key']), self.value_type(attrs=sub_attrs['value'])]
+                except KeyError:
+                    raise(KeyError, "improper synthax for sub_attrs parameter")
+            else:
+                widgets = [self.key_type(), self.value_type()]
         elif self.value_type == Dictionary:
-            widgets = [self.key_type(), self.value_type(**kwargs)]
+            if sub_attrs:
+                try:
+                    widgets = [self.key_type(attrs=sub_attrs['key']), self.value_type(attrs=sub_attrs['value'], **kwargs)]
+                except KeyError:
+                    raise(KeyError, "improper synthax for sub_attrs parameter")
+            else:
+                widgets = [self.key_type(), self.value_type(**kwargs)]
+        self.sub_attrs = sub_attrs
+        #raise error here ?
         self.key_value = key_value if key_value is not None else ''
         super(Pair, self).__init__(widgets, attrs)
 
@@ -257,8 +284,9 @@ class SubDictionary(Pair):
     value_type = Dictionary
     suffix = 'subdict'
 
-    def __init__(self, key_value=None, schema=None, no_schema=1,
-                 max_depth=None, flags=None, attrs=None):
+    def __init__(self, sub_attrs, key_value=None, schema=None,
+                 no_schema=1, max_depth=None, flags=None,
+                 attrs=None):
         if schema is None:
             schema = {'key': 'value'}
         super(SubDictionary, self).__init__(attrs=attrs,
@@ -266,7 +294,8 @@ class SubDictionary(Pair):
                                             schema=schema,
                                             flags=flags,
                                             no_schema=no_schema,
-                                            max_depth=max_depth)
+                                            max_depth=max_depth,
+                                            sub_attrs=sub_attrs)
 
     def decompress(self, value):
         if value is not None:
@@ -304,11 +333,12 @@ class StaticPair(Pair):
 
     def format_output(self, rendered_widgets, name):
         params = {
+            "html_class": self.sub_attrs.get('key', {}).get('class', ''),
             "key": self.key_value,
             "widgets": ''.join(rendered_widgets)
         }
         return """
-<li><span class="static_key">%(key)s</span> :  %(widgets)s
+<li><span class="static_key %(html_class)s">%(key)s</span> :  %(widgets)s
 </li>""" % params
 
 
@@ -329,9 +359,10 @@ class StaticSubDictionary(SubDictionary):
 
     def format_output(self, rendered_widgets, name):
         params = {
+            "html_class": self.sub_attrs.get('key', {}).get('class', ''),
             "key": self.key_value,
             "widgets": ''.join(rendered_widgets)
         }
         return """
-<li><span class="static_key">%(key)s</span> :  %(widgets)s</li>
+<li><span class="static_key %(html_class)s">%(key)s</span> :  %(widgets)s</li>
 """ % params
