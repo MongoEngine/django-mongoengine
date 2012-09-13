@@ -7,6 +7,8 @@ from django_mongoengine.utils import OrderedDict
 
 # The list of JavaScript files to insert to render any Dictionary widget
 MEDIAS = ('jquery-1.8.0.min.js', 'dict.js', 'helper.js')
+ADD_FIELD_VERBOSE = 'Add Field'
+ADD_DICT_VERBOSE = ' - Add subdictionary'
 
 
 class Dictionary(MultiWidget):
@@ -14,7 +16,9 @@ class Dictionary(MultiWidget):
     A widget representing a dictionary field
     """
 
-    def __init__(self, schema=None, no_schema=1, max_depth=None, flags=None, sub_attrs=None, attrs=None):
+    def __init__(self, schema=None, no_schema=1, max_depth=None,
+                 flags=None, sub_attrs=None, attrs=None, verbose_dict=None,
+                 verbose_field=None):
         """
         :param schema: A dictionary representing the future schema of
                        the Dictionary widget. It is responsible for the
@@ -39,11 +43,15 @@ class Dictionary(MultiWidget):
         :param sub_attrs:   A dictionary that contains the classes
                             for the keys (key.class) and the values
                             (value.class) of each pair
+        :param verbose_field:   verbose for 'Add field'
+        :param verbose_dict:    verbose for 'Add dict'
         """
+        self.verbose_field = verbose_field or ADD_FIELD_VERBOSE
+        self.verbose_dict = verbose_dict or ADD_DICT_VERBOSE
         self.no_schema = no_schema
         self.max_depth = (max_depth if max_depth >= 0 else None)
-        self.flags = flags if flags is not None else []
-        self.sub_attrs = sub_attrs if sub_attrs is not None else {}
+        self.flags = flags or []
+        self.sub_attrs = sub_attrs or {}
 
         if flags is not None and 'FORCE_SCHEMA' in flags:
             self.pair = StaticPair
@@ -57,7 +65,9 @@ class Dictionary(MultiWidget):
             for key in schema:
                 if isinstance(schema[key], dict):
                     widget_object.append(self.subdict(key_value=key, schema=schema[key],
-                                         max_depth=max_depth, sub_attrs=self.sub_attrs, attrs=attrs))
+                                         max_depth=max_depth, sub_attrs=self.sub_attrs,
+                                         attrs=attrs, verbose_field=self.verbose_field,
+                                         verbose_dict=self.verbose_dict))
                 else:
                     widget_object.append(self.pair(key_value=key, sub_attrs=self.sub_attrs, attrs=attrs))
         else:
@@ -145,14 +155,16 @@ class Dictionary(MultiWidget):
          'class_depth': class_depth,
          'widgets': ''.join(rendered_widgets),
          'add_id': 'add_id_%s' % self.id_for_label(name),
-         'add_sub_id': 'add_sub_id_%s' % self.id_for_label(name)
+         'add_sub_id': 'add_sub_id_%s' % self.id_for_label(name),
+         'add_field': ADD_FIELD_VERBOSE,
+         'add_dict': ADD_DICT_VERBOSE
         }
 
         if 'FORCE_SCHEMA' not in self.flags:
             actions = """
-<span id="%(add_id)s" class="add_pair_dictionary">Add field</span>
+<span id="%(add_id)s" class="add_pair_dictionary">%(add_field)s</span>
 <span id="%(add_sub_id)s" class="add_sub_dictionary">
-    - Add subdictionary
+    %(add_dict)s
 </span>
 """ % params
         else:
@@ -284,18 +296,11 @@ class SubDictionary(Pair):
     value_type = Dictionary
     suffix = 'subdict'
 
-    def __init__(self, sub_attrs, key_value=None, schema=None,
-                 no_schema=1, max_depth=None, flags=None,
-                 attrs=None):
+    def __init__(self, sub_attrs, schema=None, **kwargs):
         if schema is None:
             schema = {'key': 'value'}
-        super(SubDictionary, self).__init__(attrs=attrs,
-                                            key_value=key_value,
-                                            schema=schema,
-                                            flags=flags,
-                                            no_schema=no_schema,
-                                            max_depth=max_depth,
-                                            sub_attrs=sub_attrs)
+        super(SubDictionary, self).__init__(schema=schema,
+                                            sub_attrs=sub_attrs, **kwargs)
 
     def decompress(self, value):
         if value is not None:
