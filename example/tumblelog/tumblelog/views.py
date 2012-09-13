@@ -1,11 +1,10 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 
-from django_mongoengine.forms.documents import documentform_factory
 from django_mongoengine.views import (CreateView, UpdateView,
-                                      DeleteView, ListView, DetailView,
+                                      DeleteView, ListView,
                                       EmbeddedDetailView, View)
 
-from tumblelog.models import Post, BlogPost, Video, Image, Quote
+from tumblelog.models import Post, BlogPost, Video, Image, Quote, Music
 from tumblelog.forms import CommentForm
 
 
@@ -24,7 +23,7 @@ class PostDetailView(EmbeddedDetailView):
 
 class AddPostView(CreateView):
     success_url = '/'
-    doc_map = {'post': BlogPost, 'video': Video, 'image': Image, 'quote': Quote}
+    doc_map = {'post': BlogPost, 'video': Video, 'image': Image, 'quote': Quote, 'music': Music}
     success_message = "Post Added!"
     form_exclude = ('created_at', 'comments')
 
