@@ -47,6 +47,7 @@ class Quote(Post):
 
 
 class Music(Post):
+    url = fields.StringField(max_length=100, verbose_name="Music Url", required=True)
     music_parameters = fields.DictField(verbose_name="Music Parameters", required=True)
 
 

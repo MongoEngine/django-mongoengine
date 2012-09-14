@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 
+from django_mongoengine.forms.fields import DictField
 from django_mongoengine.views import (CreateView, UpdateView,
                                       DeleteView, ListView,
                                       EmbeddedDetailView, View)
@@ -31,6 +32,26 @@ class AddPostView(CreateView):
     def document(self):
         post_type = self.kwargs.get('post_type', 'post')
         return self.doc_map.get(post_type)
+
+    def get_form(self, form_class):
+        form = super(AddPostView, self).get_form(form_class)
+        music_parameters = form.fields.get('music_parameters', None)
+        if music_parameters is not None:
+            schema = {
+                'Artist': '',
+                'Title': '',
+                'Album': '',
+                'Genre': '',
+                'Label': '',
+                'Release dates': {
+                    'UK': '',
+                    'US': '',
+                    'FR': ''
+                }
+            }
+            music_parameters = DictField(initial=schema, flags=['FORCE_SCHEMA'])
+            form.fields['music_parameters'] = music_parameters
+        return form
 
 
 class DeletePostView(DeleteView):
