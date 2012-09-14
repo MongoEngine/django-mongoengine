@@ -9,7 +9,7 @@ admin.autodiscover()
 
 from django_mongoengine.admin import site
 
-post_patterns  = patterns('',
+post_patterns = patterns('',
     url(r'^$', PostDetailView.as_view(), name="post"),
     url(r'^edit/$', UpdatePostView.as_view(), name="post_update"),
     url(r'^delete/$', DeletePostView.as_view(), name="post_delete")
@@ -19,7 +19,7 @@ post_patterns  = patterns('',
 urlpatterns = patterns('',
     url(r'^$', PostIndexView.as_view(), name="post_index"),
     url(r'^new/$', AddPostView.as_view(), name="post_new"),
-    url(r'^new/(?P<post_type>(post|video|image|quote))/$',
+    url(r'^new/(?P<post_type>(post|video|image|quote|music))/$',
             AddPostView.as_view(), name="post_new"),
     url(r'^admin/', include(site.urls)),
     url(r'^image-file/(?P<slug>[a-zA-Z0-9-]+)/', ImageFileView.as_view(),
