@@ -164,7 +164,7 @@ class DictField(forms.Field):
     #Mongo prohibit . in keys
     illegal_characters = ['.']
     #limit key length for efficiency
-    key_limit = 30
+    key_limit = 200
     #limit depth for dictionaries
     max_depth = None
 
@@ -180,7 +180,7 @@ class DictField(forms.Field):
             schema = None
             #Here it needs to be clearer, because this is only useful when creating an object,
             #if no default value is provided, default is callable
-            if not callable(kwargs['initial']):
+            if 'initial' in kwargs and not callable(kwargs['initial']):
                 if isinstance(kwargs['initial'], dict):
                     schema = kwargs['initial']
 
