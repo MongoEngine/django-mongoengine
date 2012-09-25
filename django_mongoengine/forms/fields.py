@@ -164,26 +164,30 @@ class DictField(forms.Field):
     #Mongo prohibit . in keys
     illegal_characters = ['.']
     #limit key length for efficiency
-    key_limit = 30
+    key_limit = 200
     #limit depth for dictionaries
     max_depth = None
 
-    def __init__(self, max_depth=5, flags=None, *args, **kwargs):
+    def __init__(self, max_depth=None, flags=None, sub_attrs=None, attrs=None, *args, **kwargs):
         if 'error_messages' in kwargs.keys():
             kwargs['error_messages'].update(self.error_messages)
         else:
             kwargs['error_messages'] = self.error_messages
 
-        super(DictField, self).__init__(*args, **kwargs)
-        schema = None
-        #Here it needs to be clearer, because this is only useful when creating an object,
-        #if no default value is provided, default is callable
-        if not callable(self.initial):
-            if isinstance(self.initial, dict):
-                schema = self.initial
+        self.max_depth = (max_depth if max_depth >= 0 else None)
 
-        #here if other parameters are passed, like max_depth, sub_choices and flags, then we hand them to the dict
-        self.widget = Dictionary(max_depth=max_depth, flags=flags, schema=schema)
+        if 'widget' not in kwargs.keys():
+            schema = None
+            #Here it needs to be clearer, because this is only useful when creating an object,
+            #if no default value is provided, default is callable
+            if 'initial' in kwargs and not callable(kwargs['initial']):
+                if isinstance(kwargs['initial'], dict):
+                    schema = kwargs['initial']
+
+            #here if other parameters are passed, like max_depth and flags, then we hand them to the dict
+            kwargs['widget'] = Dictionary(max_depth=max_depth, flags=flags, schema=schema, sub_attrs=sub_attrs)
+
+        super(DictField, self).__init__(*args, **kwargs)
 
     def prepare_value(self, value):
         return value
@@ -213,7 +217,7 @@ class DictField(forms.Field):
 
     def validate(self, value, depth=0):
         #we should not use the super.validate method
-        if self.max_depth and depth > self.max_depth:
+        if self.max_depth is not None and depth > self.max_depth:
             raise ValidationError(self.error_messages['depth'] % self.max_depth)
         for k, v in value.items():
             self.run_validators(k)

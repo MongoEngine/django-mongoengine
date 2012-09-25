@@ -360,7 +360,7 @@ class BaseDocumentForm(BaseForm):
                 if self.instance.pk is not None:
                     qs = qs.filter(pk__ne=self.instance.pk)
                 if len(qs) > 0:
-                    message = _("%(model_name)s with this %(field_label)s already exists.") %  {
+                    message = _("%(model_name)s with this %(field_label)s already exists.") % {
                                 'model_name': unicode(capfirst(self.instance._meta.verbose_name)),
                                 'field_label': unicode(pretty_name(f.name))
                     }
@@ -378,6 +378,7 @@ class BaseDocumentForm(BaseForm):
         If commit=True, then the changes to ``instance`` will be saved to the
         database. Returns ``instance``.
         """
+
         try:
             if self.instance.pk is None:
                 fail_message = 'created'
@@ -388,7 +389,7 @@ class BaseDocumentForm(BaseForm):
 
         if self.errors:
             raise ValueError("The %s could not be %s because the data didn't"
-                             " validate." % (instance.__class__.__name__, fail_message))
+                             " validate." % (self.instance.__class__.__name__, fail_message))
 
         if self.instance._created:
             self.instance = construct_instance(self, self.instance, self.fields, self._meta.exclude)
@@ -476,7 +477,6 @@ class EmbeddedDocumentForm(BaseDocumentForm):
             raise ValueError("The %s could not be saved because the data didn't"
                          " validate." % self.instance.__class__.__name__)
 
-
         if commit:
             instance = construct_instance(self, self.instance, self.fields, self._meta.exclude)
             l = getattr(self.parent_document, self._meta.embedded_field)
@@ -534,7 +534,8 @@ class BaseDocumentFormSet(BaseFormSet):
             if not form.has_changed() and not form in self.initial_forms:
                 continue
             obj = self.save_object(form)
-            if form.cleaned_data["DELETE"]:
+
+            if form in self.deleted_forms:
                 try:
                     obj.delete()
                 except AttributeError:
@@ -557,6 +558,7 @@ class BaseDocumentFormSet(BaseFormSet):
 
         if errors:
             raise ValidationError(errors)
+
     def get_date_error_message(self, date_check):
         return _("Please correct the duplicate data for %(field_name)s "
             "which must be unique for the %(lookup)s in %(date_field)s.") % {
@@ -567,6 +569,7 @@ class BaseDocumentFormSet(BaseFormSet):
 
     def get_form_error(self):
         return _("Please correct the duplicate values below.")
+
 
 def documentformset_factory(document, form=DocumentForm, formfield_callback=None,
                          formset=BaseDocumentFormSet,
@@ -582,6 +585,7 @@ def documentformset_factory(document, form=DocumentForm, formfield_callback=None
     FormSet.model = document
     FormSet.document = document
     return FormSet
+
 
 class BaseInlineDocumentFormSet(BaseDocumentFormSet):
     """
@@ -605,7 +609,6 @@ class BaseInlineDocumentFormSet(BaseDocumentFormSet):
     def get_default_prefix(cls):
         return cls.model.__name__.lower()
     get_default_prefix = classmethod(get_default_prefix)
-
 
     def add_fields(self, form, index):
         super(BaseInlineDocumentFormSet, self).add_fields(form, index)
@@ -647,6 +650,7 @@ def inlineformset_factory(document, form=DocumentForm,
     FormSet = documentformset_factory(document, **kwargs)
     return FormSet
 
+
 class EmbeddedDocumentFormSet(BaseInlineDocumentFormSet):
     def __init__(self, parent_document=None, data=None, files=None, instance=None,
                  save_as_new=False, prefix=None, queryset=[], **kwargs):
@@ -658,6 +662,7 @@ class EmbeddedDocumentFormSet(BaseInlineDocumentFormSet):
         defaults.update(kwargs)
         form = super(BaseDocumentFormSet, self)._construct_form(i, **defaults)
         return form
+
 
 def embeddedformset_factory(document, parent_document, form=EmbeddedDocumentForm,
                           formset=EmbeddedDocumentFormSet,

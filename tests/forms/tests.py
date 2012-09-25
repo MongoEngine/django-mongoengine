@@ -144,19 +144,48 @@ class DictFieldTest(MongoTestCase):
             self.field.widget.render('widget_name', data_dicts[data])
             self._check_structure(self.field.widget, output_structures[data])
 
-    def _init_field(self, depth=None):
+    def test_static(self):
+        self._init_field(force=True)
+        structure = {
+            'type': 'Dictionary',
+            'widgets': [{'type': 'StaticPair', 'widgets': [{'type': 'HiddenInput'}, {'type': 'TextInput'}]
+                },
+                {'type': 'StaticSubDictionary',
+                    'widgets': [{'type': 'StaticPair', 'widgets': [{'type': 'HiddenInput'}, {'type': 'TextInput'}]}]
+                },
+                {'type': 'StaticSubDictionary',
+                    'widgets': [{'type': 'StaticPair',
+                                'widgets': [{'type': 'HiddenInput'}, {'type': 'TextInput'}]},
+                                {'type': 'StaticPair',
+                                'widgets': [{'type': 'HiddenInput'}, {'type': 'TextInput'}]}]
+                }]
+        }
+        self._check_structure(self.field.widget, structure)
+
+    def _init_field(self, depth=None, force=False):
         validate = [RegexValidator(regex='^[^$_]', message=u'Ensure the keys do not begin with : ["$","_"].', code='invalid_start')]
-        self.field = DictField(**{
-            'required': False,
-            'initial': {
-                'k': 'v',
-                'kk': {'kkk': 'vvv'}
-            },
-            'validators': validate,
-        })
-        if depth is not None:
-            self.field.widget = Dictionary(max_depth=depth)
-            self.field.max_depth = depth
+        if force:
+            self.field = DictField(**{
+                'required': False,
+                'initial': {
+                    'k': 'v',
+                    'k2': {'k3': 'v2'},
+                    'k4': {'k5': 'v3', 'k6': 'v4'}
+                },
+                'validators': validate,
+                'flags': ['FORCE_SCHEMA'],
+                'max_depth': depth,
+            })
+        else:
+            self.field = DictField(**{
+                'required': False,
+                'initial': {
+                    'k': 'v',
+                    'k2': {'k3': 'v2'}
+                },
+                'validators': validate,
+                'max_depth': depth,
+            })
 
     def _check_structure(self, widget, structure):
         assert isinstance(structure, dict), 'error, the comparative structure should be a dictionary'
