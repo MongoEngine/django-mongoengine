@@ -33,6 +33,26 @@
   {% if post.image %}
     <p><img src="{% url 'image_file' slug=post.slug %}" width="{{ post.image.size.0 }}" height="{{ post.image.size.1 }}" /><p>
   {% endif %}
+  {% if post.music_parameters %}
+    <p><a href="{{ post.url }}">Check out this song !</a></p>
+    <p>Music info :<br/>
+      <ul>
+      {% for key, value in post.music_parameters.items %}
+        <li>{{ key }} : 
+          {% if value.items %}
+            <ul>
+              {% for k, v in value.items%}
+                <li>{{ k }} : {{ v }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            {{ value }}
+          {% endif %}
+        </li>
+      {% endfor %}
+      </ul>
+    </p>
+  {% endif %}
   {% if post.author %}
     <blockquote>{{ post.body|linebreaksbr }}</blockquote>
     <p>{{ post.author }}</p>

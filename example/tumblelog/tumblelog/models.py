@@ -46,6 +46,11 @@ class Quote(Post):
     author = fields.StringField(verbose_name="Author Name", required=True, max_length=255)
 
 
+class Music(Post):
+    url = fields.StringField(max_length=100, verbose_name="Music Url", required=True)
+    music_parameters = fields.DictField(verbose_name="Music Parameters", required=True)
+
+
 class Comment(fields.EmbeddedDocument):
     created_at = fields.DateTimeField(default=datetime.datetime.now, required=True)
     author = fields.StringField(verbose_name="Name", max_length=255, required=True)

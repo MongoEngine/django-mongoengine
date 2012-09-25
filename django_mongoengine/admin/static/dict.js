@@ -1,7 +1,7 @@
 $(document).ready(function(){
 
     /*----------------------------------------------------------------------*/
-    var DEBUG = false;
+    var DEBUG = true;
 
     function print_array(a,name){
         debug('--------------------');
@@ -55,6 +55,7 @@ $(document).ready(function(){
 
     function save_arrays(el){
         var id = el.attr('id');
+        debug(id);
         prefixes[id] = id.substring(0,id.length-1);
         var next_ids = get_next_ids(el.children('li:last-child').children('input:first-child').attr('id'),prefixes[id]);
         next_pair_ids[id] = next_ids[0];
@@ -133,6 +134,9 @@ $(document).ready(function(){
     function pair_update_arrays(id){
         var el, i, del_pair_button;
         debug('--------PAIR UPDATE--------');
+        print_array(prefixes,'prefixes');
+        print_array(next_pair_ids,'pairs ids');
+        print_array(next_dict_ids,'dict ids');
         el = $('#'+id);
         el.append(get_pair(next_pair_ids[id]));
         del_pair_button = $('#del_'+ next_pair_ids[id].substring(3,next_pair_ids[id].length-1));
@@ -246,6 +250,7 @@ $(document).ready(function(){
     $('.add_pair_dictionary').click(function(){
         debug('-----------CLICK-----------');
         id = $(this).attr('id').substring(4);
+        debug('id : '+id);
         pair_update_arrays(id);
         debug('---------END CLICK---------');
     });
@@ -318,7 +323,7 @@ $(document).ready(function(){
 
     function debug(text) {
         if (DEBUG) {
-            debug(text)
+            console.log(text);
         }
     }
 });
