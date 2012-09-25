@@ -6,7 +6,7 @@ import re
 import sys
 from optparse import make_option
 
-from django_mongoengine.auth import User
+from django_mongoengine.auth.models import User
 from django_mongoengine.connection import DEFAULT_CONNECTION_NAME
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError

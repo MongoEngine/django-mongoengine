@@ -8,7 +8,7 @@ from django_mongoengine.forms.widgets import Dictionary
 
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
-import pdb
+
 
 class MongoChoiceIterator(object):
     def __init__(self, field):
@@ -197,7 +197,6 @@ class DictField(forms.Field):
         return value
 
     def clean(self, value):
-        #pdb.set_trace()
         self.max_depth = self.widget.max_depth
         value = self.to_python(value)
         self.validate(value)

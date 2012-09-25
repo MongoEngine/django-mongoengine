@@ -17,7 +17,7 @@ MANAGERS = ADMINS
 
 # MongoDB Databases
 MONGODB_DATABASES = {
-    'default': {'name': 'django_mongoengine'}
+    'default': {'name': 'django_mongoengine_test'}
 }
 
 DATABASES = {
