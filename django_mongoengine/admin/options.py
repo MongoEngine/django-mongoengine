@@ -13,9 +13,9 @@ from django.db.models.related import RelatedObject
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import QUERY_TERMS
 try:
-    from django.db.models.constants import LOOKUP_SEP
+    from django.db.models.constants import LOOKUP_SEP  # Django 1.5
 except ImportError:
-    from django.db.models.sql.constants import LOOKUP_SEP
+    from django.db.models.sql.constants import LOOKUP_SEP  # Django 1.4.x
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.decorators import method_decorator
