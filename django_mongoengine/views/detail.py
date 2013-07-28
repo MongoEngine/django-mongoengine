@@ -143,8 +143,6 @@ class SingleDocumentTemplateResponseMixin(TemplateResponseMixin):
 
         # Get any superclasses if needed
         doc_classes = [doc_cls]
-        if hasattr(doc_cls, '_meta') and doc_cls._meta['allow_inheritance']:
-            doc_classes += [v for k, v in doc_cls._superclasses.iteritems() if k != "Document"]
         for doc_cls in doc_classes:
             opts = get_document_options(doc_cls)
             name = "%s/%s%s.html" % (
