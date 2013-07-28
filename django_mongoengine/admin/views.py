@@ -9,6 +9,7 @@ from django.utils.encoding import smart_str
 
 from mongoengine import Q
 
+
 class DocumentChangeList(ChangeList):
     def __init__(self, request, model, list_display, list_display_links,
             list_filter, date_hierarchy, search_fields, list_select_related,
@@ -23,10 +24,8 @@ class DocumentChangeList(ChangeList):
             super(DocumentChangeList, self).__init__(request, model, list_display, list_display_links,
                     list_filter, date_hierarchy, search_fields, list_select_related,
                     list_per_page, list_editable, model_admin)
-            
-             
         self.pk_attname = self.lookup_opts.pk_name
-        
+
     def get_results(self, request):
         paginator = self.model_admin.get_paginator(request, self.query_set, self.list_per_page)
         # Get the number of objects, with admin filters applied.
@@ -59,7 +58,7 @@ class DocumentChangeList(ChangeList):
         self.can_show_all = can_show_all
         self.multi_page = multi_page
         self.paginator = paginator
-        
+
     def _get_default_ordering(self):
         try:
             ordering = super(DocumentChangeList, self)._get_default_ordering()
@@ -70,7 +69,7 @@ class DocumentChangeList(ChangeList):
             elif self.lookup_opts.ordering:
                 ordering = self.lookup_opts.ordering
         return ordering
-        
+
     def get_ordering(self, request=None, queryset=None):
         """
         Returns the list of ordering fields for the change list.
@@ -83,7 +82,7 @@ class DocumentChangeList(ChangeList):
         if queryset is None:
             # with Django < 1.4 get_ordering works without fixes for mongoengine 
             return super(DocumentChangeList, self).get_ordering()
-            
+
         params = self.params
         ordering = list(self.model_admin.get_ordering(request)
                         or self._get_default_ordering())
@@ -115,9 +114,8 @@ class DocumentChangeList(ChangeList):
             # The two sets do not intersect, meaning the pk isn't present. So
             # we add it.
             ordering.append('pk')
-
         return ordering
-    
+
     def _lookup_param_1_3(self):
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR):
@@ -147,27 +145,25 @@ class DocumentChangeList(ChangeList):
                 raise SuspiciousOperation(
                     "Filtering by %s not allowed" % key
                 )
-        
         return lookup_params
-        
+
     def get_query_set(self, request=None):
         # First, we collect all the declared list filters.
         qs = self.root_query_set.clone()
-        
+
         try:
             (self.filter_specs, self.has_filters, remaining_lookup_params,
-             use_distinct) = self.get_filters(request) 
+             use_distinct) = self.get_filters(request)
 
             # Then, we let every list filter modify the queryset to its liking.
             for filter_spec in self.filter_specs:
                 new_qs = filter_spec.queryset(request, qs)
                 if new_qs is not None:
                     qs = new_qs
-                    
         except ValueError:
             # Django < 1.4.
             remaining_lookup_params = self._lookup_param_1_3()
-                
+
         try:
             # Finally, we apply the remaining lookup parameters from the query
             # string (i.e. those that haven't already been processed by the
@@ -187,7 +183,7 @@ class DocumentChangeList(ChangeList):
             raise IncorrectLookupParameters(e)
 
         # Set ordering.
-        ordering = self.get_ordering(request, qs)  
+        ordering = self.get_ordering(request, qs)
         qs = qs.order_by(*ordering)
 
         # Apply keyword searches.
@@ -209,5 +205,4 @@ class DocumentChangeList(ChangeList):
                 or_queries = [Q(**{orm_lookup: bit})
                               for orm_lookup in orm_lookups]
                 qs = qs.filter(reduce(operator.or_, or_queries))
-            
         return qs
