@@ -1,8 +1,9 @@
 import operator
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
-from django.contrib.admin.views.main import (ChangeList, ORDER_VAR, ALL_VAR, ORDER_TYPE_VAR, 
-                                             SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
+from django.contrib.admin.views.main import (
+    ChangeList, ORDER_VAR, ALL_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR,
+    TO_FIELD_VAR)
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.core.paginator import InvalidPage
 from django.utils.encoding import smart_str
@@ -15,19 +16,22 @@ class DocumentChangeList(ChangeList):
             list_filter, date_hierarchy, search_fields, list_select_related,
             list_per_page, list_max_show_all, list_editable, model_admin):
         try:
-            super(DocumentChangeList, self).__init__(request, model, list_display, list_display_links,
-                    list_filter, date_hierarchy, search_fields, list_select_related,
-                    list_per_page, list_max_show_all, list_editable, model_admin)
+            super(DocumentChangeList, self).__init__(
+                request, model, list_display, list_display_links, list_filter,
+                date_hierarchy, search_fields, list_select_related,
+                list_per_page, list_max_show_all, list_editable, model_admin)
         except TypeError:
             self.list_max_show_all = list_max_show_all
             # The init for django <= 1.3 takes one parameter less
-            super(DocumentChangeList, self).__init__(request, model, list_display, list_display_links,
-                    list_filter, date_hierarchy, search_fields, list_select_related,
-                    list_per_page, list_editable, model_admin)
+            super(DocumentChangeList, self).__init__(
+                request, model, list_display, list_display_links, list_filter,
+                date_hierarchy, search_fields, list_select_related,
+                list_per_page, list_editable, model_admin)
         self.pk_attname = self.lookup_opts.pk_name
 
     def get_results(self, request):
-        paginator = self.model_admin.get_paginator(request, self.query_set, self.list_per_page)
+        paginator = self.model_admin.get_paginator(request, self.query_set,
+                                                   self.list_per_page)
         # Get the number of objects, with admin filters applied.
         result_count = paginator.count
 
@@ -118,7 +122,8 @@ class DocumentChangeList(ChangeList):
 
     def _lookup_param_1_3(self):
         lookup_params = self.params.copy() # a dictionary of the query string
-        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR):
+        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR,
+                  IS_POPUP_VAR, TO_FIELD_VAR):
             if i in lookup_params:
                 del lookup_params[i]
         for key, value in lookup_params.items():
