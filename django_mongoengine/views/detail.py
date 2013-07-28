@@ -152,6 +152,9 @@ class SingleDocumentTemplateResponseMixin(TemplateResponseMixin):
             )
             if name not in names:
                 names.append(name)
+
+        # Basic template form: templates/_forms.html
+        names.append("{}s.html".format(self.template_name_suffix))
         return names
 
 
