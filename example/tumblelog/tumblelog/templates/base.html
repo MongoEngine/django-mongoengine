@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>My Tumblelog</title>
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+    <style>
+      .navbar-inner small { float: left; padding: 10px;}
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar" data-dropdown="dropdown">
+      <div class="navbar-inner">
+        <div class="container">
+          <a href="/" class="brand">My Tumblelog</a> <small>Starring MongoDB and MongoEngine</small>
+          {% block top_nav %}{% endblock %}
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="content">
+        {% block page_header %}{% endblock %}
+        {% include "_messages.html" %}
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+    {% block js_footer %}
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+      <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js"></script>
+      <script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-alert.js"></script>
+    {% endblock %}
+  </body>
+</html>
+

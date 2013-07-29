@@ -1,0 +1,66 @@
+{% load mongodb_debug_tags %}
+
+<style type="text/css">
+.code {
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', 'Courier New', monospace !important;
+
+}
+.mongodb-stack-trace {
+    line-height: 2.3em !important;
+}
+.mongodb-stack-trace tr {
+    border-top: 1px dotted #ccc !important;
+}
+.mongodb-stack-trace table th {
+    text-align: left !important;
+}
+
+#djDebug .mongodb-stack-trace, #djDebug .mongodb-data, .mongodb-op-table .toolbar-query {
+    display:none;
+}
+
+#djDebug .mongodb-stack-trace table tr.mongodb-stack-trace-hide {
+    background: #eee!important;
+    display:none;
+}
+
+#djDebug .panelContent .mongodb-op-table,
+#djDebug .panelContent .mongodb-stack-trace table { display: table;}
+
+.mongodb-op-table td.fifty {width: 50%; word-wrap: break-word;}
+.mongodb-op-table td.thirty {width: 30%; word-wrap: break-word;}
+</style>
+
+
+{% with queries=queries title="Queries" slow_query_limit=100 %}
+  {% include "_stats.html" %}
+{% endwith %}
+
+{% with queries=inserts title="Inserts" slow_query_limit=100 %}
+  {% include "_stats.html" %}
+{% endwith %}
+
+{% with queries=removes title="Removes" slow_query_limit=100 %}
+  {% include "_stats.html" %}
+{% endwith %}
+
+{% with queries=updates title="Updates" slow_query_limit=100 %}
+  {% include "_stats.html" %}
+{% endwith %}
+
+<script>
+(function($) {
+    console.log($('a.mongodb-toggle-trace'))
+    $('a.mongodb-toggle-trace').click(function(){
+        $("#"+$(this).attr('data-row')).toggle();
+    });
+    $('a.mongodb-toggle-data').click(function(){
+        $("#"+$(this).attr('data-row')).toggle();
+    });
+
+    $('a.mongodb-toggle-full-trace').click(function(){
+        $(this).closest('table').find('tr.mongodb-stack-trace-hide').toggle();
+    });
+
+})(window.djdt.jQuery.noConflict(true));
+</script>

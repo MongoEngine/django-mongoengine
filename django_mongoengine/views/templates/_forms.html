@@ -1,0 +1,21 @@
+<fieldset>
+{% for field in form.visible_fields %}
+<div class="clearfix {% if field.errors %}error{% endif %}">
+  {{ field.label_tag }}
+  <div class="input">
+    {{ field }}
+    {% if field.errors or field.help_text %}
+      <span class="help-inline">
+      {% if field.errors %}
+        {{ field.errors|join:' ' }}
+      {% else %}
+        {{ field.help_text }}
+      {% endif %}
+      </span>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+{% csrf_token %}
+<div style="display:none">{% for h in form.hidden_fields %} {{ h }}{% endfor %}</div>
+</fieldset>

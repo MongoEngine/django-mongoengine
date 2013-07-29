@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block page_header %}
+  <div class="page-header">
+    <h1>{{ form.instance.slug|yesno:"Edit post,Create new post"|title }}</h1>
+  </div>
+{% endblock %}
+
+
+{% block content %}
+  {% if form.errors %}
+    <div class="alert alert-error">
+      <button class="close" data-dismiss="alert">×</button>
+      There are problems with the form data - please review
+    </div>
+  {% endif %}
+  <form action="." method="post">
+    {% include "_forms.html" %}
+    <div class="actions">
+      <input type="submit" class="btn primary" value="{{ form.instance.slug|yesno:"Edit post,Create new post" }}">
+    </div>
+  </form>
+{% endblock %}
