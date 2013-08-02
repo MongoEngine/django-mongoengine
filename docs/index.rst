@@ -1,23 +1,37 @@
 Django-MongoEngine
-=================
+==================
 
 A Django extension that provides integration with `MongoEngine <http://mongoengine.org/>`_.
 
 It provides Forms support for your models.
 
+
+Quick links
+===========
+
+.. toctree::
+    :maxdepth: 1
+
+    changelog.rst
+
+
 Installing Django-MongoEngine
 =============================
 
-Install with **pip**::
+Install with **pip**
+
+::
 
     pip install django-mongoengine
+
 
 Configuration
 =============
 
-Basic setup is easy, just fetch the extension::
+Basic setup is easy, just fetch the extension
 
-TODO - write the docs
+::
+    TODO - write the docs
 
 
 Django DebugToolBar
