@@ -16,17 +16,8 @@ import sys, os
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-# Stops exit traceback on tests
-try:
-    import multiprocessing
-except:
-   pass
 
-
-REQUIRES = ['Django>=1.3', 'mongoengine']
-
-if sys.version_info < (2, 7):
-    REQUIRES += ['ordereddict']
+REQUIRES = [i.strip() for i in open("requirements.txt").readlines()]
 
 
 setup(
