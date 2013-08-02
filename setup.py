@@ -11,8 +11,16 @@ Links
   <https://github.com/MongoEngine/django-mongoengine/raw/master#egg=Django-MongoEngine-dev>`_
 
 """
-from setuptools import setup
+from setuptools import setup, find_packages
 import sys, os
+
+
+__version__ = '0.1'
+__description__ = 'Django support for MongoDB via MongoEngine',
+__license__ = 'BSD'
+__author__ = 'Ross Lawley',
+__email__ = 'ross.lawley@gmail.com',
+
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -22,22 +30,19 @@ REQUIRES = [i.strip() for i in open("requirements.txt").readlines()]
 
 setup(
     name='django-mongoengine',
-    version='0.1',
+    version=__version__,
     url='https://github.com/mongoengine/django-mongoengine',
-    license='BSD',
-    author='Ross Lawley',
-    author_email='ross.lawley@gmail.com',
-    description='Django support for MongoDB via MongoEngine',
+    download_url='https://github.com/mongoengine/django-mongoengine/tarball/master',
+    license=__license__,
+    author=__author__,
+    author_email=__email__,
+    description=__description__,
     long_description=__doc__,
     test_suite='nose.collector',
     zip_safe=False,
     platforms='any',
     install_requires=REQUIRES,
-    packages=['django_mongoengine',
-              'django_mongoengine.debug_toolbar',
-              'django_mongoengine.forms',
-              'django_mongoengine.utils',
-              'django_mongoengine.views'],
+    packages=find_packages(exclude=('doc', 'docs',)),
     include_package_data=True,
     # use python setup.py nosetests to test
     setup_requires=['nose', 'coverage'],
