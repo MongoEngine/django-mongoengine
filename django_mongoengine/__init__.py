@@ -9,6 +9,7 @@ from types import ModuleType
 import sys
 from django_mongoengine.utils.module import MongoEngine
 
+
 __version__ = '0.1'
 
 class module(ModuleType):
@@ -25,6 +26,7 @@ class module(ModuleType):
                        '__package__', '__version__'))
         return result
 
+
 mongoengine_instance = MongoEngine()
 
 # keep a reference to this module so that it's not garbage collected
@@ -32,15 +34,16 @@ old_module = sys.modules['django_mongoengine']
 # setup the new module and patch it into the dict of loaded modules
 new_module = sys.modules['django_mongoengine'] = module('django_mongoengine')
 new_module.__dict__.update({
-    '__file__':         __file__,
-    '__package__':      'django_mongoengine',
-    '__path__':         __path__,
-    '__doc__':          __doc__,
-    '__version__':      __version__,
-    '__all__':          mongoengine_instance.__all__,
-    '__docformat__':    'restructuredtext en'
+    '__file__': __file__,
+    '__package__': 'django_mongoengine',
+    '__path__': __path__,
+    '__doc__': __doc__,
+    '__version__': __version__,
+    '__all__': mongoengine_instance.__all__,
+    '__docformat__': 'restructuredtext en'
 })
 
 extra_mod_mixins = ('connection', 'document', 'fields', 'queryset', 'signals')
 for mixin in extra_mod_mixins:
-    sys.modules['django_mongoengine.%s' % mixin] = getattr(mongoengine_instance, mixin)
+    sys.modules['django_mongoengine.%s' % mixin] = getattr(
+        mongoengine_instance, mixin)
