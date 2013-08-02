@@ -150,6 +150,7 @@ class MultipleDocumentTemplateResponseMixin(TemplateResponseMixin):
             opts = get_document_options(self.object_list._document)
             names.append("%s/%s%s.html" % (opts.app_label, opts.object_name.lower(), self.template_name_suffix))
 
+        names.append("{}s.html".format(self.template_name_suffix))
         return names
 
 
