@@ -3,7 +3,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 from mongoengine.document import Document
 from mongoengine import fields
@@ -34,7 +34,7 @@ class SessionStore(SessionBase):
         try:
             s = MongoSession.objects(session_key=self.session_key,
                                      expire_date__gt=datetime.now())[0]
-            return self.decode(force_unicode(s.session_data))
+            return self.decode(force_text(s.session_data))
         except (IndexError, SuspiciousOperation):
             self.create()
             return {}
