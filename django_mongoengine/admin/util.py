@@ -1,4 +1,4 @@
-from django.utils.encoding import force_unicode, smart_unicode, smart_str
+from django.utils.encoding import force_text, smart_unicode, smart_str
 from django.forms.forms import pretty_name
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import formats
@@ -26,7 +26,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
         label = field.name.replace('_', ' ')
     except FieldDoesNotExist:
         if name == "__unicode__":
-            label = force_unicode(model._admin_opts.verbose_name)
+            label = force_text(model._admin_opts.verbose_name)
         elif name == "__str__":
             label = smart_str(model._admin_opts.verbose_name)
         else:
