@@ -1,8 +1,12 @@
 from django import forms
 from django.core.validators import EMPTY_VALUES, RegexValidator
 from django.utils.encoding import smart_unicode
-from django.db.models.options import get_verbose_name
 from django.utils.text import capfirst
+try:
+    from django.db.models.options import get_verbose_name
+except ImportError:
+    from django.utils.text import camel_case_to_spaces as get_verbose_name
+
 
 from mongoengine import ReferenceField as MongoReferenceField
 

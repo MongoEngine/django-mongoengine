@@ -1,3 +1,5 @@
+from functools import update_wrapper
+
 from django import forms, template
 from django.forms.formsets import all_valid
 from django.forms.models import modelformset_factory
@@ -17,7 +19,6 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.decorators import method_decorator
 from django.utils.datastructures import SortedDict
-from django.utils.functional import update_wrapper
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 from django.utils.functional import curry
