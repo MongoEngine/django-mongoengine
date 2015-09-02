@@ -3,9 +3,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.settings")
 
 from django import test
 test.utils.setup_test_environment()
+import django
+django.setup()
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from django.forms.fields import TextInput
 
 from django_mongoengine.tests import MongoTestCase
 from django_mongoengine.forms.fields import DictField
@@ -18,8 +19,6 @@ class DictFieldTest(MongoTestCase):
     """
     TestCase class that tests a DictField object
     """
-    def __init__(self, methodName='rundict'):
-        super(DictFieldTest, self).__init__(methodName)
 
     def test_ouput(self):
         """
