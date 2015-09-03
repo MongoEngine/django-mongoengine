@@ -1,3 +1,5 @@
+from functools import update_wrapper
+
 from django import forms, template
 from django.forms.formsets import all_valid
 from django.forms.models import modelformset_factory
@@ -9,7 +11,10 @@ from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db import models, router
-from django.db.models.related import RelatedObject
+try:
+    from django.db.models.related import RelatedObject
+except ImportError:
+    from django.db.models.fields.related import ForeignObjectRel as RelatedObject
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import QUERY_TERMS
 from django.db.models.constants import LOOKUP_SEP
@@ -17,7 +22,6 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.decorators import method_decorator
 from django.utils.datastructures import SortedDict
-from django.utils.functional import update_wrapper
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 from django.utils.functional import curry

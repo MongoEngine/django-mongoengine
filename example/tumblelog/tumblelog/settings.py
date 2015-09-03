@@ -116,18 +116,22 @@ TEMPLATE_DIRS = (
     os.path.join(os.path.realpath(os.path.dirname(__file__)), '../templates'),
 )
 
+# XXX
+# Here is conflicting app names
+# Someone must investigate and make this working again
+# now it just commented
 INSTALLED_APPS = (
-    'django.contrib.auth',
+#    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
+#    'debug_toolbar',
     'django_mongoengine.debug_toolbar',
     'django_mongoengine.auth',
     'django_mongoengine.admin.sites',
     'django_mongoengine.admin',
-    'django.contrib.admin',
+#    'django.contrib.admin',
     'tumblelog'
 )
 

@@ -1,8 +1,12 @@
 import sys
 
 from django.db.models.fields import FieldDoesNotExist
-from django.db.models.options import get_verbose_name
 from django.utils.text import capfirst
+try:
+    from django.db.models.options import get_verbose_name
+except ImportError:
+    from django.utils.text import camel_case_to_spaces as get_verbose_name
+
 
 from mongoengine.fields import ReferenceField
 

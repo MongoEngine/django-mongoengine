@@ -1,3 +1,2 @@
 django>=1.5
-django-debug-toolbar
 mongoengine>=0.8.3
