@@ -1,14 +1,7 @@
-import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.settings")
-
-from django import test
-test.utils.setup_test_environment()
-import django
-django.setup()
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
-from django_mongoengine.tests import MongoTestCase
+from tests import MongoTestCase
 from django_mongoengine.forms.fields import DictField
 from django_mongoengine.forms.widgets import Dictionary, SubDictionary, Pair
 

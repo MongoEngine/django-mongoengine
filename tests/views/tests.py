@@ -2,13 +2,8 @@
 from __future__ import absolute_import
 
 import datetime
-import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.settings")
 
-from django import test
-test.utils.setup_test_environment()
-
-from django_mongoengine.tests import MongoTestCase
+from tests import MongoTestCase
 
 from .models import Artist, Author, Book, Page
 

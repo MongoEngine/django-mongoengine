@@ -2,11 +2,11 @@ import time
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory
 from django.utils import unittest
 from django.views.generic import View, TemplateView, RedirectView
 
-from django_mongoengine.tests import MongoTestCase as TestCase
+from tests import MongoTestCase as TestCase
 
 
 class SimpleView(View):
