@@ -24,15 +24,15 @@ Connecting
 In your **settings.py** file, add following lines
 .. code::
 
-MONGODB_DATABASES = {
-    "default": {
-        "name": database_name,
-        "host": database_host,
-        "password": database_password,
-        "username": database_user,
-        "tz_aware": True, # if you using timezones in django (USE_TZ = True)
-    },
-}
+    MONGODB_DATABASES = {
+        "default": {
+            "name": database_name,
+            "host": database_host,
+            "password": database_password,
+            "username": database_user,
+            "tz_aware": True, # if you using timezones in django (USE_TZ = True)
+        },
+    }
 
 
 Sessions
