@@ -21,8 +21,7 @@ TODO
 Connecting
 ==========
 
-In your **settings.py** file, add following lines
-.. code::
+In your **settings.py** file, add following lines::
 
     MONGODB_DATABASES = {
         "default": {
