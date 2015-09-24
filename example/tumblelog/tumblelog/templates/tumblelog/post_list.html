@@ -2,9 +2,9 @@
 {% load url from future %}
 
 {% block top_nav %}
-<ul class="nav pull-right nav-pills">
+<ul class="nav navbar-nav navbar-right">
   <li class="dropdown active">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Create <b class="caret"></b></a>
     <ul class="dropdown-menu">
       <li>
         <a href="{% url 'post_new' post_type='post' %}"><i class="icon-edit"></i> Post</a>

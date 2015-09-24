@@ -5,25 +5,46 @@
     <title>My Tumblelog</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
     <style>
-      .navbar-inner small { float: left; padding: 10px;}
+      .navbar-brand small {
+        color: #999;
+        display:block;
+        font-size:12px;
+      }
+
+      .navbar-toggle {top:10px}
+
+      @media (min-width:768px) {
+
+        .navbar-brand {
+          padding-top: 7px;
+        }
+
+      }
     </style>
   </head>
 
   <body>
-    <div class="navbar" data-dropdown="dropdown">
-      <div class="navbar-inner">
-        <div class="container">
-          <a href="/" class="brand">My Tumblelog</a> <small>Starring MongoDB and MongoEngine</small>
-          {% block top_nav %}{% endblock %}
+    <header class="navbar navbar-inverse navbar-static-top" role="banner">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="/" class="navbar-brand">
+            My Tumblelog
+            <small>Starring MongoDB and MongoEngine</small>
+          </a>
         </div>
+        <nav class="navbar-collapse">
+          {% block top_nav %}{% endblock %}
+        </nav>
       </div>
-    </div>
+    </header>
 
     <div class="container">
-      <div class="content">
-        {% block page_header %}{% endblock %}
-        {% include "_messages.html" %}
-        {% block content %}{% endblock %}
+      <div class="row">
+        <div class="col-md-9" role="main">
+          {% block page_header %}{% endblock %}
+          {% include "_messages.html" %}
+          {% block content %}{% endblock %}
+        </div>
       </div>
     </div>
     {% block js_footer %}
