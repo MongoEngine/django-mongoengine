@@ -7,22 +7,6 @@
   </div>
 {% endblock %}
 
-{% block top_nav %}
-<ul class="nav navbar-nav navbar-right">
-  <li class="dropdown active">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
-    <ul class="dropdown-menu">
-      <li>
-        <a href="{% url 'post_update' slug=post.slug %}"><i class="icon-edit"></i> edit</a>
-      </li>
-      <li>
-        <a href="{% url 'post_delete' slug=post.slug %}"><i class="icon-trash"></i> delete</a>
-      </li>
-    </ul>
-  </li>
-</ul>
-{% endblock %}
-
 {% block content %}
   {% if post.body and not post.author %}
     <p>{{ post.body|linebreaksbr }}<p>
@@ -58,6 +42,10 @@
     <p>{{ post.author }}</p>
   {% endif %}
   <p>{{ post.created_at }}</p>
+  <div class="btn-group">
+    <a href="{% url 'post_update' slug=post.slug %}" class="btn btn-default"><i class="glyphicon glyphicon-edit"></i> edit</a>
+    <a href="{% url 'post_delete' slug=post.slug %}" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> delete</a>
+  </div>
   <hr>
   <h2>Comments</h2>
   {% if post.comments %}
