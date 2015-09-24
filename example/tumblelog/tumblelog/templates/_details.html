@@ -59,7 +59,7 @@
   {% endif %}
   <h2>Add a comment</h2>
   <form action="." method="post">
-    {% include "_forms.html" %}
+    {{ form.as_p }}
     <div class="actions">
       <input type="submit" class="btn primary" value="comment">
     </div>
