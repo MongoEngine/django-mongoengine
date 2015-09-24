@@ -36,9 +36,9 @@ from django_mongoengine.fields import (DateTimeField, URLField, IntField,
                                        ReferenceField, StringField, FileField,
                                        ImageField)
 
-from django_mongoengine.admin import helpers as mongodb_helpers
-from django_mongoengine.admin.util import RelationWrapper
-from django_mongoengine.admin.helpers import AdminForm
+from django_mongoengine.mongo_admin import helpers as mongodb_helpers
+from django_mongoengine.mongo_admin.util import RelationWrapper
+from django_mongoengine.mongo_admin.helpers import AdminForm
 
 from django_mongoengine.forms.document_options import DocumentMetaWrapper
 from django_mongoengine.forms.documents import (
@@ -395,7 +395,7 @@ class DocumentAdmin(BaseDocumentAdmin):
             self.inline_instances.append(inline_instance)
 
     def get_urls(self):
-        from django.conf.urls.defaults import patterns, url
+        from django.conf.urls import patterns, url
 
         def wrap(view):
             def wrapper(*args, **kwargs):

@@ -1,6 +1,6 @@
 from django.contrib.admin.options import flatten_fieldsets, HORIZONTAL, VERTICAL
 from django.contrib.admin.util import get_fields_from_path, NotRelationField
-from django.contrib.admin.validation import validate as django_validate
+from django.contrib.admin import ModelAdmin
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
@@ -21,7 +21,7 @@ __all__ = ['validate']
 
 def validate(cls, model):
     if issubclass(model, models.Model):
-        django_validate(cls, model)
+        ModelAdmin.validate(cls, model)
     else:
         _validate(cls, model)
 

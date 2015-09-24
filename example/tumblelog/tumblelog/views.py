@@ -27,6 +27,7 @@ class AddPostView(CreateView):
     doc_map = {'post': BlogPost, 'video': Video, 'image': Image, 'quote': Quote, 'music': Music}
     success_message = "Post Added!"
     form_exclude = ('created_at', 'comments')
+    template_name = "tumblelog/post_form.html"
 
     @property
     def document(self):
@@ -69,5 +70,7 @@ class ImageFileView(View):
     def get(self, request, slug, *args, **kwargs):
         image_doc = Image.objects.get_or_404(slug=slug)
         image = image_doc.image
-        return HttpResponse(image.read(),
-                            mimetype='image/%s' % image.format.lower())
+        return HttpResponse(
+            image.read(),
+            content_type='image/%s' % image.format.lower(),
+        )

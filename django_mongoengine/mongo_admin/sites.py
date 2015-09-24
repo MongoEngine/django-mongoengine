@@ -19,7 +19,7 @@ from django.contrib.admin.sites import NotRegistered, AlreadyRegistered
 
 from mongoengine.base import TopLevelDocumentMetaclass
 
-from django_mongoengine.admin import actions, DocumentAdmin
+from django_mongoengine.mongo_admin import actions, DocumentAdmin
 
 LOGIN_FORM_KEY = 'this_is_the_login_form'
 
@@ -72,7 +72,7 @@ class AdminSite(object):
 
         # Don't import the humongous validation code unless required
         if admin_class and settings.DEBUG:
-            from django_mongoengine.admin.validation import validate
+            from django_mongoengine.mongo_admin.validation import validate
         else:
             validate = lambda model, adminclass: None
 
@@ -184,7 +184,7 @@ class AdminSite(object):
             class MyAdminSite(AdminSite):
 
                 def get_urls(self):
-                    from django.conf.urls.defaults import patterns, url
+                    from django.conf.urls import patterns, url
 
                     urls = super(MyAdminSite, self).get_urls()
                     urls += patterns('',
@@ -209,7 +209,7 @@ class AdminSite(object):
         return update_wrapper(inner, view)
 
     def get_urls(self):
-        from django.conf.urls.defaults import patterns, url, include
+        from django.conf.urls import patterns, url, include
 
         if settings.DEBUG:
             self.check_dependencies()

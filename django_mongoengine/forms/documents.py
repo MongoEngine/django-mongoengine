@@ -391,37 +391,15 @@ class BaseDocumentForm(BaseForm):
             raise ValueError("The %s could not be %s because the data didn't"
                              " validate." % (self.instance.__class__.__name__, fail_message))
 
-        if self.instance._created:
-            self.instance = construct_instance(self, self.instance, self.fields, self._meta.exclude)
+        self.instance = construct_instance(self, self.instance, self.fields, self._meta.exclude)
 
-            # Validate uniqueness if needed.
-            if self._validate_unique:
-                self.validate_unique()
+        # Validate uniqueness if needed.
+        if self._validate_unique:
+            self.validate_unique()
 
-            if commit:
-                self.instance.save()
-        else:
-            update = {}
-            for name, data in self.cleaned_data.iteritems():
+        if commit:
+            self.instance.save()
 
-                try:
-                    if isinstance(data, datetime.datetime):
-                        data = data.replace(tzinfo=None)
-                    if getattr(self.instance, name) != data:
-                        update['set__' + name] = data
-                        setattr(self.instance, name, data)
-                except AttributeError:
-                    raise Exception('Model %s has not attr %s but form %s has' \
-                                    % (type(self.instance),
-                                      name,
-                                      type(self)))
-
-            # Validate uniqueness if needed.
-            if self._validate_unique:
-                self.validate_unique()
-
-            if commit and update:
-                self.instance.update(**update)
         return self.instance
     save.alters_data = True
 

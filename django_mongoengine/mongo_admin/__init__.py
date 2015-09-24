@@ -1,5 +1,5 @@
-from django_mongoengine.admin.options import *
-from django_mongoengine.admin.sites import site
+from django_mongoengine.mongo_admin.options import *
+from django_mongoengine.mongo_admin.sites import site
 
 from django.conf import settings
 

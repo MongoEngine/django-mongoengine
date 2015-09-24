@@ -1,4 +1,4 @@
-from django_mongoengine import admin
+from django_mongoengine import mongo_admin as admin
 
 from tumblelog.models import BlogPost, Image, Quote, Video, Music
 

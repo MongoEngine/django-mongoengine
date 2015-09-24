@@ -8,7 +8,7 @@ from mongoengine import fields
 
 from django_mongoengine.forms.document_options import DocumentMetaWrapper
 
-from django_mongoengine.admin.util import label_for_field, display_for_field
+from django_mongoengine.mongo_admin.util import label_for_field, display_for_field
 from django_mongoengine.forms.utils import patch_document
 
 register = Library()

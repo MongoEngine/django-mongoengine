@@ -6,6 +6,12 @@ from django_mongoengine import fields
 import datetime
 
 
+class Comment(fields.EmbeddedDocument):
+    created_at = fields.DateTimeField(default=datetime.datetime.now, required=True)
+    author = fields.StringField(verbose_name="Name", max_length=255, required=True)
+    body = fields.StringField(verbose_name="Comment", required=True)
+
+
 class Post(Document):
     created_at = fields.DateTimeField(default=datetime.datetime.now, required=True)
     title = fields.StringField(max_length=255, required=True)
@@ -49,9 +55,3 @@ class Quote(Post):
 class Music(Post):
     url = fields.StringField(max_length=100, verbose_name="Music Url", required=True)
     music_parameters = fields.DictField(verbose_name="Music Parameters", required=True)
-
-
-class Comment(fields.EmbeddedDocument):
-    created_at = fields.DateTimeField(default=datetime.datetime.now, required=True)
-    author = fields.StringField(verbose_name="Name", max_length=255, required=True)
-    body = fields.StringField(verbose_name="Comment", required=True)

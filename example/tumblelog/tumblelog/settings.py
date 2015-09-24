@@ -102,7 +102,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+#    'debug_toolbar.middleware.DebugToolbarMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -127,11 +127,11 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 #    'debug_toolbar',
-    'django_mongoengine.debug_toolbar',
+#    'django_mongoengine.debug_toolbar',
     'django_mongoengine.auth',
-    'django_mongoengine.admin.sites',
-    'django_mongoengine.admin',
-#    'django.contrib.admin',
+    'django_mongoengine.mongo_admin.sites',
+    'django_mongoengine.mongo_admin',
+    'django.contrib.admin',
     'tumblelog'
 )
 
@@ -142,14 +142,14 @@ AUTHENTICATION_BACKENDS = (
 SESSION_ENGINE = 'django_mongoengine.sessions'
 
 DEBUG_TOOLBAR_PANELS = (
-    'debug_toolbar.panels.version.VersionDebugPanel',
-    'debug_toolbar.panels.timer.TimerDebugPanel',
-    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
-    'debug_toolbar.panels.headers.HeaderDebugPanel',
-    'debug_toolbar.panels.template.TemplateDebugPanel',
-    'debug_toolbar.panels.signals.SignalDebugPanel',
-    'debug_toolbar.panels.logger.LoggingPanel',
-    'django_mongoengine.debug_toolbar.panel.MongoDebugPanel',
+#    'debug_toolbar.panels.version.VersionDebugPanel',
+#    'debug_toolbar.panels.timer.TimerDebugPanel',
+#    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+#    'debug_toolbar.panels.headers.HeaderDebugPanel',
+#    'debug_toolbar.panels.template.TemplateDebugPanel',
+#    'debug_toolbar.panels.signals.SignalDebugPanel',
+#    'debug_toolbar.panels.logger.LoggingPanel',
+#    'django_mongoengine.debug_toolbar.panel.MongoDebugPanel',
 )
 
 DEBUG_TOOLBAR_CONFIG = {

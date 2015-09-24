@@ -7,7 +7,7 @@ from tumblelog.views import (PostIndexView, AddPostView, PostDetailView,
 from django.contrib import admin
 admin.autodiscover()
 
-from django_mongoengine.admin import site
+from django_mongoengine.mongo_admin import site
 
 post_patterns = patterns('',
     url(r'^$', PostDetailView.as_view(), name="post"),
