@@ -258,10 +258,24 @@ class MongoFormFieldGenerator(object):
             return f
 
     def generate_filefield(self, field, **kwargs):
-        return forms.FileField(**kwargs)
+        form_class = forms.FileField
+        defaults = {
+            'required': field.required,
+            'label': self.get_field_label(field),
+            'help_text': self.get_field_help_text(field),
+        }
+        defaults.update(kwargs)
+        return form_class(**defaults)
 
     def generate_imagefield(self, field, **kwargs):
-        return forms.ImageField(**kwargs)
+        form_class = forms.ImageField
+        defaults = {
+            'required': field.required,
+            'label': self.get_field_label(field),
+            'help_text': self.get_field_help_text(field),
+        }
+        defaults.update(kwargs)
+        return form_class(**defaults)
 
     def generate_dictfield(self, field, **kwargs):
         #remove Mongo reserved words
