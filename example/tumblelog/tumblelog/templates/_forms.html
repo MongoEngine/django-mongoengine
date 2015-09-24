@@ -1,21 +1,25 @@
-<fieldset>
-{% for field in form.visible_fields %}
-<div class="clearfix {% if field.errors %}error{% endif %}">
-  {{ field.label_tag }}
-  <div class="input">
-    {{ field }}
-    {% if field.errors or field.help_text %}
-      <span class="help-inline">
-      {% if field.errors %}
-        {{ field.errors|join:' ' }}
-      {% else %}
-        {{ field.help_text }}
-      {% endif %}
-      </span>
-    {% endif %}
+{% extends "base.html" %}
+
+{% block page_header %}
+  <div class="page-header">
+    <h1>{{ form.instance.slug|yesno:"Edit post,Create new post"|title }}</h1>
   </div>
-</div>
-{% endfor %}
-{% csrf_token %}
-<div style="display:none">{% for h in form.hidden_fields %} {{ h }}{% endfor %}</div>
-</fieldset>
+{% endblock %}
+
+
+{% block content %}
+  {% if form.errors %}
+    <div class="alert alert-error">
+      <button class="close" data-dismiss="alert">×</button>
+      There are problems with the form data - please review
+    </div>
+  {% endif %}
+  <form action="." method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <div class="actions">
+      <input type="submit" class="btn primary" value="{{ form.instance.slug|yesno:"Edit post,Create new post" }}">
+    </div>
+  </form>
+{% endblock %}
