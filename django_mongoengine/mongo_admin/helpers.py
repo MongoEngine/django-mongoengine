@@ -1,4 +1,4 @@
-from django.contrib.admin.util import lookup_field
+from django.contrib.admin.utils import lookup_field
 from django.contrib.admin.helpers import AdminForm as DjangoAdminForm
 from django.contrib.admin.helpers import Fieldset as DjangoFieldSet
 from django.contrib.admin.helpers import Fieldline as DjangoFieldLine

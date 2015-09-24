@@ -5,7 +5,7 @@ from django.forms.formsets import all_valid
 from django.forms.models import modelformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.util import unquote, flatten_fieldsets, model_format_dict
+from django.contrib.admin.utils import unquote, flatten_fieldsets, model_format_dict
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied, ValidationError

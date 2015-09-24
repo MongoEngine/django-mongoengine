@@ -1,5 +1,5 @@
 from django.contrib.admin.options import flatten_fieldsets, HORIZONTAL, VERTICAL
-from django.contrib.admin.util import get_fields_from_path, NotRelationField
+from django.contrib.admin.utils import get_fields_from_path, NotRelationField
 from django.contrib.admin import ModelAdmin
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
