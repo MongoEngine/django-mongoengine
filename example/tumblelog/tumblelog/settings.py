@@ -126,12 +126,13 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.admin',
+
 #    'debug_toolbar',
 #    'django_mongoengine.debug_toolbar',
     'django_mongoengine.auth',
     'django_mongoengine.mongo_admin.sites',
     'django_mongoengine.mongo_admin',
-    'django.contrib.admin',
     'tumblelog'
 )
 
