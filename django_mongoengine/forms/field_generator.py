@@ -23,7 +23,7 @@ class MongoFormFieldGenerator(object):
         field-classname) and raises a NotImplementedError of no generator
         can be found.
 
-        :param default: Default to a CharField?
+        :param charfield_default: Default to a CharField?
         """
         field_name = field.__class__.__name__.lower()
         if hasattr(self, 'generate_%s' % field_name):
@@ -34,7 +34,7 @@ class MongoFormFieldGenerator(object):
             if hasattr(self, 'generate_%s' % cls_name):
                 return getattr(self, 'generate_%s' % cls_name)(field, **kwargs)
 
-        if default:
+        if charfield_default:
             # Default to a normal CharField
             # TODO: Somehow add a warning
             defaults = {'required': field.required}
