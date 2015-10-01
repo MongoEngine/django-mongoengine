@@ -121,7 +121,7 @@ TEMPLATE_DIRS = (
 # Someone must investigate and make this working again
 # now it just commented
 INSTALLED_APPS = (
-#    'django.contrib.auth',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -130,7 +130,7 @@ INSTALLED_APPS = (
 
 #    'debug_toolbar',
 #    'django_mongoengine.debug_toolbar',
-    'django_mongoengine.auth',
+    'django_mongoengine.mongo_auth',
     'django_mongoengine.mongo_admin.sites',
     'django_mongoengine.mongo_admin',
     'tumblelog'
