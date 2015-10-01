@@ -370,3 +370,48 @@ class StaticSubDictionary(SubDictionary):
         return """
 <li><span class="static_key %(html_class)s">%(key)s</span> :  %(widgets)s</li>
 """ % params
+
+class EmbeddedFieldWidget(MultiWidget):
+    """
+    A widget that render each field found in the supplied form.
+    """
+    def __init__(self, fields, attrs=None):
+        self.fields = fields
+        super(EmbeddedFieldWidget, self).__init__([f.widget for f in self.fields.values()], attrs)
+
+    def decompress(self, value):
+        """
+        Retreieve each field value or provide the initial values
+        """
+        if value:
+            return [value.__getitem__(field) for field in self.fields.keys()]
+        return [field.field.initial for field in self.fields.values()]
+
+    def format_label(self, field, counter):
+        """
+        Format the label for each field
+        """
+        return '<label for="id_formfield_%s" %s>%s:</label>' % (
+            counter, field.required and 'class="required"', field.label)
+
+    def format_help_text(self, field, counter):
+        """
+        Format the help text for the bound field
+        """
+        if field.help_text != None:
+            return '(<em>%s</em>)' % field.help_text
+        return ''
+
+    def format_output(self, rendered_widgets):
+        """
+        This output will yeild all widgets grouped in a un-ordered list
+        """
+        ret = ['<ul class="formfield">']
+        for i, field in enumerate(self.fields):
+            label = self.format_label(self.fields[field], i)
+            help_text = self.format_help_text(self.fields[field], i)
+            ret.append('<li>%s %s %s</li>' % (
+                label, help_text, rendered_widgets[i]))
+
+        ret.append('</ul>')
+        return u''.join(ret)

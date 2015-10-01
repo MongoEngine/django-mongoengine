@@ -5,11 +5,10 @@ from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 
 from django_mongoengine.utils import force_text
-from django_mongoengine.forms.widgets import Dictionary
+from django_mongoengine.forms.widgets import Dictionary, EmbeddedFieldWidget
 
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
-
 
 class MongoChoiceIterator(object):
     def __init__(self, field):
@@ -231,3 +230,34 @@ class DictField(forms.Field):
                     raise ValidationError(self.error_messages['illegal'] % self.illegal_characters)
             if isinstance(v, dict):
                 self.validate(v, depth + 1)
+
+class EmbeddedDocumentField(forms.MultiValueField):
+    def __init__(self, form, *args, **kwargs):
+        self.form = form()
+        # Set the widget and initial data
+        kwargs['widget'] = EmbeddedFieldWidget(self.form.fields)
+        kwargs['initial'] = [f.initial for f in self.form.fields.values()]
+        kwargs['require_all_fields'] = False
+        super(EmbeddedDocumentField, self).__init__(fields=tuple([f for f in self.form.fields.values()]), *args, **kwargs)
+
+    def bound_data(self, data, initial):
+        return data
+
+    def prepare_value(self, value):
+        return value
+    def compress(self, data_list):
+        data = {}
+        if data_list:
+            data = dict((f.name, data_list[i]) for i, f in enumerate(self.form))
+            f = self.form.__class__(data)
+            f.is_valid()
+            return f.cleaned_data
+        return data
+
+    def clean(self, value):
+        return self.to_python(super(EmbeddedDocumentField, self).clean(value))
+
+    def to_python(self, value):
+        obj = self.form._meta.model()
+        [ obj.__setattr__(k, value[k]) for k in value.keys() ]
+        return obj

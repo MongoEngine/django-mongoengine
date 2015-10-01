@@ -13,6 +13,7 @@ Quick links
     :maxdepth: 1
 
     changelog.rst
+    examples.rst
 
 
 Installing Django-MongoEngine

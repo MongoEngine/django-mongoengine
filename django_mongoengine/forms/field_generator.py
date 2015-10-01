@@ -10,7 +10,7 @@ except ImportError:
 
 from mongoengine import ReferenceField as MongoReferenceField
 
-from fields import MongoCharField, ReferenceField, DocumentMultipleChoiceField, DictField
+from fields import MongoCharField, ReferenceField, DocumentMultipleChoiceField, DictField, EmbeddedDocumentField
 
 BLANK_CHOICE_DASH = [("", "---------")]
 
@@ -288,6 +288,18 @@ class MongoFormFieldGenerator(object):
             'validators': validate,
         }
         return DictField(**defaults)
+
+    def generate_embeddeddocumentfield(self, field, **kwargs):
+        from documents import documentform_factory
+        defaults = {
+            'label': self.get_field_label(field),
+            'help_text': self.get_field_help_text(field),
+        }
+        form_class = EmbeddedDocumentField
+        defaults.update(kwargs)
+        form = form_class(documentform_factory(field.document_type), **defaults)
+        return form
+
 
 
 class MongoDefaultFormFieldGenerator(MongoFormFieldGenerator):
