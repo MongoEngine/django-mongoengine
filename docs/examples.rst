@@ -6,6 +6,7 @@ Embedded Fields
 ===============
 
 **models.py**::
+
     class ContactInfo(fields.EmbeddedDocument):
         web = fields.URLField(help_text=_("""List of languages for your application (the first one will be the default language)"""))
         email = fields.EmailField(verbose_name=_('e-mail address'))
@@ -19,6 +20,7 @@ Embedded Fields
 
 
 **forms.py**::
+
     class ContactInfoForm(DocumentForm):
         class Meta:
             document = ContactInfo
