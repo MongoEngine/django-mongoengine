@@ -1,4 +1,5 @@
 import sys
+import warnings
 
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.text import capfirst
@@ -37,7 +38,7 @@ class DocumentMetaWrapper(object):
     _pk = None
     pk_name = None
     app_label = None
-    module_name = None
+    model_name = None
     verbose_name = None
     has_auto_field = False
     object_name = None
@@ -58,7 +59,7 @@ class DocumentMetaWrapper(object):
         except AttributeError:
             self.object_name = self.document.__class__.__name__
 
-        self.module_name = self.object_name.lower()
+        self.model_name = self.object_name.lower()
         self.app_label = self.get_app_label()
         self.verbose_name = self.get_verbose_name()
 
@@ -68,6 +69,16 @@ class DocumentMetaWrapper(object):
             self._init_pk()
         except KeyError:
             pass
+
+    @property
+    def module_name(self):
+        """
+        This property has been deprecated in favor of `model_name`.
+        """
+        warnings.warn(
+            "Options.module_name has been deprecated in favor of model_name",
+            PendingDeprecationWarning, stacklevel=2)
+        return self.model_name
 
     def get_app_label(self):
         model_module = sys.modules[self.document.__module__]

@@ -402,7 +402,7 @@ class DocumentAdmin(BaseDocumentAdmin):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
-        info = self.opts.app_label, self.opts.module_name
+        info = self.opts.app_label, self.opts.model_name
 
         urlpatterns = patterns('',
             url(r'^$',

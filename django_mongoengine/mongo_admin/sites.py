@@ -246,8 +246,8 @@ class AdminSite(object):
 
         # Add in each model's views.
         for model, model_admin in self._registry.iteritems():
-            # Try to read app_label and module_name from classes _meta attribute.
-            # If they don't exist we try to add a mongo document. app_label and module_name
+            # Try to read app_label and model_name from classes _meta attribute.
+            # If they don't exist we try to add a mongo document. app_label and model_name
             # are then created here and added to the document's _meta.
             try:
                 app_label = model._meta.app_label
@@ -255,12 +255,12 @@ class AdminSite(object):
                 app_label = model_admin.opts.app_label
 
             try:
-                module_name = model._meta.module_name
+                model_name = model._meta.model_name
             except AttributeError:
-                module_name = model_admin.opts.module_name
+                model_name = model_admin.opts.model_name
 
             urlpatterns += patterns('',
-                url(r'^%s/%s/' % (app_label, module_name),
+                url(r'^%s/%s/' % (app_label, model_name),
                     include(model_admin.urls))
             )
         return urlpatterns

@@ -6,7 +6,7 @@ import re
 import sys
 from optparse import make_option
 
-from django_mongoengine.auth.models import User
+from django_mongoengine.mongo_auth import MongoUser
 from django_mongoengine.connection import DEFAULT_CONNECTION_NAME
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
@@ -84,8 +84,8 @@ class Command(BaseCommand):
                         username = None
                         continue
                     try:
-                        User.objects.get(username=username)
-                    except User.DoesNotExist:
+                        MongoUser.objects.get(username=username)
+                    except MongoUser.DoesNotExist:
                         break
                     else:
                         sys.stderr.write("Error: That username is already taken.\n")
@@ -121,6 +121,6 @@ class Command(BaseCommand):
                 sys.stderr.write("\nOperation cancelled.\n")
                 sys.exit(1)
 
-        User.create_superuser(username, email, password)
+        MongoUser.objects.create_superuser(username, email, password)
         if verbosity >= 1:
           self.stdout.write("Superuser created successfully.\n")

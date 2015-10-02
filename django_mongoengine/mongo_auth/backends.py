@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
-from django_mongoengine.auth.models import User
+from django.contrib import auth
 
 
 class MongoEngineBackend(object):
@@ -9,19 +9,26 @@ class MongoEngineBackend(object):
     supports_object_permissions = False
     supports_anonymous_user = False
     supports_inactive_user = False
+    _user_doc = False
 
     def authenticate(self, username=None, password=None):
-        user = User.objects(username=username).first()
+        user = self.user_document.objects(username=username).first()
         if user:
             if password and user.check_password(password):
+                backend = auth.get_backends()[0]
+                user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
                 return user
         return None
 
     def get_user(self, user_id):
-        user = User.objects.with_id(user_id)
-        user.id.__class__.__int__ = lambda self: int("%s" % self, 17)
-        return user
+        return self.user_document.objects.with_id(user_id)
 
+    @property
+    def user_document(self):
+        if self._user_doc is False:
+            from . import get_user_document
+            self._user_doc = get_user_document()
+        return self._user_doc
 
 def get_user(userid):
     """Returns a User object from an id (User.id). Django's equivalent takes
