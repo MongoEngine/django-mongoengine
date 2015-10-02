@@ -1,4 +1,4 @@
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, smart_text
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.models import _user_has_perm, _user_get_all_permissions, _user_has_module_perms
@@ -156,46 +156,6 @@ class Group(document.Document):
 
     def __unicode__(self):
         return self.name
-
-
-class UserManager(models.Manager):
-    def create_user(self, username, email, password=None):
-        """
-        Creates and saves a User with the given username, e-mail and password.
-        """
-        now = timezone.now()
-
-        # Normalize the address by lowercasing the domain part of the email
-        # address.
-        try:
-            email_name, domain_part = email.strip().split('@', 1)
-        except ValueError:
-            pass
-        else:
-            email = '@'.join([email_name, domain_part.lower()])
-
-        user = self.model(username=username, email=email, is_staff=False,
-                          is_active=True, is_superuser=False, last_login=now,
-                          date_joined=now)
-
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, username, email, password):
-        u = self.create_user(username, email, password)
-        u.is_staff = True
-        u.is_active = True
-        u.is_superuser = True
-        u.save(using=self._db)
-        return u
-
-    def make_random_password(self, length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'):
-        "Generates a random password with the given length and given allowed_chars"
-        # Note that default value of allowed_chars does not have "I" or letters
-        # that look like it -- just to avoid confusion.
-        from random import choice
-        return ''.join([choice(allowed_chars) for i in range(length)])
 
 
 class User(document.Document):
@@ -371,3 +331,6 @@ class User(document.Document):
             except (ImportError, ImproperlyConfigured):
                 raise SiteProfileNotAvailable
         return self._profile_cache
+
+User._meta.pk = User._fields["id"]
+User._meta.pk.value_to_string = lambda obj: smart_text(obj.pk)

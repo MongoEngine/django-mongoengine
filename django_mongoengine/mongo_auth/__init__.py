@@ -9,6 +9,7 @@ except ImportError:
     from django.utils.importlib import import_module
 from django.utils.translation import ugettext_lazy as _
 
+from bson.objectid import ObjectId
 
 __all__ = (
     'get_user_document',
@@ -116,3 +117,5 @@ class MongoUser(Model):
     def set_password(self, password):
         """Doesn't do anything, but works around the issue with Django 1.6."""
         make_password(password)
+
+MongoUser._meta.pk.to_python = ObjectId
