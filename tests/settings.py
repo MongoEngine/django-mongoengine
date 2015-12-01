@@ -1,10 +1,12 @@
+#!/usr/bin/env python
+# coding=utf-8
+from __future__ import absolute_import, division, print_function
 # Django settings for tumblelog project.
 import sys
 import os
 
 PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.append(os.path.join(PROJECT_ROOT, '../../../'))
-
 
 DEBUG = True
 TEMPLATE_DEBUG = False
@@ -16,9 +18,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 # MongoDB Databases
-MONGODB_DATABASES = {
-    'default': {'name': 'django_mongoengine_test'}
-}
+MONGODB_DATABASES = {'default': {'name': 'django_mongoengine_test'}}
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -77,25 +77,23 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'd2h8yt+x2g0$+e#9$z5z$auy%v0axov(wt3o*bj1#h^1+x^n(!'
 
 # List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
-)
+TEMPLATE_LOADERS = ('django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    #     'django.template.loaders.eggs.Loader',
+                    )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.common.CommonMiddleware'
-)
+    'django.middleware.common.CommonMiddleware')
 
 ROOT_URLCONF = ''
 
@@ -104,16 +102,10 @@ WSGI_APPLICATION = 'tumblelog.wsgi.application'
 
 TEMPLATE_DIRS = ()
 
-INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'tests.views'
-)
-
+INSTALLED_APPS = ('django.contrib.auth', 'django.contrib.contenttypes',
+                  'django.contrib.sessions', 'django.contrib.sites',
+                  'django.contrib.messages', 'django.contrib.staticfiles',
+                  'tests.views')
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

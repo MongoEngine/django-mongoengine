@@ -1,4 +1,6 @@
-from __future__ import absolute_import
+#!/usr/bin/env python
+# coding=utf-8
+from __future__ import absolute_import, division, print_function
 
 from django.core.exceptions import ImproperlyConfigured
 from .tests import TestCase
@@ -32,15 +34,19 @@ class DetailViewTest(TestCase):
     def test_detail_by_slug(self):
         res = self.client.get('/detail/author/byslug/scott-rosenberg/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(slug='scott-rosenberg'))
-        self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
+        self.assertEqual(res.context['object'],
+                         Author.objects.get(slug='scott-rosenberg'))
+        self.assertEqual(res.context['author'],
+                         Author.objects.get(slug='scott-rosenberg'))
         self.assertTemplateUsed(res, 'views/author_detail.html')
 
     def test_detail_by_custom_slug(self):
         res = self.client.get('/detail/author/bycustomslug/scott-rosenberg/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(slug='scott-rosenberg'))
-        self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
+        self.assertEqual(res.context['object'],
+                         Author.objects.get(slug='scott-rosenberg'))
+        self.assertEqual(res.context['author'],
+                         Author.objects.get(slug='scott-rosenberg'))
         self.assertTemplateUsed(res, 'views/author_detail.html')
 
     def test_verbose_name(self):
@@ -87,7 +93,9 @@ class DetailViewTest(TestCase):
         self.assertTemplateUsed(res, 'views/author_detail.html')
 
     def test_invalid_url(self):
-        self.assertRaises(AttributeError, self.client.get, '/detail/author/invalid/url/')
+        self.assertRaises(AttributeError, self.client.get,
+                          '/detail/author/invalid/url/')
 
     def test_invalid_queryset(self):
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/detail/author/invalid/qs/')
+        self.assertRaises(ImproperlyConfigured, self.client.get,
+                          '/detail/author/invalid/qs/')
