@@ -1,5 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
+#!/usr/bin/env python
+# coding=utf-8
+from __future__ import absolute_import, division, print_function
 
 import datetime
 
@@ -9,7 +10,6 @@ from .models import Artist, Author, Book, Page
 
 
 class TestCase(MongoTestCase):
-
     def _fixture_setup(self):
         Artist.drop_collection()
         Author.drop_collection()
@@ -19,7 +19,9 @@ class TestCase(MongoTestCase):
         Artist(id="1", name="Rene Magritte").save()
 
         Author(id="1", name=u"Roberto Bolaño", slug="roberto-bolano").save()
-        scott = Author(id="2", name="Scott Rosenberg", slug="scott-rosenberg").save()
+        scott = Author(id="2",
+                       name="Scott Rosenberg",
+                       slug="scott-rosenberg").save()
 
         Book(**{
             "id": "1",
@@ -48,5 +50,5 @@ class TestCase(MongoTestCase):
 from .base import ViewTest, TemplateViewTest, RedirectViewTest
 from .detail import DetailViewTest
 from .edit import (FormMixinTests, ModelFormMixinTests, CreateViewTests,
-    UpdateViewTests, DeleteViewTests)
+                   UpdateViewTests, DeleteViewTests)
 from .list import ListViewTests
