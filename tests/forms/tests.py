@@ -249,7 +249,7 @@ class DictFieldTest(MongoTestCase):
     def _check_structure(self, widget, structure):
         # TODO: fix depth
         assert isinstance(structure, dict), 'error, the comparative structure should be a dictionary'
-        assert isinstance(widget, Dictionary), 'widget should be a %s' % structure['type']
+        assert isinstance(widget, structure['type']), 'widget should be a %s' % structure['type']
         if 'widgets' in structure.keys():
             assert isinstance(structure['widgets'], list), 'structure field "widgets" should be a list'
             assert isinstance(widget.widgets, list), 'widget.widgets should be a list'
