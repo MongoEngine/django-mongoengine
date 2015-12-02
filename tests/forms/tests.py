@@ -4,10 +4,12 @@ from __future__ import absolute_import, division, print_function
 
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-
 from tests import MongoTestCase
+
 from django_mongoengine.forms.fields import DictField
-from django_mongoengine.forms.widgets import Dictionary, SubDictionary, Pair
+from django_mongoengine.forms.widgets import (Dictionary, SubDictionary, Pair,
+                                              StaticPair, StaticSubDictionary,
+                                              TextInput, HiddenInput)
 
 # TODO : test for max_depth
 
@@ -86,22 +88,19 @@ class DictFieldTest(MongoTestCase):
         }
         invalid_message = {
             '[[key1,value1],[$key2,value2]]':
-            [u'Ensure the keys do not begin with : ["$","_"].'],
+            u'Ensure the keys do not begin with : ["$","_"].',
             '[[key1,value1],[_key2,value2]]':
-            [u'Ensure the keys do not begin with : ["$","_"].'],
+            u'Ensure the keys do not begin with : ["$","_"].',
             '[[key1,value1],[k.ey2,value2]]':
-            [self.field.error_messages['illegal'] %
-             self.field.illegal_characters],
+            self.field.error_messages['illegal'] % self.field.illegal_characters,
             '[[keykeykeykeykeykeykeykeykeykeykey,value1],[key2,value2]]':
-            [self.field.error_messages['length'] % self.field.key_limit],
+            self.field.error_messages['length'] % self.field.key_limit,
             '[[err,value1],[key2,value2]]':
-            [self.field.error_messages['invalid_key'] % self.field.invalid_keys
-             ],
+            self.field.error_messages['invalid_key'] % self.field.invalid_keys,
             '[[errmsg,value1],[key2,value2]]':
-            [self.field.error_messages['invalid_key'] % self.field.invalid_keys
-             ],
+            self.field.error_messages['invalid_key'] % self.field.invalid_keys,
             '[[key1,[key2,[key3,[key4,value4]]]]]':
-            [self.field.error_messages['depth'] % max_depth_test],
+            self.field.error_messages['depth'] % max_depth_test,
         }
 
         # test valid inputs
@@ -112,10 +111,10 @@ class DictFieldTest(MongoTestCase):
         # test invalid inputs
         self._init_field(depth=max_depth_test)
         for input, input_list in invalid_input.items():
-            with self.assertRaises(ValidationError) as context_manager:
+            try:
                 self.field.clean(input_list)
-            self.assertEqual(context_manager.exception.messages,
-                             invalid_message[input])
+            except ValidationError as e:
+                self.assertEqual(e.messages[0], invalid_message[input])
 
     def test_rendering(self):
         """
@@ -137,20 +136,31 @@ class DictFieldTest(MongoTestCase):
         output_structures = {
             'data1': {
                 'type': 'Dictionary',
-                'widgets':
-                [{'type': 'SubDictionary',
-                  'widgets':
-                  [{'type': 'TextInput'},
-                   {'type': 'Dictionary',
-                    'widgets':
-                    [{'type': 'SubDictionary',
-                      'widgets':
-                      [{'type': 'TextInput'},
-                       {'type': 'Dictionary',
-                        'widgets':
-                        [{'type': 'Pair',
-                          'widgets': [{'type': 'TextInput'},
-                                      {'type': 'TextInput'}]}]}]}]}]}]
+                'widgets': [{
+                    'type': 'SubDictionary',
+                    'widgets': [
+                        {'type': 'TextInput'},
+                        {
+                            'type': 'Dictionary',
+                            'widgets': [{
+                                'type': 'SubDictionary',
+                                'widgets': [
+                                    {'type': 'TextInput'},
+                                    {
+                                        'type': 'Dictionary',
+                                        'widgets': [{
+                                            'type': 'Pair',
+                                            'widgets': [
+                                                {'type': 'TextInput'},
+                                                {'type': 'TextInput'}
+                                            ]
+                                        }]
+                                    }
+                                ]
+                            }]
+                        }
+                    ]
+                }]
             }
         }
 
@@ -165,21 +175,45 @@ class DictFieldTest(MongoTestCase):
     def test_static(self):
         self._init_field(force=True)
         structure = {
-            'type': 'Dictionary',
-            'widgets':
-            [{'type': 'StaticPair',
-              'widgets': [{'type': 'HiddenInput'}, {'type': 'TextInput'}]},
-             {'type': 'StaticSubDictionary',
-              'widgets': [{'type': 'StaticPair',
-                           'widgets':
-                           [{'type': 'HiddenInput'}, {'type': 'TextInput'}]}]},
-             {'type': 'StaticSubDictionary',
-              'widgets': [{'type': 'StaticPair',
-                           'widgets':
-                           [{'type': 'HiddenInput'}, {'type': 'TextInput'}]},
-                          {'type': 'StaticPair',
-                           'widgets':
-                           [{'type': 'HiddenInput'}, {'type': 'TextInput'}]}]}]
+            'type': Dictionary,
+            'widgets': [
+                {
+                    'type': StaticPair,
+                    'widgets': [
+                        {'type': HiddenInput},
+                        {'type': TextInput},
+                    ]
+                },
+                {
+                    'type': StaticSubDictionary,
+                    'widgets': [{
+                        'type': StaticPair,
+                        'widgets': [
+                            {'type': HiddenInput},
+                            {'type': TextInput},
+                        ]
+                    }]
+                },
+                {
+                    'type': StaticSubDictionary,
+                    'widgets': [
+                        {
+                            'type': StaticPair,
+                            'widgets': [
+                                {'type': HiddenInput},
+                                {'type': TextInput},
+                            ]
+                        },
+                        {
+                            'type': StaticPair,
+                            'widgets': [
+                                {'type': HiddenInput},
+                                {'type': TextInput},
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
         self._check_structure(self.field.widget, structure)
 
@@ -213,16 +247,11 @@ class DictFieldTest(MongoTestCase):
             })
 
     def _check_structure(self, widget, structure):
-        assert isinstance(
-            structure,
-            dict), 'error, the comparative structure should be a dictionary'
-        assert isinstance(widget, eval(structure[
-            'type'])), 'widget should be a %s' % structure['type']
+        # TODO: fix depth
+        assert isinstance(structure, dict), 'error, the comparative structure should be a dictionary'
+        assert isinstance(widget, Dictionary), 'widget should be a %s' % structure['type']
         if 'widgets' in structure.keys():
-            assert isinstance(
-                structure['widgets'],
-                list), 'structure field "widgets" should be a list'
-            assert isinstance(widget.widgets,
-                              list), 'widget.widgets should be a list'
+            assert isinstance(structure['widgets'], list), 'structure field "widgets" should be a list'
+            assert isinstance(widget.widgets, list), 'widget.widgets should be a list'
             for i, w in enumerate(widget.widgets):
                 self._check_structure(w, structure['widgets'][i])
