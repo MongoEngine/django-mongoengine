@@ -1,3 +1,4 @@
+import django
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import UserManager
@@ -82,7 +83,10 @@ class MongoUserManager(UserManager):
 
     def get(self, *args, **kwargs):
         try:
-            return self.get_query_set().get(*args, **kwargs)
+            m = (self.get_query_set
+                 if hasattr(self, 'get_query_set')
+                 else self.get_queryset)
+            return m().get(*args, **kwargs)
         except self.model.DoesNotExist:
             # ModelBackend expects this exception
             raise self.dj_model.DoesNotExist
@@ -94,8 +98,11 @@ class MongoUserManager(UserManager):
     def get_empty_query_set(self):
         return self.model.objects.none()
 
-    def get_query_set(self):
+    def get_queryset(self):
         return self.model.objects
+
+    if django.VERSION < (1, 6):
+        get_query_set = get_queryset
 
 
 class MongoUser(Model):
