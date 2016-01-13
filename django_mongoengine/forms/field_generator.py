@@ -75,12 +75,12 @@ class MongoFormFieldGenerator(object):
         return value.lower() == 'true'
 
     def get_field_label(self, field):
-        if field.verbose_name:
+        if hasattr(field, 'verbose_name'):
             return field.verbose_name
         return capfirst(get_verbose_name(field.name))
 
     def get_field_help_text(self, field):
-        if field.help_text:
+        if hasattr(field, 'help_text'):
             return field.help_text.capitalize()
 
     def generate_stringfield(self, field, **kwargs):
