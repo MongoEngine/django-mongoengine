@@ -22,7 +22,7 @@
     <p>Music info :<br/>
       <ul>
       {% for key, value in post.music_parameters.items %}
-        <li>{{ key }} : 
+        <li>{{ key }} :
           {% if value.items %}
             <ul>
               {% for k, v in value.items%}
@@ -59,6 +59,7 @@
   {% endif %}
   <h2>Add a comment</h2>
   <form action="." method="post">
+    {% csrf_token %}
     {{ form.as_p }}
     <div class="actions">
       <input type="submit" class="btn primary" value="comment">
