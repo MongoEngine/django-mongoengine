@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# coding=utf-8
+from __future__ import absolute_import, division, print_function
+
 import time
 
 from django.core.exceptions import ImproperlyConfigured
@@ -13,6 +17,7 @@ class SimpleView(View):
     """
     A simple view with a docstring.
     """
+
     def get(self, request):
         return HttpResponse('This is a simple view')
 
@@ -36,10 +41,10 @@ def decorator(view):
 
 
 class DecoratedDispatchView(SimpleView):
-
     @decorator
     def dispatch(self, request, *args, **kwargs):
-        return super(DecoratedDispatchView, self).dispatch(request, *args, **kwargs)
+        return super(DecoratedDispatchView, self).dispatch(request, *args, **
+                                                           kwargs)
 
 
 class AboutTemplateView(TemplateView):
@@ -58,7 +63,6 @@ class AboutTemplateAttributeView(TemplateView):
 
 
 class InstanceView(View):
-
     def get(self, request):
         return self
 
@@ -86,7 +90,8 @@ class ViewTest(unittest.TestCase):
         """
         try:
             view = SimpleView.as_view('value')
-            self.fail('Should not be able to use non-keyword arguments instantiating a view')
+            self.fail(
+                'Should not be able to use non-keyword arguments instantiating a view')
         except TypeError:
             pass
 
@@ -95,18 +100,19 @@ class ViewTest(unittest.TestCase):
         The edge case of a http request that spoofs an existing method name is caught.
         """
         self.assertEqual(SimpleView.as_view()(
-            self.rf.get('/', REQUEST_METHOD='DISPATCH')
-        ).status_code, 405)
+            self.rf.get('/', REQUEST_METHOD='DISPATCH')).status_code,
+            405)
 
     def test_get_only(self):
         """
         Test a view which only allows GET doesn't allow other methods.
         """
         self._assert_simple(SimpleView.as_view()(self.rf.get('/')))
-        self.assertEqual(SimpleView.as_view()(self.rf.post('/')).status_code, 405)
+        self.assertEqual(SimpleView.as_view()(self.rf.post('/')).status_code,
+                         405)
         self.assertEqual(SimpleView.as_view()(
-            self.rf.get('/', REQUEST_METHOD='FAKE')
-        ).status_code, 405)
+            self.rf.get('/', REQUEST_METHOD='FAKE')).status_code,
+            405)
 
     def test_get_and_head(self):
         """
@@ -130,8 +136,8 @@ class ViewTest(unittest.TestCase):
         self._assert_simple(SimplePostView.as_view()(self.rf.get('/')))
         self._assert_simple(SimplePostView.as_view()(self.rf.post('/')))
         self.assertEqual(SimplePostView.as_view()(
-            self.rf.get('/', REQUEST_METHOD='FAKE')
-        ).status_code, 405)
+            self.rf.get('/', REQUEST_METHOD='FAKE')).status_code,
+            405)
 
     def test_invalid_keyword_argument(self):
         """
@@ -140,7 +146,7 @@ class ViewTest(unittest.TestCase):
         """
         # Check each of the allowed method names
         for method in SimpleView.http_method_names:
-            kwargs = dict(((method, "value"),))
+            kwargs = dict(((method, "value"), ))
             self.assertRaises(TypeError, SimpleView.as_view, **kwargs)
 
         # Check the case view argument is ok if predefined on the class...
@@ -163,7 +169,8 @@ class ViewTest(unittest.TestCase):
         """
         self.assertEqual(SimpleView.__doc__, SimpleView.as_view().__doc__)
         self.assertEqual(SimpleView.__name__, SimpleView.as_view().__name__)
-        self.assertEqual(SimpleView.__module__, SimpleView.as_view().__module__)
+        self.assertEqual(SimpleView.__module__,
+                         SimpleView.as_view().__module__)
 
     def test_dispatch_decoration(self):
         """
@@ -201,20 +208,23 @@ class TemplateViewTest(TestCase):
         Test a view that renders a template on GET with the template name as
         an attribute on the class.
         """
-        self._assert_about(AboutTemplateAttributeView.as_view()(self.rf.get('/about/')))
+        self._assert_about(AboutTemplateAttributeView.as_view()(self.rf.get(
+            '/about/')))
 
     def test_get_generic_template(self):
         """
         Test a completely generic view that renders a template on GET
         with the template name as an argument at instantiation.
         """
-        self._assert_about(TemplateView.as_view(template_name='views/about.html')(self.rf.get('/about/')))
+        self._assert_about(TemplateView.as_view(
+            template_name='views/about.html')(self.rf.get('/about/')))
 
     def test_template_name_required(self):
         """
         A template view must provide a template name
         """
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/template/no_template/')
+        self.assertRaises(ImproperlyConfigured, self.client.get,
+                          '/template/no_template/')
 
     def test_template_params(self):
         """
@@ -255,6 +265,7 @@ class TemplateViewTest(TestCase):
 
         self.assertNotEqual(response.content, response2.content)
 
+
 class RedirectViewTest(unittest.TestCase):
     rf = RequestFactory()
 
@@ -271,7 +282,8 @@ class RedirectViewTest(unittest.TestCase):
 
     def test_temporary_redirect(self):
         "Permanent redirects are an option"
-        response = RedirectView.as_view(url='/bar/', permanent=False)(self.rf.get('/foo/'))
+        response = RedirectView.as_view(url='/bar/',
+                                        permanent=False)(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/bar/')
 
@@ -281,20 +293,25 @@ class RedirectViewTest(unittest.TestCase):
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response['Location'], '/bar/')
 
-        response = RedirectView.as_view(url='/bar/', query_string=True)(self.rf.get('/foo/?pork=spam'))
+        response = RedirectView.as_view(
+            url='/bar/',
+            query_string=True)(self.rf.get('/foo/?pork=spam'))
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response['Location'], '/bar/?pork=spam')
 
     def test_include_urlencoded_args(self):
         "GET arguments can be URL-encoded when included in the redirected URL"
-        response = RedirectView.as_view(url='/bar/', query_string=True)(
-            self.rf.get('/foo/?unicode=%E2%9C%93'))
+        response = RedirectView.as_view(
+            url='/bar/',
+            query_string=True)(self.rf.get('/foo/?unicode=%E2%9C%93'))
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response['Location'], '/bar/?unicode=%E2%9C%93')
 
     def test_parameter_substitution(self):
         "Redirection URLs can be parameterized"
-        response = RedirectView.as_view(url='/bar/%(object_id)d/')(self.rf.get('/foo/42/'), object_id=42)
+        response = RedirectView.as_view(
+            url='/bar/%(object_id)d/')(self.rf.get('/foo/42/'),
+                                       object_id=42)
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response['Location'], '/bar/42/')
 
@@ -331,5 +348,6 @@ class RedirectViewTest(unittest.TestCase):
     def test_redirect_when_meta_contains_no_query_string(self):
         "regression for #16705"
         # we can't use self.rf.get because it always sets QUERY_STRING
-        response = RedirectView.as_view(url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
+        response = RedirectView.as_view(
+            url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
         self.assertEqual(response.status_code, 301)

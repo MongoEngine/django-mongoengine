@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# coding=utf-8
+from __future__ import absolute_import, division, print_function
+
 from bson import ObjectId
 from django.db.models import permalink
 
@@ -27,10 +31,7 @@ class Author(Document):
     name = fields.StringField(max_length=100)
     slug = fields.StringField()
 
-    _meta = {
-        "ordering": ['name'],
-        "exclude": 'id'
-    }
+    _meta = {"ordering": ['name'], "exclude": 'id'}
 
     def __unicode__(self):
         return self.name
@@ -44,9 +45,7 @@ class Book(Document):
     authors = fields.ListField(fields.ReferenceField(Author))
     pubdate = fields.DateTimeField()
 
-    _meta = {
-        "ordering": ['-pubdate']
-    }
+    _meta = {"ordering": ['-pubdate']}
 
     def __unicode__(self):
         return self.name
