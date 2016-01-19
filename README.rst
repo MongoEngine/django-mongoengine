@@ -8,6 +8,7 @@ Working
 -------
 
 * sessions
+* models/fields
 * auth? need testing
 
 TODO
