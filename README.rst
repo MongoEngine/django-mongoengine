@@ -14,6 +14,7 @@ Working / Django 1.9
 * [?] auth, need testing
 * [x] views.ListView
 * [ ] views.*
+* [ ] admin
 
 
 TODO
