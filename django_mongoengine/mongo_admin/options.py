@@ -674,7 +674,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         actions = OrderedDict(sorted([
             (name, (func, name, desc))
             for func, name, desc in actions
-        ], key=lambda (nn, (f, n, d)): d))
+        ], key=lambda nn_fnd: nn_fnd[1][2]))
 
         return actions
 
