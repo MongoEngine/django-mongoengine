@@ -1,5 +1,4 @@
-{% extends "base.html" %}
-{% load url from future %}
+{% extends "base.html" %}{% load bootstrap3 %}
 
 {% block top_nav %}
 <ul class="nav navbar-nav navbar-right">
@@ -50,4 +49,6 @@
       </p>
       <hr />
     {% endfor %}
+
+    {% bootstrap_pagination page_obj %}
 {% endblock %}

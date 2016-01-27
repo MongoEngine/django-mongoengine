@@ -1,17 +1,21 @@
 from django.http import HttpResponse
+from django.views.generic import View
 
 from django_mongoengine.forms.fields import DictField
-from django_mongoengine.views import (CreateView, UpdateView,
-                                      DeleteView, ListView,
-                                      EmbeddedDetailView, View)
+from django_mongoengine.views import (
+    CreateView, UpdateView,
+    DeleteView, ListView,
+    EmbeddedDetailView,
+)
 
 from tumblelog.models import Post, BlogPost, Video, Image, Quote, Music
 from tumblelog.forms import CommentForm
 
 
 class PostIndexView(ListView):
-    document = Post
+    model = Post
     context_object_name = 'posts_list'
+    paginate_by = 5
 
 
 class PostDetailView(EmbeddedDetailView):
