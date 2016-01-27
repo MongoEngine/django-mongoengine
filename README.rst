@@ -62,5 +62,7 @@ How to run example app
 ----------------------
 .. code::
 
-    pip install -r requirements_example.txt
-    python manage.py devsrv # fails
+    virtualenv env
+    ./env/bin/pip install .
+    ./env/bin/pip install -r example/tumblelog/requirements.txt
+    ./env/bin/python example/tumblelog/manage.py devsrv
