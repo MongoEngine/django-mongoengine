@@ -3,7 +3,7 @@ from collections import OrderedDict
 from django.forms.fields import Field
 from django.utils import six
 
-from document_options import DocumentMetaWrapper
+from .document_options import DocumentMetaWrapper
 
 
 def patch_document(function, instance):
