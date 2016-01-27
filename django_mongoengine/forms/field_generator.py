@@ -10,7 +10,7 @@ except ImportError:
 
 from mongoengine import ReferenceField as MongoReferenceField
 
-from fields import MongoCharField, ReferenceField, DocumentMultipleChoiceField, DictField, EmbeddedDocumentField
+from .fields import MongoCharField, ReferenceField, DocumentMultipleChoiceField, DictField, EmbeddedDocumentField
 
 BLANK_CHOICE_DASH = [("", "---------")]
 
