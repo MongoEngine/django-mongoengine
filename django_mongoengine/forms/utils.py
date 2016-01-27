@@ -1,4 +1,3 @@
-import new
 from collections import OrderedDict
 
 from django.forms.fields import Field
