@@ -1,2 +1,2 @@
-django>=1.5
+django>=1.6,<1.9
 mongoengine>=0.8.3

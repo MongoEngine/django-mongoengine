@@ -65,4 +65,4 @@ How to run example app
     virtualenv env
     ./env/bin/pip install .
     ./env/bin/pip install -r example/tumblelog/requirements.txt
-    ./env/bin/python example/tumblelog/manage.py devsrv
+    ./env/bin/python example/tumblelog/manage.py runserver
