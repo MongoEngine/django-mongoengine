@@ -2,14 +2,19 @@
 Django-MongoEngine
 ==================
 
-DO NOT CLONE UNTIL STABLE
+THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
-Working
--------
+Right now we're targeting to get things working on Django 1.9
 
-* sessions
-* models/fields
-* auth? need testing
+Working / Django 1.9
+--------------------
+
+* [x] sessions
+* [x] models/fields
+* [?] auth, need testing
+* [x] views.ListView
+* [ ] views.*
+
 
 TODO
 ----
