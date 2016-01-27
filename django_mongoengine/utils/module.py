@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
-from mongoengine.base import ValidationError, TopLevelDocumentMetaclass
+from mongoengine.base import ValidationError
 
 
 class MongoEngine(object):
@@ -44,21 +44,24 @@ class BaseQuerySet(QuerySet):
         try:
             return self.get(*args, **kwargs)
         except (MultipleObjectsReturned, DoesNotExist, ValidationError):
-            raise Http404('No %s matches the given query.' %
-                            self._document.__name__)
+            raise Http404(
+                'No %s matches the given query.' % self._document.__name__
+            )
 
     def first_or_404(self, *args, **kwargs):
         obj = self.first(*args, **kwargs)
         if obj is None:
-            raise Http404('No %s matches the given query.' %
-                            self._document.__name__)
+            raise Http404(
+                'No %s matches the given query.' % self._document.__name__
+            )
         return obj
 
     def get_list_or_404(self, *args, **kwargs):
         obj_list = list(self.filter(*args, **kwargs))
         if not obj_list:
-            raise Http404('No %s matches the given query.' %
-                            self._document.__name__)
+            raise Http404(
+                'No %s matches the given query.' % self._document.__name__
+            )
         return obj_list
 
     def paginate(self, page, per_page, error_out=True):
@@ -75,15 +78,19 @@ class BaseQuerySet(QuerySet):
 
 class Document(mongoengine.Document):
     """Abstract document with extra helpers in the queryset class"""
-    meta = {'abstract': True,
-                'queryset_class': BaseQuerySet}
+    meta = {
+        'abstract': True,
+        'queryset_class': BaseQuerySet,
+    }
 
 
 
 class DynamicDocument(mongoengine.DynamicDocument):
     """Abstract Dynamic document with extra helpers in the queryset class"""
-    meta = {'abstract': True,
-                'queryset_class': BaseQuerySet}
+    meta = {
+        'abstract': True,
+        'queryset_class': BaseQuerySet,
+    }
 
 
 class Pagination(object):
