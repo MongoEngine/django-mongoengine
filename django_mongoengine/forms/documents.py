@@ -1,11 +1,8 @@
 import os
 import itertools
-import gridfs
-import datetime
+from collections import OrderedDict
 
-from django.utils.datastructures import SortedDict
-
-from django.forms.forms import BaseForm, get_declared_fields, NON_FIELD_ERRORS, pretty_name
+from django.forms.forms import BaseForm, NON_FIELD_ERRORS, pretty_name
 from django.forms.widgets import media_property
 from django.core.exceptions import FieldError
 from django.core.validators import EMPTY_VALUES
@@ -17,7 +14,9 @@ from django.utils.text import capfirst
 from mongoengine.fields import ObjectIdField, ListField, ReferenceField, FileField, ImageField
 from mongoengine.base import ValidationError
 from mongoengine.connection import _get_db
+import gridfs
 
+from .utils import get_declared_fields
 from .field_generator import MongoFormFieldGenerator
 from .document_options import DocumentMetaWrapper
 
@@ -145,7 +144,7 @@ def fields_for_document(document, fields=None, exclude=None, widgets=None,
                         formfield_callback=None,
                         field_generator=MongoFormFieldGenerator):
     """
-    Returns a ``SortedDict`` containing form fields for the given model.
+    Returns a ``OrderedDict`` containing form fields for the given model.
 
     ``fields`` is an optional list of field names. If provided, only the named
     fields will be included in the returned fields.
@@ -188,9 +187,9 @@ def fields_for_document(document, fields=None, exclude=None, widgets=None,
         else:
             ignored.append(f.name)
 
-    field_dict = SortedDict(field_list)
+    field_dict = OrderedDict(field_list)
     if fields:
-        field_dict = SortedDict(
+        field_dict = OrderedDict(
             [(f, field_dict.get(f)) for f in fields
                 if ((not exclude) or (exclude and f not in exclude)) and (f not in ignored)]
         )

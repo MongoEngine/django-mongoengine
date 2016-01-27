@@ -19,7 +19,7 @@ __all__ = ['validate']
 
 def validate(cls, model):
     if issubclass(model, models.Model):
-        ModelAdmin.validate(model)
+        ModelAdmin.check(model)
     else:
         _validate(cls, model)
 

@@ -1,13 +1,6 @@
-from django_mongoengine.mongo_admin.options import *
-from django_mongoengine.mongo_admin.sites import site
+default_app_config = "django_mongoengine.mongo_admin.apps.MongoAdminConfig"
 
-from django.conf import settings
+from .options import DocumentAdmin
+from .sites import site
 
-if getattr(settings, 'DJANGO_MONGOENGINE_OVERRIDE_ADMIN', False):
-    import django.contrib.admin
-    # copy already registered model admins
-    # without that the already registered models
-    # don't show up in the new admin
-    site._registry = django.contrib.admin.site._registry
-
-    django.contrib.admin.site = site
+__all__ = ['DocumentAdmin', 'site']

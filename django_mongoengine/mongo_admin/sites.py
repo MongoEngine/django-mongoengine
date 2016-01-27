@@ -2,9 +2,7 @@ from functools import update_wrapper
 
 from django import http, template
 from django.contrib.admin import ModelAdmin
-from django.contrib.admin.forms import AdminAuthenticationForm
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.contenttypes import views as contenttype_views
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
 from django.core.exceptions import ImproperlyConfigured
@@ -19,7 +17,8 @@ from django.contrib.admin.sites import NotRegistered, AlreadyRegistered
 
 from mongoengine.base import TopLevelDocumentMetaclass
 
-from django_mongoengine.mongo_admin import actions, DocumentAdmin
+from django_mongoengine.mongo_admin.options import DocumentAdmin
+from django_mongoengine.mongo_admin import actions
 
 LOGIN_FORM_KEY = 'this_is_the_login_form'
 
@@ -210,6 +209,7 @@ class AdminSite(object):
 
     def get_urls(self):
         from django.conf.urls import patterns, url, include
+        from django.contrib.contenttypes import views as contenttype_views
 
         if settings.DEBUG:
             self.check_dependencies()
@@ -333,6 +333,7 @@ class AdminSite(object):
         """
         Displays the login form for the given HttpRequest.
         """
+        from django.contrib.admin.forms import AdminAuthenticationForm
         from django.contrib.auth.views import login
         context = {
             'title': _('Log in'),

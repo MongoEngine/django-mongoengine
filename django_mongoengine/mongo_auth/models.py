@@ -6,10 +6,12 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentTypeManager
 from django.contrib import auth
 
+from bson.objectid import ObjectId
 from mongoengine import ImproperlyConfigured
 
 from django_mongoengine import document
 from django_mongoengine import fields
+from .managers import MongoUserManager
 
 try:
     from django.contrib.auth.hashers import check_password, make_password
@@ -334,3 +336,26 @@ class User(document.Document):
 
 User._meta.pk = User._fields["id"]
 User._meta.pk.value_to_string = lambda obj: smart_text(obj.pk)
+
+
+class MongoUser(models.Model):
+    """"Dummy user model for Django.
+
+    MongoUser is used to replace Django's UserManager with MongoUserManager.
+    The actual user document class is django_mongoengine.auth.models.User or any
+    other document class specified in MONGOENGINE_USER_DOCUMENT.
+
+    To get the user document class, use `get_user_document()`.
+
+    """
+
+    objects = MongoUserManager()
+
+    class Meta:
+        app_label = 'mongo_auth'
+
+    def set_password(self, password):
+        """Doesn't do anything, but works around the issue with Django 1.6."""
+        make_password(password)
+
+MongoUser._meta.pk.to_python = ObjectId

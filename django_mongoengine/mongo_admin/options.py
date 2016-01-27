@@ -1,16 +1,16 @@
 from functools import update_wrapper
+from collections import OrderedDict
 
 from django import forms, template
 from django.forms.formsets import all_valid
 from django.forms.models import modelformset_factory
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets, helpers
 from django.contrib.admin.utils import unquote, flatten_fieldsets, model_format_dict
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
-from django.db import models, router
+from django.db import models#, router
 try:
     from django.db.models.related import RelatedObject
 except ImportError:
@@ -21,7 +21,6 @@ from django.db.models.constants import LOOKUP_SEP
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.decorators import method_decorator
-from django.utils.datastructures import SortedDict
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 from django.utils.functional import curry
@@ -649,7 +648,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         # want *any* actions enabled on this page.
         from django.contrib.admin.views.main import IS_POPUP_VAR
         if self.actions is None or IS_POPUP_VAR in request.GET:
-            return SortedDict()
+            return OrderedDict()
 
         actions = []
 
@@ -670,12 +669,12 @@ class DocumentAdmin(BaseDocumentAdmin):
         # get_action might have returned None, so filter any of those out.
         actions = filter(None, actions)
 
-        # Convert the actions into a SortedDict keyed by name
+        # Convert the actions into a OrderedDict keyed by name
         # and sorted by description.
-        actions = SortedDict([
+        actions = OrderedDict(sorted([
             (name, (func, name, desc))
             for func, name, desc in actions
-        ])
+        ], key=lambda (nn, (f, n, d)): d))
 
         return actions
 
@@ -1348,7 +1347,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         if obj is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_text(opts.verbose_name), 'key': escape(object_id)})
 
-        using = router.db_for_write(self.model)
+        #using = router.db_for_write(self.model)
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
@@ -1398,6 +1397,7 @@ class DocumentAdmin(BaseDocumentAdmin):
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
+        from django.contrib.contenttypes.models import ContentType
         model = self.model
         opts = model._meta
         app_label = opts.app_label
