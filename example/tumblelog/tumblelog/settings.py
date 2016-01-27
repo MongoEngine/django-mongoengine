@@ -102,7 +102,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-#    'debug_toolbar.middleware.DebugToolbarMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -116,10 +115,6 @@ TEMPLATE_DIRS = (
     os.path.join(os.path.realpath(os.path.dirname(__file__)), '../templates'),
 )
 
-# XXX
-# Here is conflicting app names
-# Someone must investigate and make this working again
-# now it just commented
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -128,8 +123,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
-#    'debug_toolbar',
-#    'django_mongoengine.debug_toolbar',
     'django_mongoengine.mongo_auth',
     'django_mongoengine.mongo_admin.sites',
     'django_mongoengine.mongo_admin',
@@ -144,20 +137,6 @@ AUTHENTICATION_BACKENDS = (
 
 SESSION_ENGINE = 'django_mongoengine.sessions'
 
-DEBUG_TOOLBAR_PANELS = (
-#    'debug_toolbar.panels.version.VersionDebugPanel',
-#    'debug_toolbar.panels.timer.TimerDebugPanel',
-#    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
-#    'debug_toolbar.panels.headers.HeaderDebugPanel',
-#    'debug_toolbar.panels.template.TemplateDebugPanel',
-#    'debug_toolbar.panels.signals.SignalDebugPanel',
-#    'debug_toolbar.panels.logger.LoggingPanel',
-#    'django_mongoengine.debug_toolbar.panel.MongoDebugPanel',
-)
-
-DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': False
-}
 
 INTERNAL_IPS = ('127.0.0.1', '10.0.2.2',)
 
