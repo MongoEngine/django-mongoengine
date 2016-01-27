@@ -22,10 +22,10 @@ def check_grappelli(parser, token):
     bits = token.contents.split()
     
     if len(bits) != 3:
-        raise template.TemplateSyntaxError, "'check_grappelli' tag takes exactly two arguments."
+        raise template.TemplateSyntaxError("'check_grappelli' tag takes exactly two arguments.")
     
     if bits[1] != 'as':
-        raise template.TemplateSyntaxError, "The second argument to 'check_grappelli' must be 'as'"
+        raise template.TemplateSyntaxError("The second argument to 'check_grappelli' must be 'as'")
     varname = bits[2]
     
     return CheckGrappelli(varname)
