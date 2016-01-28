@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
+from django.utils import six
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
 from django.conf import settings
@@ -142,7 +143,7 @@ class AdminSite(object):
         """
         Get all the enabled actions as an iterable of (name, func).
         """
-        return self._actions.iteritems()
+        return six.iteritems(self._actions)
 
     def has_permission(self, request):
         """
@@ -245,7 +246,7 @@ class AdminSite(object):
 
 
         # Add in each model's views.
-        for model, model_admin in self._registry.iteritems():
+        for model, model_admin in six.iteritems(self._registry):
             # Try to read app_label and model_name from classes _meta attribute.
             # If they don't exist we try to add a mongo document. app_label and model_name
             # are then created here and added to the document's _meta.

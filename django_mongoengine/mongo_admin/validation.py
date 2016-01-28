@@ -5,7 +5,7 @@ from django.db import models
 from django.forms.models import BaseModelForm, _get_foreign_key
 
 from django_mongoengine.forms.documents import (
-    fields_for_document, BaseDocumentFormSet
+    fields_for_document, BaseDocumentFormSet, BaseDocumentForm,
 )
 from django_mongoengine.forms.document_options import DocumentMetaWrapper
 
@@ -307,10 +307,9 @@ def validate_base(cls, model):
         if len(cls.exclude) > len(set(cls.exclude)):
             raise ImproperlyConfigured('There are duplicate field(s) in %s.exclude' % cls.__name__)
 
-    # form
-    # TODO: FInd out why issubclass doesn't work!
-    if hasattr(cls, 'form') and not (issubclass(cls.form, BaseModelForm) or
-                                     cls.form.__class__.__name__ == 'DocumentFormMetaclass'):
+    if hasattr(cls, 'form') and not (
+            issubclass(cls.form, BaseModelForm) or
+            issubclass(cls.form, BaseDocumentForm)):
         raise ImproperlyConfigured("%s.form does not inherit from "
                 "BaseModelForm." % cls.__name__)
 

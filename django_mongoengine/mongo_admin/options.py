@@ -7,6 +7,7 @@ from django.forms.models import modelformset_factory
 from django.contrib.admin import widgets, helpers
 from django.contrib.admin.utils import unquote, flatten_fieldsets, model_format_dict
 from django.contrib import messages
+from django.utils import six
 from django.views.decorators.csrf import csrf_protect
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
@@ -107,9 +108,8 @@ def formfield(field, form_class=None, **kwargs):
         return MongoDefaultFormFieldGenerator().generate(field, **defaults)
 
 
-class BaseDocumentAdmin(object):
+class BaseDocumentAdmin(object, six.with_metaclass(forms.MediaDefiningClass)):
     """Functionality common to both ModelAdmin and InlineAdmin."""
-    __metaclass__ = forms.MediaDefiningClass
 
     raw_id_fields = ()
     fields = None
@@ -358,7 +358,7 @@ class DocumentAdmin(BaseDocumentAdmin):
             'ENGINE', 'django.db.backends.dummy').endswith('dummy')
 
     def get_inline_instances(self):
-        for f in self.document._fields.itervalues():
+        for f in six.itervalues(self.document._fields):
             if not (isinstance(f, ListField) and isinstance(getattr(f, 'field', None), EmbeddedDocumentField)) and not isinstance(f, EmbeddedDocumentField):
                 continue
             # Should only reach here if there is an embedded document...
@@ -684,7 +684,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         tuple (name, description).
         """
         choices = [] + default_choices
-        for func, name, description in self.get_actions(request).itervalues():
+        for func, name, description in six.itervalues(self.get_actions(request)):
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)
         return choices
