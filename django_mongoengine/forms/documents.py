@@ -10,6 +10,7 @@ from django.forms.utils import ErrorList
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import capfirst
+from django.utils import six
 
 from mongoengine.fields import ObjectIdField, ListField, ReferenceField, FileField, ImageField
 from mongoengine.base import ValidationError
@@ -44,7 +45,7 @@ def construct_instance(form, instance, fields=None, exclude=None, ignore=None):
     if isinstance(instance, type):
         instance = instance()
 
-    for f in instance._fields.itervalues():
+    for f in six.itervalues(instance._fields):
         if isinstance(f, ObjectIdField):
             continue
         if not f.name in cleaned_data:
@@ -103,7 +104,7 @@ def save_instance(form, instance, fields=None, fail_message='saved',
         # see BaseDocumentForm._post_clean for an explanation
         if hasattr(form, '_delete_before_save'):
             fields = instance._fields
-            new_fields = dict([(n, f) for n, f in fields.iteritems()
+            new_fields = dict([(n, f) for n, f in six.iteritems(fields)
                                 if not n in form._delete_before_save])
             if hasattr(instance, '_changed_fields'):
                 for field in form._delete_before_save:
@@ -130,7 +131,7 @@ def document_to_dict(instance, fields=None, exclude=None):
     the ``fields`` argument.
     """
     data = {}
-    for f in instance._fields.itervalues():
+    for f in six.itervalues(instance._fields):
         if fields and not f.name in fields:
             continue
         if exclude and f.name in exclude:
@@ -238,7 +239,7 @@ class DocumentFormMetaclass(type):
             fields = fields_for_document(opts.document, opts.fields,
                             opts.exclude, opts.widgets, formfield_callback, formfield_generator)
             # make sure opts.fields doesn't specify an invalid field
-            none_document_fields = [k for k, v in fields.iteritems() if not v]
+            none_document_fields = [k for k, v in six.iteritems(fields) if not v]
             missing_fields = set(none_document_fields) - \
                              set(declared_fields.keys())
             if missing_fields:
@@ -305,7 +306,7 @@ class BaseDocumentForm(BaseForm):
         exclude = []
         # Build up a list of fields that should be excluded from model field
         # validation and unique checks.
-        for f in self.instance._fields.itervalues():
+        for f in six.itervalues(self.instance._fields):
             field = f.name
             # Exclude fields that aren't on the form. The developer may be
             # adding these values to the model after form validation.
@@ -348,7 +349,7 @@ class BaseDocumentForm(BaseForm):
         """
         errors = []
         exclude = self._get_validation_exclusions()
-        for f in self.instance._fields.itervalues():
+        for f in six.itervalues(self.instance._fields):
             if f.unique and f.name not in exclude:
                 filter_kwargs = {
                     f.name: getattr(self.instance, f.name)
@@ -403,8 +404,8 @@ class BaseDocumentForm(BaseForm):
     save.alters_data = True
 
 
-class DocumentForm(BaseDocumentForm):
-    __metaclass__ = DocumentFormMetaclass
+class DocumentForm(BaseDocumentForm, six.with_metaclass(DocumentFormMetaclass)):
+    pass
 
 
 def documentform_factory(document, form=DocumentForm, fields=None,
@@ -439,8 +440,7 @@ def documentform_factory(document, form=DocumentForm, fields=None,
     return DocumentFormMetaclass(class_name, (form,), form_class_attrs)
 
 
-class EmbeddedDocumentForm(BaseDocumentForm):
-    __metaclass__ = DocumentFormMetaclass
+class EmbeddedDocumentForm(BaseDocumentForm, six.with_metaclass(DocumentFormMetaclass)):
 
     def __init__(self, parent_document, *args, **kwargs):
         super(EmbeddedDocumentForm, self).__init__(*args, **kwargs)

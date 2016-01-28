@@ -5,7 +5,7 @@ from django.db import models
 from django.forms.models import BaseModelForm, _get_foreign_key
 
 from django_mongoengine.forms.documents import (
-    fields_for_document, BaseDocumentFormSet, BaseDocumentForm,
+    fields_for_document, BaseDocumentFormSet,
 )
 from django_mongoengine.forms.document_options import DocumentMetaWrapper
 
@@ -309,7 +309,7 @@ def validate_base(cls, model):
 
     if hasattr(cls, 'form') and not (
             issubclass(cls.form, BaseModelForm) or
-            issubclass(cls.form, BaseDocumentForm)):
+            cls.form.__class__.__name__ == 'DocumentFormMetaclass'):
         raise ImproperlyConfigured("%s.form does not inherit from "
                 "BaseModelForm." % cls.__name__)
 
