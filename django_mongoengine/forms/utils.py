@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from functools import partial
 
 from django.forms.fields import Field
 from django.utils import six
@@ -7,7 +8,7 @@ from .document_options import DocumentMetaWrapper
 
 
 def patch_document(function, instance):
-    setattr(instance, function.__name__, function)
+    setattr(instance, function.__name__, partial(function, instance))
 
 
 def init_document_options(document):
