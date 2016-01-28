@@ -1,12 +1,14 @@
 from django.core.exceptions import ImproperlyConfigured
 
 from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _, ugettext
-from django.views.generic.edit import FormMixin, ProcessFormView, DeletionMixin, FormView
+from django.utils.translation import ugettext_lazy as _
+from django.views.generic.edit import FormMixin, ProcessFormView, DeletionMixin
 
 from django_mongoengine.forms.documents import documentform_factory
-from django_mongoengine.views.detail import (SingleDocumentMixin, DetailView,
-                         SingleDocumentTemplateResponseMixin, BaseDetailView)
+from django_mongoengine.views.detail import (
+    SingleDocumentMixin, DetailView,
+    SingleDocumentTemplateResponseMixin, BaseDetailView,
+)
 
 
 class DocumentFormMixin(FormMixin, SingleDocumentMixin):
@@ -142,7 +144,7 @@ class EmbeddedFormMixin(FormMixin):
     def get_context_data(self, **kwargs):
         context = super(EmbeddedFormMixin, self).get_context_data(**kwargs)
 
-        object = getattr(self, 'object', self.get_object())
+        self.object = getattr(self, 'object', self.get_object())
         if 'form' in kwargs:
             form = kwargs['form']
         else:
