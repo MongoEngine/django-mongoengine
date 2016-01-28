@@ -12,7 +12,7 @@ from django_mongoengine.forms.document_options import DocumentMetaWrapper
 from mongoengine.fields import ListField, EmbeddedDocumentField, ReferenceField
 from mongoengine.base import BaseDocument
 
-from options import BaseDocumentAdmin, EmbeddedDocumentAdmin
+from .options import BaseDocumentAdmin, EmbeddedDocumentAdmin
 
 __all__ = ['validate']
 

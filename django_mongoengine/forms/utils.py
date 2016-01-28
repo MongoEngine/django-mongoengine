@@ -1,14 +1,14 @@
-import new
 from collections import OrderedDict
+from functools import partial
 
 from django.forms.fields import Field
 from django.utils import six
 
-from document_options import DocumentMetaWrapper
+from .document_options import DocumentMetaWrapper
 
 
 def patch_document(function, instance):
-    setattr(instance, function.__name__, new.instancemethod(function, instance, instance.__class__))
+    setattr(instance, function.__name__, partial(function, instance))
 
 
 def init_document_options(document):

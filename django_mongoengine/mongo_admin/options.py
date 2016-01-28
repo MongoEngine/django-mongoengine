@@ -674,7 +674,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         actions = OrderedDict(sorted([
             (name, (func, name, desc))
             for func, name, desc in actions
-        ], key=lambda (nn, (f, n, d)): d))
+        ], key=lambda nn_fnd: nn_fnd[1][2]))
 
         return actions
 
@@ -1351,7 +1351,7 @@ class DocumentAdmin(BaseDocumentAdmin):
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        print "FIXME: Need to delete nested objects."
+        print("FIXME: Need to delete nested objects.")
         #(deleted_objects, perms_needed, protected) = get_deleted_objects(
         #    [obj], opts, request.user, self.admin_site, using)
 

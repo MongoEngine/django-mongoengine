@@ -29,7 +29,7 @@ class TestCase(MongoTestCase):
             "slug": "2066",
             "pages": "800",
             "authors": [scott],
-            "pubdate": datetime.datetime(2008, 10, 01)
+            "pubdate": datetime.datetime(2008, 10, 1)
         }).save()
 
         Book(**{
@@ -37,7 +37,7 @@ class TestCase(MongoTestCase):
             "name": "Dreaming in Code",
             "slug": "dreaming-in-code",
             "pages": "300",
-            "pubdate": datetime.datetime(2006, 05, 01)
+            "pubdate": datetime.datetime(2006, 5, 1)
         }).save()
 
         Page(**{

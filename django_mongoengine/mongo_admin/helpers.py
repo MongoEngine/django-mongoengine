@@ -9,7 +9,7 @@ from django.contrib.admin.helpers import InlineFieldset as DjangoInlineFieldset
 from django.contrib.admin.helpers import AdminField
 from django.core.exceptions import ObjectDoesNotExist
 
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
@@ -79,7 +79,7 @@ class AdminReadonlyField(DjangoAdminReadonlyField):
                 if boolean:
                     result_repr = _boolean_icon(value)
                 else:
-                    result_repr = smart_unicode(value)
+                    result_repr = smart_text(value)
                     if getattr(attr, "allow_tags", False):
                         result_repr = mark_safe(result_repr)
             else:
