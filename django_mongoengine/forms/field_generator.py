@@ -82,7 +82,7 @@ class MongoFormFieldGenerator(object):
     def get_field_help_text(self, field):
         try:
             return field.help_text.capitalize()
-        except:
+        except AttributeError:
             return None
 
     def generate_stringfield(self, field, **kwargs):
