@@ -108,7 +108,7 @@ def formfield(field, form_class=None, **kwargs):
         return MongoDefaultFormFieldGenerator().generate(field, **defaults)
 
 
-class BaseDocumentAdmin(object, six.with_metaclass(forms.MediaDefiningClass)):
+class BaseDocumentAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
     raw_id_fields = ()

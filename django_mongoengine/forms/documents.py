@@ -403,8 +403,8 @@ class BaseDocumentForm(BaseForm):
         return self.instance
     save.alters_data = True
 
-
-class DocumentForm(BaseDocumentForm, six.with_metaclass(DocumentFormMetaclass)):
+@six.add_metaclass(DocumentFormMetaclass)
+class DocumentForm(BaseDocumentForm):
     pass
 
 
@@ -440,7 +440,8 @@ def documentform_factory(document, form=DocumentForm, fields=None,
     return DocumentFormMetaclass(class_name, (form,), form_class_attrs)
 
 
-class EmbeddedDocumentForm(BaseDocumentForm, six.with_metaclass(DocumentFormMetaclass)):
+@six.add_metaclass(DocumentFormMetaclass)
+class EmbeddedDocumentForm(BaseDocumentForm):
 
     def __init__(self, parent_document, *args, **kwargs):
         super(EmbeddedDocumentForm, self).__init__(*args, **kwargs)
