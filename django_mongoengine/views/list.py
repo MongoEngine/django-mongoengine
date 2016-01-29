@@ -1,4 +1,4 @@
-from django.views.generic import View
+from django.utils import six
 
 from mongoengine.queryset import QuerySet
 
@@ -7,7 +7,6 @@ from .utils import get_patched_django_module
 
 __all__ = [
     "MultipleObjectMixin",
-    "BaseListView",
     "ListView",
 ]
 
@@ -15,14 +14,13 @@ djmod = get_patched_django_module("django.views.generic.list",
     QuerySet=QuerySet,
 )
 
-
-class MultipleObjectMixin(djmod.MultipleObjectMixin, WrapDocument):
+@six.add_metaclass(WrapDocument)
+class MultipleObjectMixin(djmod.MultipleObjectMixin):
     pass
 
+@six.add_metaclass(WrapDocument)
+class MultipleObjectTemplateResponseMixin(djmod.MultipleObjectTemplateResponseMixin):
+    pass
 
-class BaseListView(MultipleObjectMixin, View):
-    get = djmod.BaseListView.__dict__["get"]
-
-
-class ListView(djmod.MultipleObjectTemplateResponseMixin, BaseListView):
+class ListView(MultipleObjectTemplateResponseMixin, djmod.BaseListView):
     pass

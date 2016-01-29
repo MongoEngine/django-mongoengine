@@ -1,14 +1,13 @@
 from __future__ import absolute_import
 
-from .detail import DetailView
-from .edit import CreateView, UpdateView, DeleteView, EmbeddedDetailView
 from .list import ListView
+from .detail import DetailView
+from .embedded import EmbeddedDetailView
+from .edit import CreateView, UpdateView, DeleteView
 
 __all__ = [
-    "DetailView", "CreateView", "UpdateView", "DeleteView", "EmbeddedDetailView",
     "ListView",
+    "DetailView",
+    "EmbeddedDetailView",
+    "CreateView", "UpdateView", "DeleteView",
 ]
-
-class GenericViewError(Exception):
-    """A problem in a generic view."""
-    pass

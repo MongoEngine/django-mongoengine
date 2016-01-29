@@ -9,6 +9,8 @@ import mongoengine
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine.base import ValidationError
 
+
+from django_mongoengine.forms import utils
 from .wrappers import ModelDocument
 
 class MongoEngine(object):
@@ -79,8 +81,13 @@ class BaseQuerySet(QuerySet):
         return ListFieldPagination(self, field_name, doc_id, page, per_page,
             total=total)
 
+class DocumentMixin(object):
 
-class Document(mongoengine.Document):
+    @classmethod
+    def get_document_options(cls):
+        return utils.get_document_options(cls)
+
+class Document(mongoengine.Document, DocumentMixin):
     """Abstract document with extra helpers in the queryset class"""
     meta = {
         'abstract': True,
@@ -89,7 +96,7 @@ class Document(mongoengine.Document):
 
 
 
-class DynamicDocument(mongoengine.DynamicDocument):
+class DynamicDocument(mongoengine.DynamicDocument, DocumentMixin):
     """Abstract Dynamic document with extra helpers in the queryset class"""
     meta = {
         'abstract': True,

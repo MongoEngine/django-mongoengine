@@ -20,6 +20,7 @@ class PostIndexView(ListView):
 
 class PostDetailView(EmbeddedDetailView):
     document = Post
+    template_name = "_details.html"
     context_object_name = 'post'
     embedded_context_name = 'form'
     embedded_form_class = CommentForm
