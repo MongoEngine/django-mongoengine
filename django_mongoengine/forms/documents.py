@@ -1,5 +1,6 @@
 import os
 import itertools
+from functools import partial
 from collections import OrderedDict
 
 from django.forms.forms import BaseForm, NON_FIELD_ERRORS, pretty_name
@@ -8,6 +9,7 @@ from django.core.exceptions import FieldError
 from django.core.validators import EMPTY_VALUES
 from django.forms.utils import ErrorList
 from django.forms.formsets import BaseFormSet, formset_factory
+from django.forms import models as model_forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import capfirst
 from django.utils import six
@@ -118,28 +120,6 @@ def save_instance(form, instance, fields=None, fail_message='saved',
     return instance
 
 
-def document_to_dict(instance, fields=None, exclude=None):
-    """
-    Returns a dict containing the data in ``instance`` suitable for passing as
-    a Form's ``initial`` keyword argument.
-
-    ``fields`` is an optional list of field names. If provided, only the named
-    fields will be included in the returned dict.
-
-    ``exclude`` is an optional list of field names. If provided, the named
-    fields will be excluded from the returned dict, even if they are listed in
-    the ``fields`` argument.
-    """
-    data = {}
-    for f in six.itervalues(instance._fields):
-        if fields and not f.name in fields:
-            continue
-        if exclude and f.name in exclude:
-            continue
-        else:
-            data[f.name] = getattr(instance, f.name)
-    return data
-
 
 def fields_for_document(document, fields=None, exclude=None, widgets=None,
                         formfield_callback=None,
@@ -197,20 +177,16 @@ def fields_for_document(document, fields=None, exclude=None, widgets=None,
     return field_dict
 
 
-class DocumentFormOptions(object):
+class DocumentFormOptions(model_forms.ModelFormOptions):
     def __init__(self, options=None):
-        self.document = getattr(options, 'document', None)
-        self.model = self.document
+        super(DocumentFormOptions, self).__init__(options)
         # set up the document meta wrapper if document meta is a dict
-        if self.document is not None:
-            if not hasattr(self.document, '_meta'):
-                self.document._meta = {}
-            if isinstance(self.document._meta, dict):
-                self.document._meta = DocumentMetaWrapper(self.document)
-                self.document._admin_opts = self.document._meta
-        self.fields = getattr(options, 'fields', None)
-        self.exclude = getattr(options, 'exclude', None)
-        self.widgets = getattr(options, 'widgets', None)
+        if self.model is not None:
+            if not hasattr(self.model, '_meta'):
+                self.model._meta = {}
+            if isinstance(self.model._meta, dict):
+                self.model._meta = DocumentMetaWrapper(self.model)
+            options.model = self.model
         self.embedded_field = getattr(options, 'embedded_field_name', None)
         self.formfield_generator = getattr(options, 'formfield_generator', MongoFormFieldGenerator)
 
@@ -232,11 +208,12 @@ class DocumentFormMetaclass(type):
             new_class.media = media_property(new_class)
 
         opts = new_class._meta = DocumentFormOptions(getattr(new_class, 'Meta', None))
-        if opts.document:
+
+        if opts.model:
             formfield_generator = getattr(opts, 'formfield_generator', MongoFormFieldGenerator)
 
             # If a model is defined, extract form fields from it.
-            fields = fields_for_document(opts.document, opts.fields,
+            fields = fields_for_document(opts.model, opts.fields,
                             opts.exclude, opts.widgets, formfield_callback, formfield_generator)
             # make sure opts.fields doesn't specify an invalid field
             none_document_fields = [k for k, v in six.iteritems(fields) if not v]
@@ -273,7 +250,7 @@ class BaseDocumentForm(BaseForm):
             object_data = {}
         else:
             self.instance = instance
-            object_data = document_to_dict(instance, opts.fields, opts.exclude)
+            object_data = model_forms.model_to_dict(instance, opts.fields, opts.exclude)
 
         # if initial was provided, it should override the values from instance
         if initial is not None:
@@ -408,36 +385,7 @@ class DocumentForm(BaseDocumentForm):
     pass
 
 
-def documentform_factory(document, form=DocumentForm, fields=None,
-                         exclude=None, formfield_callback=None):
-    # Build up a list of attributes that the Meta object will have.
-    attrs = {'document': document, 'model': document}
-    if fields is not None:
-        attrs['fields'] = fields
-    if exclude is not None:
-        attrs['exclude'] = exclude
-
-    # If parent form class already has an inner Meta, the Meta we're
-    # creating needs to inherit from the parent's inner meta.
-    parent = (object,)
-    if hasattr(form, 'Meta'):
-        parent = (form.Meta, object)
-    Meta = type('Meta', parent, attrs)
-
-    # Give this new form class a reasonable name.
-    if isinstance(document, type):
-        doc_inst = document()
-    else:
-        doc_inst = document
-    class_name = doc_inst.__class__.__name__ + 'Form'
-
-    # Class attributes for the new form class.
-    form_class_attrs = {
-        'Meta': Meta,
-        'formfield_callback': formfield_callback
-    }
-
-    return DocumentFormMetaclass(class_name, (form,), form_class_attrs)
+documentform_factory = partial(model_forms.modelform_factory, form=DocumentForm)
 
 
 @six.add_metaclass(DocumentFormMetaclass)
@@ -484,7 +432,7 @@ class BaseDocumentFormSet(BaseFormSet):
         initial = []
         try:
             for d in self.get_queryset():
-                initial.append(document_to_dict(d))
+                initial.append(model_forms.model_to_dict(d))
         except TypeError:
             pass
         return initial

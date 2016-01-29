@@ -13,6 +13,9 @@ class ModelDocument(object):
     def __getattr__(self, name):
         return getattr(self._document, name)
 
+    def __call__(self, *args, **kwargs):
+        return self._document(*args, **kwargs)
+
 
 class WrapDocument(type):
     """
@@ -25,6 +28,11 @@ class WrapDocument(type):
             attrs['model'] = ModelDocument(document)
         return super(WrapDocument, cls).__new__(cls, name, bases, attrs)
 
+class WrapDocumentMixin(object):
+
+    @property
+    def model(self):
+        return ModelDocument(self.document)
 
 def copy_class(source):
     @wraps(source)

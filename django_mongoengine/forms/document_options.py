@@ -43,6 +43,8 @@ class DocumentMetaWrapper(object):
     has_auto_field = False
     object_name = None
     proxy = []
+    virtual_fields = []
+    concrete_fields = []
     parents = {}
     many_to_many = []
     _field_cache = None
@@ -53,6 +55,7 @@ class DocumentMetaWrapper(object):
         self.document = document
         self._meta = document._meta or {}
         self.concrete_model = document
+        self.concrete_fields = document._fields
 
         try:
             self.object_name = self.document.__name__
@@ -194,8 +197,8 @@ class DocumentMetaWrapper(object):
     def __getattr__(self, name):
         try:
             return self._meta[name]
-        except KeyError:
-            raise AttributeError
+        except KeyError as e:
+            raise AttributeError(e.message)
 
     def __setattr__(self, name, value):
         if not hasattr(self, name):

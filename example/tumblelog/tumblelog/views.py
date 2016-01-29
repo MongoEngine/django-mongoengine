@@ -29,10 +29,11 @@ class PostDetailView(EmbeddedDetailView):
 
 class AddPostView(CreateView):
     success_url = '/'
+    template_name = "_forms.html"
     doc_map = {'post': BlogPost, 'video': Video, 'image': Image, 'quote': Quote, 'music': Music}
     success_message = "Post Added!"
     form_exclude = ('created_at', 'comments')
-    template_name = "tumblelog/post_form.html"
+    fields = "__all__"
 
     @property
     def document(self):
