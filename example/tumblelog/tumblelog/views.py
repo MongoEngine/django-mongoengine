@@ -13,7 +13,7 @@ from tumblelog.forms import CommentForm
 
 
 class PostIndexView(ListView):
-    model = Post
+    document = Post
     context_object_name = 'posts_list'
     paginate_by = 5
 

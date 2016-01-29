@@ -1,15 +1,15 @@
 from __future__ import absolute_import
-import mongoengine
-
 import math
 
 from django.http import Http404
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
+import mongoengine
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine.base import ValidationError
 
+from .wrappers import ModelDocument
 
 class MongoEngine(object):
 
@@ -39,6 +39,10 @@ class BaseQuerySet(QuerySet):
     """
     A base queryset with handy extras
     """
+
+    @property
+    def model(self):
+        return ModelDocument(self._document)
 
     def get_or_404(self, *args, **kwargs):
         try:
