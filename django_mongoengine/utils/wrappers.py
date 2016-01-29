@@ -14,12 +14,13 @@ class ModelDocument(object):
         return getattr(self._document, name)
 
 
-class WrapDocument(type):
+class WrapDocument(object):
     """
     Wrapper for views to include wrapped `model` attribute
     """
 
-    def __new__(cls, name, bases, attrs):
-        if 'document' in attrs:
-            attrs['model'] = ModelDocument(attrs['document'])
-        return super(WrapDocument, cls).__new__(cls, name, bases, attrs)
+    def __init__(self, *args, **kwargs):
+        try:
+            self.model = ModelDocument(self.document)
+        except AttributeError:
+            pass

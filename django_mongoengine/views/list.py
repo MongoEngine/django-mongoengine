@@ -1,12 +1,9 @@
-import imp
-
 from django.views.generic import View
-from django.utils import six
-
 
 from mongoengine.queryset import QuerySet
 
 from django_mongoengine.utils.wrappers import WrapDocument
+from .utils import get_patched_django_module
 
 __all__ = [
     "MultipleObjectMixin",
@@ -14,23 +11,12 @@ __all__ = [
     "ListView",
 ]
 
-def get_patched_django_module(m, **kwargs):
-    from django.views import generic as g
-    m = imp.load_module(
-        "%s_mongoengine_patched" % m,
-        *imp.find_module("list", g.__path__)
-    )
-    for k, v in kwargs.items():
-        setattr(m, k, v)
-    return m
-
-djmod = get_patched_django_module("list",
+djmod = get_patched_django_module("django.views.generic.list",
     QuerySet=QuerySet,
 )
 
 
-@six.add_metaclass(WrapDocument)
-class MultipleObjectMixin(djmod.MultipleObjectMixin):
+class MultipleObjectMixin(djmod.MultipleObjectMixin, WrapDocument):
     pass
 
 
