@@ -80,8 +80,10 @@ class MongoFormFieldGenerator(object):
         return capfirst(get_verbose_name(field.name))
 
     def get_field_help_text(self, field):
-        if hasattr(field, 'help_text'):
+        try:
             return field.help_text.capitalize()
+        except AttributeError:
+            return None
 
     def generate_stringfield(self, field, **kwargs):
         form_class = MongoCharField
