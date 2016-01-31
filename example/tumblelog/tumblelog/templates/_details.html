@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load bootstrap3 %}
 
 {% block page_header %}
   <div class="page-header">
@@ -57,9 +57,9 @@
     <p>No comments, be the first to comment!</p>
   {% endif %}
   <h2>Add a comment</h2>
-  <form action="." method="post">
+  <form class="form" action="." method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% bootstrap_form form %}
     <div class="actions">
       <input type="submit" class="btn primary" value="comment">
     </div>
