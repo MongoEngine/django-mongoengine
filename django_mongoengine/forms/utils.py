@@ -4,23 +4,9 @@ from functools import partial
 from django.forms.fields import Field
 from django.utils import six
 
-from .document_options import DocumentMetaWrapper
-
 
 def patch_document(function, instance):
     setattr(instance, function.__name__, partial(function, instance))
-
-
-def init_document_options(document):
-    if not hasattr(document, '_meta') or not isinstance(document._meta, DocumentMetaWrapper):
-        document._admin_opts = DocumentMetaWrapper(document)
-    if not isinstance(document._admin_opts, DocumentMetaWrapper):
-        document._admin_opts = document._meta
-    return document
-
-
-def get_document_options(document):
-    return DocumentMetaWrapper(document)
 
 
 def get_declared_fields(bases, attrs, with_base_fields=True):

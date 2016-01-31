@@ -6,6 +6,7 @@ from django.forms.formsets import all_valid
 from django.forms.models import modelformset_factory
 from django.contrib.admin import widgets, helpers
 from django.contrib.admin.utils import unquote, flatten_fieldsets, model_format_dict
+from django.contrib.admin.options import BaseModelAdmin
 from django.contrib import messages
 from django.utils import six
 from django.views.decorators.csrf import csrf_protect
@@ -57,20 +58,7 @@ get_ul_class = lambda x: 'radiolist%s' % (
 class IncorrectLookupParameters(Exception):
     pass
 
-# Defaults for formfield_overrides. ModelAdmin subclasses can change this
-# by adding to ModelAdmin.formfield_overrides.
-FORMFIELD_FOR_DBFIELD_DEFAULTS = {
-    DateTimeField: {
-        'form_class': forms.SplitDateTimeField,
-        'widget': widgets.AdminSplitDateTime
-    },
-    #models.DateField:       {'widget': widgets.AdminDateWidget},
-    #models.TimeField:       {'widget': widgets.AdminTimeWidget},
-    URLField:       {'widget': widgets.AdminURLFieldWidget},
-    IntField:       {'widget': widgets.AdminIntegerFieldWidget},
-    ImageField:     {'widget': widgets.AdminFileWidget},
-    FileField:      {'widget': widgets.AdminFileWidget},
-}
+
 
 csrf_protect_m = method_decorator(csrf_protect)
 
@@ -108,27 +96,9 @@ def formfield(field, form_class=None, **kwargs):
         return MongoDefaultFormFieldGenerator().generate(field, **defaults)
 
 
-class BaseDocumentAdmin(six.with_metaclass(forms.MediaDefiningClass)):
+class BaseDocumentAdmin(BaseModelAdmin):
     """Functionality common to both ModelAdmin and InlineAdmin."""
-
-    raw_id_fields = ()
-    fields = None
-    exclude = None
-    fieldsets = None
     form = DocumentForm
-    filter_vertical = ()
-    filter_horizontal = ()
-    radio_fields = {}
-    prepopulated_fields = {}
-    formfield_overrides = {}
-    readonly_fields = ()
-    ordering = None
-
-    def __init__(self):
-        super(BaseDocumentAdmin, self).__init__()
-        overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
-        overrides.update(self.formfield_overrides)
-        self.formfield_overrides = overrides
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
@@ -213,78 +183,7 @@ class BaseDocumentAdmin(six.with_metaclass(forms.MediaDefiningClass)):
 
         return formfield(db_field, **kwargs)
 
-    def _declared_fieldsets(self):
-        if self.fieldsets:
-            return self.fieldsets
-        elif self.fields:
-            return [(None, {'fields': self.fields})]
-        return None
-    declared_fieldsets = property(_declared_fieldsets)
-
-    def get_readonly_fields(self, request, obj=None):
-        return self.readonly_fields
-
-    def queryset(self, request):
-        """
-        Returns a QuerySet of all model instances that can be edited by the
-        admin site. This is used by changelist_view.
-        """
-        # override documents object class to filter
-        qs = self.document.objects()
-        #qs = self.model._default_manager.get_query_set()
-        # TODO: this should be handled by some parameter to the ChangeList.
-        ordering = self.ordering or () # otherwise we might try to *None, which is bad ;)
-        if ordering:
-            qs = qs.order_by(*ordering)
-        return qs
-
-    def lookup_allowed(self, lookup, value):
-        model = self.model
-        # Check FKey lookups that are allowed, so that popups produced by
-        # ForeignKeyRawIdWidget, on the basis of ForeignKey.limit_choices_to,
-        # are allowed to work.
-        for l in model._meta.related_fkey_lookups:
-            for k, v in widgets.url_params_from_lookup_dict(l).items():
-                if k == lookup and v == value:
-                    return True
-
-        parts = lookup.split(LOOKUP_SEP)
-
-        # Last term in lookup is a query term (__exact, __startswith etc)
-        # This term can be ignored.
-        if len(parts) > 1 and parts[-1] in QUERY_TERMS:
-            parts.pop()
-
-        # Special case -- foo__id__exact and foo__id queries are implied
-        # if foo has been specificially included in the lookup list; so
-        # drop __id if it is the last part. However, first we need to find
-        # the pk attribute name.
-        pk_attr_name = None
-        for part in parts[:-1]:
-            field, _, _, _ = model._meta.get_field_by_name(part)
-            if hasattr(field, 'rel'):
-                model = field.rel.to
-                pk_attr_name = model._meta.pk.name
-            elif isinstance(field, RelatedObject):
-                model = field.model
-                pk_attr_name = model._meta.pk.name
-            else:
-                pk_attr_name = None
-        if pk_attr_name and len(parts) > 1 and parts[-1] == pk_attr_name:
-            parts.pop()
-
-        try:
-            self.model._meta.get_field_by_name(parts[0])
-        except FieldDoesNotExist:
-            # Lookups on non-existants fields are ok, since they're ignored
-            # later.
-            return True
-        else:
-            if len(parts) == 1:
-                return True
-            clean_lookup = LOOKUP_SEP.join(parts)
-            return clean_lookup in self.list_filter or clean_lookup == self.date_hierarchy
-
+### TODO: AFTER THIS LINE CODE IS OLD, UNCHANGED, POSSIBLY BROKEN
 
 class DocumentAdmin(BaseDocumentAdmin):
     "Encapsulates all admin options and functionality for a given model."

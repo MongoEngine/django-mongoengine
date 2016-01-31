@@ -47,6 +47,7 @@ class DocumentMetaWrapper(object):
     concrete_fields = []
     parents = {}
     many_to_many = []
+    swapped = False
     _field_cache = None
     document = None
     _meta = None

@@ -9,8 +9,7 @@ import mongoengine
 from mongoengine.queryset import MultipleObjectsReturned, DoesNotExist, QuerySet
 from mongoengine.base import ValidationError
 
-
-from django_mongoengine.forms import utils
+from django_mongoengine.forms.document_options import DocumentMetaWrapper
 from .wrappers import ModelDocument
 
 class MongoEngine(object):
@@ -114,7 +113,7 @@ class DocumentMixin(object):
 
     @classmethod
     def get_document_options(cls):
-        return utils.get_document_options(cls)
+        return DocumentMetaWrapper(cls)
 
 class Document(mongoengine.Document, DocumentMixin):
     """Abstract document with extra helpers in the queryset class"""

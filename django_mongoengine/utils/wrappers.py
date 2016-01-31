@@ -1,5 +1,16 @@
 from functools import wraps
 
+class Manager(object):
+
+    def __init__(self, document):
+        self.document = document
+
+    def get_queryset(self):
+        return self.document.objects
+
+    def all(self):
+        return self.document.objects
+
 class ModelDocument(object):
     """
     Document wrapped in django-compatible object
@@ -8,7 +19,7 @@ class ModelDocument(object):
     def __init__(self, document):
         self._document = document
         self._meta = document.get_document_options()
-        self._default_manager = document.objects
+        self._default_manager = Manager(document)
 
     def __getattr__(self, name):
         return getattr(self._document, name)

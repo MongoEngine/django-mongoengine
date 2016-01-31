@@ -6,8 +6,6 @@ from django.utils import formats
 from mongoengine import fields
 
 from django_mongoengine.utils import force_text
-from django_mongoengine.forms.document_options import DocumentMetaWrapper
-from django_mongoengine.forms.utils import init_document_options
 
 
 class RelationWrapper(object):
@@ -16,20 +14,19 @@ class RelationWrapper(object):
     django's ForeignKeyField.rel
     """
     def __init__(self, document):
-        self.to = init_document_options(document)
+        self.to = document
 
 
 def label_for_field(name, model, model_admin=None, return_attr=False):
     attr = None
-    model._admin_opts = DocumentMetaWrapper(model)
     try:
-        field = model._admin_opts.get_field_by_name(name)[0]
+        field = model._meta.get_field_by_name(name)[0]
         label = field.name.replace('_', ' ')
     except FieldDoesNotExist:
         if name == "__unicode__":
-            label = force_text(model._admin_opts.verbose_name)
+            label = force_text(model._meta.verbose_name)
         elif name == "__str__":
-            label = smart_str(model._admin_opts.verbose_name)
+            label = smart_str(model._meta.verbose_name)
         else:
             if callable(name):
                 attr = name
