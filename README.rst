@@ -41,6 +41,8 @@ In your **settings.py** file, add following lines::
         },
     }
 
+    INSTALLED_APPS += ["django_mongoengine"]
+
 
 Sessions
 ========
