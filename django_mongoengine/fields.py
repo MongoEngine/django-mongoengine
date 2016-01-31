@@ -20,6 +20,19 @@ class DjangoFieldMixin(object):
     def value_from_object(self, obj):
         return getattr(obj, self.name)
 
+    def __eq__(self, other):
+        # Needed for @total_ordering
+        if isinstance(other, fields.BaseField):
+            return self.creation_counter == other.creation_counter
+        return NotImplemented
+
+    def __lt__(self, other):
+        # This is needed because bisect does not take a comparison function.
+        if isinstance(other, fields.BaseField):
+            return self.creation_counter < other.creation_counter
+        return NotImplemented
+
+
 import sys
 current_module = sys.modules[__name__]
 missing = ['EmbeddedDocument']
