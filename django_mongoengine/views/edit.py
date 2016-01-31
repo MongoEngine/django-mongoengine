@@ -1,5 +1,5 @@
 from django_mongoengine.utils.wrappers import WrapDocumentMixin
-from django_mongoengine.views.utils import get_patched_django_module
+from django_mongoengine.utils.monkey import get_patched_django_module
 from django_mongoengine.forms.documents import documentform_factory
 
 djmod = get_patched_django_module(

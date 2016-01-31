@@ -23,7 +23,7 @@ class MongoEngine(object):
         self.__all__ = mongoengine.__all__
         self.connection = mongoengine.connection
         self.document = mongoengine.document
-        self.fields = mongoengine.fields
+        self.fields = patch_fields(mongoengine.fields)
         self.queryset = mongoengine.queryset
         self.signals = mongoengine.signals
 
@@ -35,6 +35,21 @@ class MongoEngine(object):
 
         for alias, conn_settings in settings.MONGODB_DATABASES.items():
             self.connection.register_connection(alias, **conn_settings)
+
+def patch_fields(fields):
+    from django_mongoengine.forms.field_generator import MongoFormFieldGenerator
+
+    class DjangoField(object):
+
+        def formfield(self, **kwargs):
+            return MongoFormFieldGenerator().generate(
+                self, **kwargs
+            )
+
+    for f in fields.__all__:
+        field = getattr(fields, f)
+        field.formfield = DjangoField.__dict__['formfield']
+    return fields
 
 
 class BaseQuerySet(QuerySet):

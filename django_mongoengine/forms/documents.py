@@ -3,23 +3,19 @@ import itertools
 from functools import partial
 from collections import OrderedDict
 
-from django.forms.forms import BaseForm, NON_FIELD_ERRORS, pretty_name
-from django.forms.widgets import media_property
-from django.core.exceptions import FieldError
-from django.core.validators import EMPTY_VALUES
-from django.forms.utils import ErrorList
+from django.forms.forms import DeclarativeFieldsMetaclass
+from django.forms.models import ALL_FIELDS
+from django.core.exceptions import FieldError, ImproperlyConfigured
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms import models as model_forms
 from django.utils.translation import ugettext_lazy as _
-from django.utils.text import capfirst
 from django.utils import six
 
-from mongoengine.fields import ObjectIdField, ListField, ReferenceField, FileField, ImageField
+from mongoengine.fields import ObjectIdField, FileField, ImageField
 from mongoengine.base import ValidationError
 from mongoengine.connection import _get_db
 import gridfs
 
-from .utils import get_declared_fields
 from .field_generator import MongoFormFieldGenerator
 from .document_options import DocumentMetaWrapper
 
@@ -34,7 +30,7 @@ def _get_unique_filename(name):
     return name
 
 
-def construct_instance(form, instance, fields=None, exclude=None, ignore=None):
+def construct_instance_old(form, instance, fields=None, exclude=None, ignore=None):
     """
     Constructs and returns a document instance from the bound ``form``'s
     ``cleaned_data``, but does not save the returned instance to the
@@ -84,6 +80,37 @@ def construct_instance(form, instance, fields=None, exclude=None, ignore=None):
 
     return instance
 
+def construct_instance(form, instance, fields=None, exclude=None):
+    """
+    Constructs and returns a model instance from the bound ``form``'s
+    ``cleaned_data``, but does not save the returned instance to the
+    database.
+    """
+    opts = instance._meta
+
+    cleaned_data = form.cleaned_data
+    file_field_list = []
+    for f in opts.fields:
+        if not f.editable or isinstance(f, ObjectIdField) \
+                or f.name not in cleaned_data:
+            continue
+        if fields is not None and f.name not in fields:
+            continue
+        if exclude and f.name in exclude:
+            continue
+        # Defer saving file-type fields until after the other fields, so a
+        # callable upload_to can use the values from other fields.
+        if isinstance(f, FileField):
+            file_field_list.append(f)
+        else:
+            f.save_form_data(instance, cleaned_data[f.name])
+
+    for f in file_field_list:
+        f.save_form_data(instance, cleaned_data[f.name])
+
+    return instance
+
+
 
 def save_instance(form, instance, fields=None, fail_message='saved',
                   commit=True, exclude=None, construct=True):
@@ -120,10 +147,10 @@ def save_instance(form, instance, fields=None, fail_message='saved',
     return instance
 
 
-
-def fields_for_document(document, fields=None, exclude=None, widgets=None,
-                        formfield_callback=None,
-                        field_generator=MongoFormFieldGenerator):
+def fields_for_model(model, fields=None, exclude=None, widgets=None,
+                     formfield_callback=None, localized_fields=None,
+                     labels=None, help_texts=None, error_messages=None,
+                     field_classes=None):
     """
     Returns a ``OrderedDict`` containing form fields for the given model.
 
@@ -133,41 +160,64 @@ def fields_for_document(document, fields=None, exclude=None, widgets=None,
     ``exclude`` is an optional list of field names. If provided, the named
     fields will be excluded from the returned fields, even if they are listed
     in the ``fields`` argument.
+
+    ``widgets`` is a dictionary of model field names mapped to a widget.
+
+    ``formfield_callback`` is a callable that takes a model field and returns
+    a form field.
+
+    ``localized_fields`` is a list of names of fields which should be localized.
+
+    ``labels`` is a dictionary of model field names mapped to a label.
+
+    ``help_texts`` is a dictionary of model field names mapped to a help text.
+
+    ``error_messages`` is a dictionary of model field names mapped to a
+    dictionary of error messages.
+
+    ``field_classes`` is a dictionary of model field names mapped to a form
+    field class.
     """
     field_list = []
     ignored = []
-    if isinstance(field_generator, type):
-        field_generator = field_generator()
-
-    sorted_fields = sorted(document._fields.values(),
-                           key=lambda field: field.creation_counter)
-
-    for f in sorted_fields:
-        if isinstance(f, ObjectIdField):
+    opts = model._meta
+    # Avoid circular import
+    from django.db.models.fields import Field as ModelField
+    sortable_virtual_fields = [f for f in opts.virtual_fields
+                               if isinstance(f, ModelField)]
+    for f in sorted(itertools.chain(opts.concrete_fields, sortable_virtual_fields, opts.many_to_many)):
+        if not getattr(f, 'editable', True):
             continue
-        if isinstance(f, ListField) and not (f.field.choices or isinstance(f.field, ReferenceField)):
-            continue
-        if fields is not None and not f.name in fields:
+        if fields is not None and f.name not in fields:
             continue
         if exclude and f.name in exclude:
             continue
+
+        kwargs = {}
         if widgets and f.name in widgets:
-            kwargs = {'widget': widgets[f.name]}
-        else:
-            kwargs = {}
+            kwargs['widget'] = widgets[f.name]
+        if localized_fields == ALL_FIELDS or (localized_fields and f.name in localized_fields):
+            kwargs['localize'] = True
+        if labels and f.name in labels:
+            kwargs['label'] = labels[f.name]
+        if help_texts and f.name in help_texts:
+            kwargs['help_text'] = help_texts[f.name]
+        if error_messages and f.name in error_messages:
+            kwargs['error_messages'] = error_messages[f.name]
+        if field_classes and f.name in field_classes:
+            kwargs['form_class'] = field_classes[f.name]
 
         if formfield_callback is None:
-            form_field = field_generator.generate(f, **kwargs)
+            formfield = f.formfield(**kwargs)
         elif not callable(formfield_callback):
             raise TypeError('formfield_callback must be a function or callable')
         else:
-            form_field = formfield_callback(f, **kwargs)
+            formfield = formfield_callback(f, **kwargs)
 
-        if form_field:
-            field_list.append((f.name, form_field))
+        if formfield:
+            field_list.append((f.name, formfield))
         else:
             ignored.append(f.name)
-
     field_dict = OrderedDict(field_list)
     if fields:
         field_dict = OrderedDict(
@@ -181,6 +231,7 @@ class DocumentFormOptions(model_forms.ModelFormOptions):
     def __init__(self, options=None):
         super(DocumentFormOptions, self).__init__(options)
         # set up the document meta wrapper if document meta is a dict
+        self.model = getattr(options, 'document', None) or getattr(options, 'model', None)
         if self.model is not None:
             if not hasattr(self.model, '_meta'):
                 self.model._meta = {}
@@ -191,34 +242,57 @@ class DocumentFormOptions(model_forms.ModelFormOptions):
         self.formfield_generator = getattr(options, 'formfield_generator', MongoFormFieldGenerator)
 
 
-class DocumentFormMetaclass(type):
-    def __new__(cls, name, bases, attrs):
+class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
+    def __new__(mcs, name, bases, attrs):
         formfield_callback = attrs.pop('formfield_callback', None)
-        try:
-            parents = [b for b in bases if issubclass(b, DocumentForm) or issubclass(b, EmbeddedDocumentForm)]
-        except NameError:
-            # We are defining DocumentForm itself.
-            parents = None
-        declared_fields = get_declared_fields(bases, attrs, False)
-        new_class = super(DocumentFormMetaclass, cls).__new__(cls, name, bases, attrs)
-        if not parents:
-            return new_class
 
-        if 'media' not in attrs:
-            new_class.media = media_property(new_class)
+        new_class = super(DocumentFormMetaclass, mcs).__new__(mcs, name, bases, attrs)
+
+        if bases == (BaseDocumentForm,):
+            return new_class
 
         opts = new_class._meta = DocumentFormOptions(getattr(new_class, 'Meta', None))
 
-        if opts.model:
-            formfield_generator = getattr(opts, 'formfield_generator', MongoFormFieldGenerator)
+        # We check if a string was passed to `fields` or `exclude`,
+        # which is likely to be a mistake where the user typed ('foo') instead
+        # of ('foo',)
+        for opt in ['fields', 'exclude', 'localized_fields']:
+            value = getattr(opts, opt)
+            if isinstance(value, six.string_types) and value != ALL_FIELDS:
+                msg = ("%(model)s.Meta.%(opt)s cannot be a string. "
+                       "Did you mean to type: ('%(value)s',)?" % {
+                           'model': new_class.__name__,
+                           'opt': opt,
+                           'value': value,
+                       })
+                raise TypeError(msg)
 
+        if opts.model:
             # If a model is defined, extract form fields from it.
-            fields = fields_for_document(opts.model, opts.fields,
-                            opts.exclude, opts.widgets, formfield_callback, formfield_generator)
+            if opts.fields is None and opts.exclude is None:
+                raise ImproperlyConfigured(
+                    "Creating a ModelForm without either the 'fields' attribute "
+                    "or the 'exclude' attribute is prohibited; form %s "
+                    "needs updating." % name
+                )
+
+            if opts.fields == ALL_FIELDS:
+                # Sentinel for fields_for_model to indicate "get the list of
+                # fields from the model"
+                opts.fields = None
+
+            fields = fields_for_model(
+                opts.model, opts.fields, opts.exclude,
+                opts.widgets, formfield_callback,
+                opts.localized_fields, opts.labels,
+                opts.help_texts, opts.error_messages,
+                opts.field_classes,
+            )
+
             # make sure opts.fields doesn't specify an invalid field
-            none_document_fields = [k for k, v in six.iteritems(fields) if not v]
-            missing_fields = set(none_document_fields) - \
-                             set(declared_fields.keys())
+            none_model_fields = [k for k, v in six.iteritems(fields) if not v]
+            missing_fields = (set(none_model_fields) -
+                              set(new_class.declared_fields.keys()))
             if missing_fields:
                 message = 'Unknown field(s) (%s) specified for %s'
                 message = message % (', '.join(missing_fields),
@@ -226,126 +300,19 @@ class DocumentFormMetaclass(type):
                 raise FieldError(message)
             # Override default model fields with any custom declared ones
             # (plus, include all the other declared fields).
-            fields.update(declared_fields)
+            fields.update(new_class.declared_fields)
         else:
-            fields = declared_fields
+            fields = new_class.declared_fields
 
-        new_class.declared_fields = declared_fields
         new_class.base_fields = fields
+
         return new_class
 
 
-class BaseDocumentForm(BaseForm):
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':',
-                 empty_permitted=False, instance=None):
+class BaseDocumentForm(model_forms.BaseModelForm):
 
-        opts = self._meta
-
-        if instance is None:
-            if opts.document is None:
-                raise ValueError('DocumentForm has no document class specified.')
-            # if we didn't get an instance, instantiate a new one
-            self.instance = opts.document
-            object_data = {}
-        else:
-            self.instance = instance
-            object_data = model_forms.model_to_dict(instance, opts.fields, opts.exclude)
-
-        # if initial was provided, it should override the values from instance
-        if initial is not None:
-            object_data.update(initial)
-
-        # self._validate_unique will be set to True by BaseModelForm.clean().
-        # It is False by default so overriding self.clean() and failing to call
-        # super will stop validate_unique from being called.
-        self._validate_unique = False
-        super(BaseDocumentForm, self).__init__(data, files, auto_id, prefix, object_data,
-                                            error_class, label_suffix, empty_permitted)
-
-    def _update_errors(self, message_dict):
-        for k, v in message_dict.items():
-            if k != NON_FIELD_ERRORS:
-                self._errors.setdefault(k, self.error_class()).extend(v)
-                # Remove the data from the cleaned_data dict since it was invalid
-                if k in self.cleaned_data:
-                    del self.cleaned_data[k]
-        if NON_FIELD_ERRORS in message_dict:
-            messages = message_dict[NON_FIELD_ERRORS]
-            self._errors.setdefault(NON_FIELD_ERRORS, self.error_class()).extend(messages)
-
-    def _get_validation_exclusions(self):
-        """
-        For backwards-compatibility, several types of fields need to be
-        excluded from model validation. See the following tickets for
-        details: #12507, #12521, #12553
-        """
-        exclude = []
-        # Build up a list of fields that should be excluded from model field
-        # validation and unique checks.
-        for f in six.itervalues(self.instance._fields):
-            field = f.name
-            # Exclude fields that aren't on the form. The developer may be
-            # adding these values to the model after form validation.
-            if field not in self.fields:
-                exclude.append(f.name)
-
-            # Don't perform model validation on fields that were defined
-            # manually on the form and excluded via the ModelForm's Meta
-            # class. See #12901.
-            elif self._meta.fields and field not in self._meta.fields:
-                exclude.append(f.name)
-            elif self._meta.exclude and field in self._meta.exclude:
-                exclude.append(f.name)
-
-            # Exclude fields that failed form validation. There's no need for
-            # the model fields to validate them as well.
-            elif field in self._errors.keys():
-                exclude.append(f.name)
-
-            # Exclude empty fields that are not required by the form, if the
-            # underlying model field is required. This keeps the model field
-            # from raising a required error. Note: don't exclude the field from
-            # validaton if the model field allows blanks. If it does, the blank
-            # value may be included in a unique check, so cannot be excluded
-            # from validation.
-            else:
-                field_value = self.cleaned_data.get(field, None)
-                if not f.required and field_value in EMPTY_VALUES:
-                    exclude.append(f.name)
-        return exclude
-
-    def clean(self):
-        self._validate_unique = True
-        return self.cleaned_data
-
-    def validate_unique(self):
-        """
-        Validates unique constrains on the document.
-        unique_with is not checked at the moment.
-        """
-        errors = []
-        exclude = self._get_validation_exclusions()
-        for f in six.itervalues(self.instance._fields):
-            if f.unique and f.name not in exclude:
-                filter_kwargs = {
-                    f.name: getattr(self.instance, f.name)
-                }
-                qs = self.instance.__class__.objects().filter(**filter_kwargs)
-                # Exclude the current object from the query if we are editing an
-                # instance (as opposed to creating a new one)
-                if self.instance.pk is not None:
-                    qs = qs.filter(pk__ne=self.instance.pk)
-                if len(qs) > 0:
-                    message = _("%(model_name)s with this %(field_label)s already exists.") % {
-                                'model_name': unicode(capfirst(self.instance._meta.verbose_name)),
-                                'field_label': unicode(pretty_name(f.name))
-                    }
-                    err_dict = {f.name: [message]}
-                    self._update_errors(err_dict)
-                    errors.append(err_dict)
-
-        return errors
+    def _save_m2m(self):
+        pass
 
     def save(self, commit=True):
         """
@@ -356,29 +323,24 @@ class BaseDocumentForm(BaseForm):
         database. Returns ``instance``.
         """
 
-        try:
-            if self.instance.pk is None:
-                fail_message = 'created'
-            else:
-                fail_message = 'changed'
-        except (KeyError, AttributeError):
-            fail_message = 'embedded document saved'
-
         if self.errors:
-            raise ValueError("The %s could not be %s because the data didn't"
-                             " validate." % (self.instance.__class__.__name__, fail_message))
-
-        self.instance = construct_instance(self, self.instance, self.fields, self._meta.exclude)
-
-        # Validate uniqueness if needed.
-        if self._validate_unique:
-            self.validate_unique()
+            try:
+                if self.instance.pk is None:
+                    fail_message = 'created'
+                else:
+                    fail_message = 'changed'
+            except (KeyError, AttributeError):
+                fail_message = 'embedded document saved'
+            raise ValueError(
+                "The %s could not be %s because the data didn't"
+                " validate." % (self.instance.__class__.__name__, fail_message))
 
         if commit:
             self.instance.save()
 
         return self.instance
     save.alters_data = True
+
 
 @six.add_metaclass(DocumentFormMetaclass)
 class DocumentForm(BaseDocumentForm):

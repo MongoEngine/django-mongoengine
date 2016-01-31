@@ -1,6 +1,6 @@
 from django_mongoengine.forms import EmbeddedDocumentForm
 
-from tumblelog.models import BlogPost, Comment
+from tumblelog.models import Comment
 
 
 class CommentForm(EmbeddedDocumentForm):

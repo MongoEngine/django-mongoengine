@@ -5,7 +5,7 @@ from django.db import models
 from django.forms.models import BaseModelForm, _get_foreign_key
 
 from django_mongoengine.forms.documents import (
-    fields_for_document, BaseDocumentFormSet,
+    fields_for_model, BaseDocumentFormSet,
 )
 from django_mongoengine.forms.document_options import DocumentMetaWrapper
 
@@ -383,7 +383,7 @@ def check_formfield(cls, model, opts, label, field):
             raise ImproperlyConfigured("'%s.%s' refers to field '%s' that "
                 "is missing from the form." % (cls.__name__, label, field))
     else:
-        fields = fields_for_document(model)
+        fields = fields_for_model(model)
         try:
             fields[field]
         except KeyError:
