@@ -41,6 +41,7 @@
     <p>{{ post.author }}</p>
   {% endif %}
   <p>{{ post.created_at }}</p>
+  {% block aftercontent %}
   <div class="btn-group">
     <a href="{% url 'post_update' slug=post.slug %}" class="btn btn-default"><i class="glyphicon glyphicon-edit"></i> edit</a>
     <a href="{% url 'post_delete' slug=post.slug %}" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i> delete</a>
@@ -64,6 +65,7 @@
       <input type="submit" class="btn primary" value="comment">
     </div>
   </form>
+  {% endblock %}
 
   {{ embedded_form }}
 {% endblock %}

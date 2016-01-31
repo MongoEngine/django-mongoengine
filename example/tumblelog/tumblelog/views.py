@@ -62,8 +62,10 @@ class AddPostView(CreateView):
 
 
 class DeletePostView(DeleteView):
+    context_object_name = 'post'
     document = Post
     success_url = '/'
+    template_name = "_delete.html"
 
 
 class UpdatePostView(UpdateView):

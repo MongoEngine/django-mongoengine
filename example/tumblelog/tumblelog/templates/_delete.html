@@ -1,0 +1,12 @@
+{% extends "_details.html" %}{% load bootstrap3 %}
+{% block aftercontent %}
+<div class="alert alert-danger">
+  Delete this object? It can not be restored.
+</div>
+<form class="form" action="." method="post">
+  {% csrf_token %}
+  <div class="actions">
+    <input type="submit" class="btn btn-danger" value="Confirm deletion">
+  </div>
+</form>
+{% endblock %}
