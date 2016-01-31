@@ -44,3 +44,17 @@ for f in fields.__all__ + missing:
             "meta": {"abstract": True},
         })
     )
+
+def patch_mongoengine_fields():
+    """
+    patch mongoengine.StringField for comparsion support
+    becouse it's required in django.forms.models.fields_for_model
+    importing using mongoengine intername import cache
+    """
+    from mongoengine import common
+    StringField = common._import_class("StringField")
+    for k in ["__eq__", "__lt__"]:
+        if not k in StringField.__dict__:
+            setattr(StringField, k, DjangoFieldMixin.__dict__[k])
+
+patch_mongoengine_fields()
