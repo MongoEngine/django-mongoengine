@@ -5,6 +5,7 @@ from django_mongoengine.forms.fields import DictField
 from django_mongoengine.views import (
     CreateView, UpdateView,
     DeleteView, ListView,
+    DetailView,
     EmbeddedDetailView,
 )
 
@@ -73,11 +74,11 @@ class UpdatePostView(UpdateView):
     exclude = ('created_at', 'comments',)
 
 
-class ImageFileView(View):
+class ImageFileView(DetailView):
+    document = Image
 
-    def get(self, request, slug, *args, **kwargs):
-        image_doc = Image.objects.get_or_404(slug=slug)
-        image = image_doc.image
+    def get(self, request, *args, **kwargs):
+        image = self.get_object().image
         return HttpResponse(
             image.read(),
             content_type='image/%s' % image.format.lower(),
