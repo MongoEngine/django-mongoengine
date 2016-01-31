@@ -49,7 +49,7 @@ def patch_mongoengine_fields():
     """
     patch mongoengine.StringField for comparison support
     becouse it's required in django.forms.models.fields_for_model
-    importing using mongoengine intername import cache
+    importing using mongoengine internal import cache
     """
     from mongoengine import common
     StringField = common._import_class("StringField")
