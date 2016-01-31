@@ -2,11 +2,9 @@ from django.contrib.admin.options import flatten_fieldsets, HORIZONTAL, VERTICAL
 from django.contrib.admin import ModelAdmin
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.forms.models import BaseModelForm, _get_foreign_key
+from django.forms.models import BaseModelForm, _get_foreign_key, fields_for_model
 
-from django_mongoengine.forms.documents import (
-    fields_for_model, BaseDocumentFormSet,
-)
+from django_mongoengine.forms.documents import BaseDocumentFormSet
 from django_mongoengine.forms.document_options import DocumentMetaWrapper
 
 from mongoengine.fields import ListField, EmbeddedDocumentField, ReferenceField

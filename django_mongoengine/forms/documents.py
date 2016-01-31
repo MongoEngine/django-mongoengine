@@ -1,6 +1,4 @@
-import itertools
 from functools import partial
-from collections import OrderedDict
 
 from django.forms.forms import DeclarativeFieldsMetaclass
 from django.forms.models import ALL_FIELDS
@@ -84,85 +82,6 @@ def save_instance(form, instance, fields=None, fail_message='saved',
     return instance
 
 
-def fields_for_model(model, fields=None, exclude=None, widgets=None,
-                     formfield_callback=None, localized_fields=None,
-                     labels=None, help_texts=None, error_messages=None,
-                     field_classes=None):
-    """
-    Returns a ``OrderedDict`` containing form fields for the given model.
-
-    ``fields`` is an optional list of field names. If provided, only the named
-    fields will be included in the returned fields.
-
-    ``exclude`` is an optional list of field names. If provided, the named
-    fields will be excluded from the returned fields, even if they are listed
-    in the ``fields`` argument.
-
-    ``widgets`` is a dictionary of model field names mapped to a widget.
-
-    ``formfield_callback`` is a callable that takes a model field and returns
-    a form field.
-
-    ``localized_fields`` is a list of names of fields which should be localized.
-
-    ``labels`` is a dictionary of model field names mapped to a label.
-
-    ``help_texts`` is a dictionary of model field names mapped to a help text.
-
-    ``error_messages`` is a dictionary of model field names mapped to a
-    dictionary of error messages.
-
-    ``field_classes`` is a dictionary of model field names mapped to a form
-    field class.
-    """
-    field_list = []
-    ignored = []
-    opts = model._meta
-    # Avoid circular import
-    from django.db.models.fields import Field as ModelField
-    sortable_virtual_fields = [f for f in opts.virtual_fields
-                               if isinstance(f, ModelField)]
-    for f in sorted(itertools.chain(opts.concrete_fields, sortable_virtual_fields, opts.many_to_many)):
-        if not getattr(f, 'editable', False):
-            continue
-        if fields is not None and f.name not in fields:
-            continue
-        if exclude and f.name in exclude:
-            continue
-
-        kwargs = {}
-        if widgets and f.name in widgets:
-            kwargs['widget'] = widgets[f.name]
-        if localized_fields == ALL_FIELDS or (localized_fields and f.name in localized_fields):
-            kwargs['localize'] = True
-        if labels and f.name in labels:
-            kwargs['label'] = labels[f.name]
-        if help_texts and f.name in help_texts:
-            kwargs['help_text'] = help_texts[f.name]
-        if error_messages and f.name in error_messages:
-            kwargs['error_messages'] = error_messages[f.name]
-        if field_classes and f.name in field_classes:
-            kwargs['form_class'] = field_classes[f.name]
-
-        if formfield_callback is None:
-            formfield = f.formfield(**kwargs)
-        elif not callable(formfield_callback):
-            raise TypeError('formfield_callback must be a function or callable')
-        else:
-            formfield = formfield_callback(f, **kwargs)
-
-        if formfield:
-            field_list.append((f.name, formfield))
-        else:
-            ignored.append(f.name)
-    field_dict = OrderedDict(field_list)
-    if fields:
-        field_dict = OrderedDict(
-            [(f, field_dict.get(f)) for f in fields
-                if ((not exclude) or (exclude and f not in exclude)) and (f not in ignored)]
-        )
-    return field_dict
-
 
 class DocumentFormOptions(model_forms.ModelFormOptions):
     def __init__(self, options=None):
@@ -218,7 +137,7 @@ class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
                 # fields from the model"
                 opts.fields = None
 
-            fields = fields_for_model(
+            fields = model_forms.fields_for_model(
                 opts.model, opts.fields, opts.exclude,
                 opts.widgets, formfield_callback,
                 opts.localized_fields, opts.labels,
