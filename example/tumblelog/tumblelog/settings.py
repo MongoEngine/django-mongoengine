@@ -123,6 +123,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
+    'django_mongoengine',
     'django_mongoengine.mongo_auth',
     'django_mongoengine.mongo_admin.sites',
     'django_mongoengine.mongo_admin',
