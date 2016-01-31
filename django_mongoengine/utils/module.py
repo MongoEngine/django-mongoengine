@@ -41,14 +41,25 @@ def patch_fields(fields):
 
     class DjangoField(object):
 
+        editable = True
+
         def formfield(self, **kwargs):
             return MongoFormFieldGenerator().generate(
                 self, **kwargs
             )
 
+        @property
+        def blank(self):
+            return self.null
+
+        def save_form_data(self, instance, data):
+            setattr(instance, self.name, data)
+
     for f in fields.__all__:
-        field = getattr(fields, f)
-        field.formfield = DjangoField.__dict__['formfield']
+        fieldclass = getattr(fields, f)
+        for k, v in DjangoField.__dict__.items():
+            if not k in fieldclass.__dict__ and not k.startswith("_"):
+                setattr(fieldclass, k, v)
     return fields
 
 

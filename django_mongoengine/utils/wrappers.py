@@ -35,7 +35,6 @@ class WrapDocumentMixin(object):
         return ModelDocument(self.document)
 
 def copy_class(source):
-    @wraps(source)
     def decorator(cls):
         for k in source.__dict__:
             if k not in cls.__dict__:

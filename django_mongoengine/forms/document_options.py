@@ -56,6 +56,7 @@ class DocumentMetaWrapper(object):
         self._meta = document._meta or {}
         self.concrete_model = document
         self.concrete_fields = document._fields.values()
+        self.fields = self.concrete_fields
 
         try:
             self.object_name = self.document.__name__

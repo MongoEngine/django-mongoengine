@@ -186,7 +186,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     sortable_virtual_fields = [f for f in opts.virtual_fields
                                if isinstance(f, ModelField)]
     for f in sorted(itertools.chain(opts.concrete_fields, sortable_virtual_fields, opts.many_to_many)):
-        if not getattr(f, 'editable', True):
+        if not getattr(f, 'editable', False):
             continue
         if fields is not None and f.name not in fields:
             continue
@@ -313,6 +313,16 @@ class BaseDocumentForm(model_forms.BaseModelForm):
 
     def _save_m2m(self):
         pass
+
+    def _post_clean(self):
+        opts = self._meta
+
+        exclude = self._get_validation_exclusions()
+
+        try:
+            self.instance = construct_instance(self, self.instance, opts.fields, exclude)
+        except ValidationError as e:
+            self._update_errors(e)
 
     def save(self, commit=True):
         """
