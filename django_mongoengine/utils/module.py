@@ -55,6 +55,9 @@ def patch_fields(fields):
         def save_form_data(self, instance, data):
             setattr(instance, self.name, data)
 
+        def value_from_object(self, obj):
+            return getattr(obj, self.name)
+
     for f in fields.__all__:
         fieldclass = getattr(fields, f)
         for k, v in DjangoField.__dict__.items():
