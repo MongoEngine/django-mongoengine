@@ -164,7 +164,7 @@ class DictField(forms.Field):
         else:
             kwargs['error_messages'] = self.error_messages
 
-        self.max_depth = (max_depth if max_depth >= 0 else None)
+        self.max_depth = (max_depth if max_depth and max_depth >= 0 else None)
 
         if 'widget' not in kwargs.keys():
             schema = None

@@ -73,6 +73,10 @@ class UpdatePostView(UpdateView):
     template_name = "_forms.html"
     fields = "__all__"
 
+    def get_form_class(self):
+        from django_mongoengine.forms.documents import documentform_factory
+        return documentform_factory(self.object.__class__, fields=self.fields)
+
 
 class ImageFileView(DetailView):
     document = Image

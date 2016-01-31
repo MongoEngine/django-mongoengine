@@ -49,7 +49,7 @@ class Dictionary(MultiWidget):
         self.verbose_field = verbose_field or ADD_FIELD_VERBOSE
         self.verbose_dict = verbose_dict or ADD_DICT_VERBOSE
         self.no_schema = no_schema
-        self.max_depth = (max_depth if max_depth >= 0 else None)
+        self.max_depth = (max_depth if max_depth and max_depth >= 0 else None)
         self.flags = flags or []
         self.sub_attrs = sub_attrs or {}
 
@@ -78,7 +78,7 @@ class Dictionary(MultiWidget):
     def decompress(self, value):
         if value and isinstance(value, dict):
             value = self.dict_sort(value)
-            value = value.items()
+            value = list(value.items())
 
             # If the schema in place wasn't passed by a parent widget
             # we need to rebuild it
@@ -211,12 +211,10 @@ class Dictionary(MultiWidget):
 
     def dict_sort(self, d):
         if isinstance(d, dict):
-            l = d.items()
-            l.sort()
-            k = OrderedDict()
-            for item in l:
-                k[item[0]] = self.dict_sort(item[1])
-            return k
+            return OrderedDict([
+                (k, self.dict_sort(v))
+                for k, v in sorted(d.items())
+            ])
         else:
             return d
 
@@ -238,7 +236,7 @@ class Pair(MultiWidget):
                 try:
                     widgets = [self.key_type(attrs=sub_attrs['key']), self.value_type(attrs=sub_attrs['value'])]
                 except KeyError:
-                    raise(KeyError, "improper synthax for sub_attrs parameter")
+                    raise KeyError("improper synthax for sub_attrs parameter")
             else:
                 widgets = [self.key_type(), self.value_type()]
         elif self.value_type == Dictionary:
@@ -246,7 +244,7 @@ class Pair(MultiWidget):
                 try:
                     widgets = [self.key_type(attrs=sub_attrs['key']), self.value_type(attrs=sub_attrs['value'], **kwargs)]
                 except KeyError:
-                    raise(KeyError, "improper synthax for sub_attrs parameter")
+                    raise KeyError("improper synthax for sub_attrs parameter")
             else:
                 widgets = [self.key_type(), self.value_type(**kwargs)]
         self.sub_attrs = sub_attrs
