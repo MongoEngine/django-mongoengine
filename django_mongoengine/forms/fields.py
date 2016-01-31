@@ -89,16 +89,6 @@ class ReferenceField(forms.ChoiceField):
             raise forms.ValidationError(self.error_messages['invalid_choice'] % {'value': value})
         return obj
 
-    # Fix for Django 1.4
-    # TODO: Test with older django versions
-    # from django-mongotools by wpjunior
-    # https://github.com/wpjunior/django-mongotools/
-    def __deepcopy__(self, memo):
-        result = super(forms.ChoiceField, self).__deepcopy__(memo)
-        result.queryset = result.queryset
-        result.empty_label = result.empty_label
-        return result
-
 
 class DocumentMultipleChoiceField(ReferenceField):
     """A MultipleChoiceField whose choices are a model QuerySet."""

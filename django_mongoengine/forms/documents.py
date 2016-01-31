@@ -1,4 +1,3 @@
-import os
 import itertools
 from functools import partial
 from collections import OrderedDict
@@ -11,74 +10,12 @@ from django.forms import models as model_forms
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 
-from mongoengine.fields import ObjectIdField, FileField, ImageField
+from mongoengine.fields import ObjectIdField, FileField
 from mongoengine.base import ValidationError
-from mongoengine.connection import _get_db
-import gridfs
 
 from .field_generator import MongoFormFieldGenerator
 from .document_options import DocumentMetaWrapper
 
-
-def _get_unique_filename(name):
-    fs = gridfs.GridFS(_get_db())
-    file_root, file_ext = os.path.splitext(name)
-    count = itertools.count(1)
-    while fs.exists(filename=name):
-        # file_ext includes the dot.
-        name = os.path.join("%s_%s%s" % (file_root, count.next(), file_ext))
-    return name
-
-
-def construct_instance_old(form, instance, fields=None, exclude=None, ignore=None):
-    """
-    Constructs and returns a document instance from the bound ``form``'s
-    ``cleaned_data``, but does not save the returned instance to the
-    database.
-    """
-    cleaned_data = form.cleaned_data
-    file_field_list = []
-
-    # check wether object is instantiated
-    if isinstance(instance, type):
-        instance = instance()
-
-    for f in six.itervalues(instance._fields):
-        if isinstance(f, ObjectIdField):
-            continue
-        if not f.name in cleaned_data:
-            continue
-        if fields is not None and f.name not in fields:
-            continue
-        if exclude and f.name in exclude:
-            continue
-        if f.primary_key and cleaned_data[f.name] == getattr(instance, f.name):
-            continue
-
-        # Defer saving file-type fields until after the other fields, so a
-        # callable upload_to can use the values from other fields.
-        if isinstance(f, FileField) or isinstance(f, ImageField):
-            file_field_list.append(f)
-        else:
-            setattr(instance, f.name, cleaned_data[f.name])
-
-    for f in file_field_list:
-        upload = cleaned_data[f.name]
-        if upload is None:
-            continue
-        field = getattr(instance, f.name)
-        try:
-            upload.file.seek(0)
-            filename = _get_unique_filename(upload.name)
-            field.replace(upload, content_type=upload.content_type, filename=filename)
-            setattr(instance, f.name, field)
-        except AttributeError:
-            # file was already uploaded and not changed during edit.
-            # upload is already the gridfsproxy object we need.
-            upload.get()
-            setattr(instance, f.name, upload)
-
-    return instance
 
 def construct_instance(form, instance, fields=None, exclude=None):
     """
