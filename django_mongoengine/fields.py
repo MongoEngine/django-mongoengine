@@ -47,7 +47,7 @@ for f in fields.__all__ + missing:
 
 def patch_mongoengine_fields():
     """
-    patch mongoengine.StringField for comparsion support
+    patch mongoengine.StringField for comparison support
     becouse it's required in django.forms.models.fields_for_model
     importing using mongoengine intername import cache
     """
