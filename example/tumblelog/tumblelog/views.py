@@ -34,7 +34,6 @@ class AddPostView(CreateView):
     doc_map = {'post': BlogPost, 'video': Video, 'image': Image, 'quote': Quote, 'music': Music}
     success_message = "Post Added!"
     fields = "__all__"
-    exclude = ('created_at', 'comments')
 
     @property
     def document(self):
@@ -71,7 +70,6 @@ class UpdatePostView(UpdateView):
     document = Post
     template_name = "_forms.html"
     fields = "__all__"
-    exclude = ('created_at', 'comments',)
 
 
 class ImageFileView(DetailView):

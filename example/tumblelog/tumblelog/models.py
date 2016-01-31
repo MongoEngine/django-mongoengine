@@ -7,13 +7,17 @@ import datetime
 
 
 class Comment(fields.EmbeddedDocument):
-    created_at = fields.DateTimeField(default=datetime.datetime.now, required=True)
+    created_at = fields.DateTimeField(
+        default=datetime.datetime.now, required=True, editable=False,
+    )
     author = fields.StringField(verbose_name="Name", max_length=255, required=True)
     body = fields.StringField(verbose_name="Comment", required=True)
 
 
 class Post(Document):
-    created_at = fields.DateTimeField(default=datetime.datetime.now, required=True)
+    created_at = fields.DateTimeField(
+        default=datetime.datetime.now, required=True, editable=False,
+    )
     title = fields.StringField(max_length=255, required=True)
     slug = fields.StringField(max_length=255, required=True, primary_key=True)
     comments = fields.ListField(fields.EmbeddedDocumentField('Comment'))
