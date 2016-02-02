@@ -1,4 +1,3 @@
-from functools import wraps
 
 class Manager(object):
 
@@ -36,14 +35,14 @@ class WrapDocument(type):
     def __new__(cls, name, bases, attrs):
         document = attrs.get("document")
         if document:
-            attrs['model'] = ModelDocument(document)
+            try:
+                attrs['model'] = ModelDocument(document)
+            except AttributeError:
+                attrs['model'] = property(
+                    lambda self: ModelDocument(self.document)
+                )
         return super(WrapDocument, cls).__new__(cls, name, bases, attrs)
 
-class WrapDocumentMixin(object):
-
-    @property
-    def model(self):
-        return ModelDocument(self.document)
 
 def copy_class(source):
     def decorator(cls):
