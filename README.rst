@@ -1,6 +1,8 @@
 ==================
-Django-MongoEngine .. image:: https://travis-ci.org/MongoEngine/django-mongoengine.svg?branch=dev
+Django-MongoEngine
 ==================
+
+.. image:: https://travis-ci.org/MongoEngine/django-mongoengine.svg?branch=dev
 
 THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
