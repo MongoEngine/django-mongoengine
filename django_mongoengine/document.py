@@ -25,3 +25,6 @@ class DynamicDocument(me.DynamicDocument, DocumentMixin):
         'abstract': True,
         'queryset_class': QuerySet,
     }
+
+
+EmbeddedDocument = me.EmbeddedDocument

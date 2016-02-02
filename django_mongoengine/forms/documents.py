@@ -11,7 +11,6 @@ from django.utils import six
 from mongoengine.fields import ObjectIdField, FileField
 from mongoengine.base import ValidationError
 
-from .field_generator import MongoFormFieldGenerator
 from .document_options import DocumentMetaWrapper
 
 
@@ -99,7 +98,6 @@ class DocumentFormOptions(model_forms.ModelFormOptions):
                 self.model._meta = DocumentMetaWrapper(self.model)
             options.model = self.model
         self.embedded_field = getattr(options, 'embedded_field_name', None)
-        self.formfield_generator = getattr(options, 'formfield_generator', MongoFormFieldGenerator)
 
 
 class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
