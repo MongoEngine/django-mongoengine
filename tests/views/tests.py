@@ -47,8 +47,7 @@ class TestCase(MongoTestCase):
         }).save()
 
 
-from .base import ViewTest, TemplateViewTest, RedirectViewTest
-from .detail import DetailViewTest
-from .edit import (FormMixinTests, ModelFormMixinTests, CreateViewTests,
-                   UpdateViewTests, DeleteViewTests)
-from .list import ListViewTests
+from .base import *   # noqa
+from .detail import * # noqa
+from .edit import *   # noqa
+from .list import *   # noqa

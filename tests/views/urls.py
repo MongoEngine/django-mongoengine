@@ -5,7 +5,7 @@ from __future__ import absolute_import, division, print_function
 from django.conf.urls import patterns, url
 from django.views.decorators.cache import cache_page
 
-from django_mongoengine.views import TemplateView
+from django.views.generic import TemplateView
 
 from . import views
 

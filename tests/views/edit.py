@@ -26,12 +26,6 @@ class FormMixinTests(TestCase):
         self.assertNotEqual(initial_1, initial_2)
 
 
-class ModelFormMixinTests(TestCase):
-    def test_get_form(self):
-        form_class = views.AuthorGetQuerySetFormView().get_form_class()
-        self.assertEqual(form_class._meta.model, Author)
-
-
 class CreateViewTests(TestCase):
     urls = 'tests.views.urls'
 

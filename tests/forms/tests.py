@@ -7,9 +7,7 @@ from django.core.validators import RegexValidator
 from tests import MongoTestCase
 
 from django_mongoengine.forms.fields import DictField
-from django_mongoengine.forms.widgets import (Dictionary, SubDictionary, Pair,
-                                              StaticPair, StaticSubDictionary,
-                                              TextInput, HiddenInput)
+from django_mongoengine.forms import widgets
 
 # TODO : test for max_depth
 
@@ -135,24 +133,24 @@ class DictFieldTest(MongoTestCase):
         # contains structures of output
         output_structures = {
             'data1': {
-                'type': 'Dictionary',
+                'type': widgets.Dictionary,
                 'widgets': [{
-                    'type': 'SubDictionary',
+                    'type': widgets.SubDictionary,
                     'widgets': [
-                        {'type': 'TextInput'},
+                        {'type': widgets.TextInput},
                         {
-                            'type': 'Dictionary',
+                            'type': widgets.Dictionary,
                             'widgets': [{
-                                'type': 'SubDictionary',
+                                'type': widgets.SubDictionary,
                                 'widgets': [
-                                    {'type': 'TextInput'},
+                                    {'type': widgets.TextInput},
                                     {
-                                        'type': 'Dictionary',
+                                        'type': widgets.Dictionary,
                                         'widgets': [{
-                                            'type': 'Pair',
+                                            'type': widgets.Pair,
                                             'widgets': [
-                                                {'type': 'TextInput'},
-                                                {'type': 'TextInput'}
+                                                {'type': widgets.TextInput},
+                                                {'type': widgets.TextInput}
                                             ]
                                         }]
                                     }
@@ -175,40 +173,40 @@ class DictFieldTest(MongoTestCase):
     def test_static(self):
         self._init_field(force=True)
         structure = {
-            'type': Dictionary,
+            'type': widgets.Dictionary,
             'widgets': [
                 {
-                    'type': StaticPair,
+                    'type': widgets.StaticPair,
                     'widgets': [
-                        {'type': HiddenInput},
-                        {'type': TextInput},
+                        {'type': widgets.HiddenInput},
+                        {'type': widgets.TextInput},
                     ]
                 },
                 {
-                    'type': StaticSubDictionary,
+                    'type': widgets.StaticSubDictionary,
                     'widgets': [{
-                        'type': StaticPair,
+                        'type': widgets.StaticPair,
                         'widgets': [
-                            {'type': HiddenInput},
-                            {'type': TextInput},
+                            {'type': widgets.HiddenInput},
+                            {'type': widgets.TextInput},
                         ]
                     }]
                 },
                 {
-                    'type': StaticSubDictionary,
+                    'type': widgets.StaticSubDictionary,
                     'widgets': [
                         {
-                            'type': StaticPair,
+                            'type': widgets.StaticPair,
                             'widgets': [
-                                {'type': HiddenInput},
-                                {'type': TextInput},
+                                {'type': widgets.HiddenInput},
+                                {'type': widgets.TextInput},
                             ]
                         },
                         {
-                            'type': StaticPair,
+                            'type': widgets.StaticPair,
                             'widgets': [
-                                {'type': HiddenInput},
-                                {'type': TextInput},
+                                {'type': widgets.HiddenInput},
+                                {'type': widgets.TextInput},
                             ]
                         }
                     ]
@@ -249,9 +247,11 @@ class DictFieldTest(MongoTestCase):
     def _check_structure(self, widget, structure):
         # TODO: fix depth
         assert isinstance(structure, dict), 'error, the comparative structure should be a dictionary'
-        assert isinstance(widget, structure['type']), 'widget should be a %s' % structure['type']
+        wclass = structure['type']
+        assert isinstance(widget, wclass), 'widget should be a %s' % wclass
         if 'widgets' in structure.keys():
-            assert isinstance(structure['widgets'], list), 'structure field "widgets" should be a list'
+            wlist = structure['widgets']
+            assert isinstance(wlist, list), 'structure field "widgets" should be a list'
             assert isinstance(widget.widgets, list), 'widget.widgets should be a list'
-            for i, w in enumerate(widget.widgets):
-                self._check_structure(w, structure['widgets'][i])
+            for w, expected in zip(widget.widgets, wlist):
+                self._check_structure(w, expected)

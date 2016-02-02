@@ -6,14 +6,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView
 
 from django_mongoengine import views
 
 from .forms import AuthorForm
-from .models import Artist, Author, Book, Page
+from .models import Artist, Author, Page #Book
 
 
-class CustomTemplateView(views.TemplateView):
+class CustomTemplateView(TemplateView):
     template_name = 'views/about.html'
 
     def get_context_data(self, **kwargs):
@@ -160,8 +161,3 @@ class SpecializedAuthorDelete(views.DeleteView):
 
     def get_success_url(self):
         return reverse('authors_list')
-
-
-class AuthorGetQuerySetFormView(views.edit.DocumentFormMixin):
-    def get_queryset(self):
-        return Author.objects.all()
