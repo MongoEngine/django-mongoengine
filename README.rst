@@ -11,9 +11,8 @@ Working / Django 1.9
 
 * [x] sessions
 * [x] models/fields
+* [x] views.*
 * [?] auth, need testing
-* [x] views.ListView
-* [ ] views.*
 * [ ] admin
 
 
