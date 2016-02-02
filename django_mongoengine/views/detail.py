@@ -56,6 +56,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
 
             # The least-specific option is the default <app>/<model>_detail.html;
             # only use this if the object in question is a model.
+            opts = None
             if isinstance(self.object, Document):
                 opts = self.object.get_document_options()
             elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, ModelDocument):
