@@ -2,13 +2,14 @@
 # coding=utf-8
 from __future__ import absolute_import, division, print_function
 
+from unittest import expectedFailure
+
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django import forms
-from django.utils.unittest import expectedFailure
 from django.views.generic.edit import FormMixin
 
-from django_mongoengine import forms
+#from django_mongoengine import forms
 
 from .tests import TestCase
 from .models import Artist, Author
@@ -119,7 +120,7 @@ class CreateViewTests(TestCase):
 
     def test_create_without_redirect(self):
         try:
-            res = self.client.post('/edit/authors/create/naive/',
+            self.client.post('/edit/authors/create/naive/',
                                    {'id': 1,
                                     'name': 'Randall Munroe',
                                     'slug': 'randall-munroe'})
@@ -256,7 +257,7 @@ class UpdateViewTests(TestCase):
             a = Author.objects.create(id='1',
                                       name='Randall Munroe',
                                       slug='randall-munroe', )
-            res = self.client.post('/edit/author/%s/update/naive/' % a.pk,
+            self.client.post('/edit/author/%s/update/naive/' % a.pk,
                                    {'id': '1',
                                     'name': 'Randall Munroe (author of xkcd)',
                                     'slug': 'randall-munroe'})
@@ -349,7 +350,7 @@ class DeleteViewTests(TestCase):
             a = Author.objects.create(id='1',
                                       name='Randall Munroe',
                                       slug='randall-munroe', )
-            res = self.client.post('/edit/author/%s/delete/naive/' % a.pk)
+            self.client.post('/edit/author/%s/delete/naive/' % a.pk)
             self.fail(
                 'Should raise exception -- No redirect URL provided, and no get_absolute_url provided')
         except ImproperlyConfigured:
