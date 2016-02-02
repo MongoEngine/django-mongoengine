@@ -1,16 +1,17 @@
 from django.core.urlresolvers import reverse
 
-from django_mongoengine import Document
+from django_mongoengine import Document, EmbeddedDocument
 from django_mongoengine import fields
 
 import datetime
 
 
-class Comment(fields.EmbeddedDocument):
+class Comment(EmbeddedDocument):
     created_at = fields.DateTimeField(
         default=datetime.datetime.now, required=True, editable=False,
     )
     author = fields.StringField(verbose_name="Name", max_length=255, required=True)
+    email  = fields.EmailField(verbose_name="Email")
     body = fields.StringField(verbose_name="Comment", required=True)
 
 
