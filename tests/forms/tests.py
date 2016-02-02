@@ -248,9 +248,9 @@ class DictFieldTest(MongoTestCase):
         # TODO: fix depth
         assert isinstance(structure, dict), 'error, the comparative structure should be a dictionary'
         wclass = structure['type']
-        assert isinstance(widget, wclass), 'widget should be a %s' % wclass
-        if 'widgets' in structure.keys():
-            wlist = structure['widgets']
+        assert isinstance(widget, wclass), 'widget: %s should be a %s' % (widget, wclass)
+        wlist = structure.get('widgets')
+        if wlist:
             assert isinstance(wlist, list), 'structure field "widgets" should be a list'
             assert isinstance(widget.widgets, list), 'widget.widgets should be a list'
             for w, expected in zip(widget.widgets, wlist):

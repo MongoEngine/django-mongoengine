@@ -99,6 +99,7 @@ class NaiveAuthorCreate(views.CreateView):
 class AuthorCreate(views.CreateView):
     document = Author
     success_url = '/list/authors/'
+    fields = "__all__"
 
 
 class SpecializedAuthorCreate(views.CreateView):
