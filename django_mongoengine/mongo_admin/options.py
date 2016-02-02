@@ -16,10 +16,8 @@ from django.db import models#, router
 try:
     from django.db.models.related import RelatedObject
 except ImportError:
-    from django.db.models.fields.related import ForeignObjectRel as RelatedObject
-from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
-from django.db.models.sql.constants import QUERY_TERMS
-from django.db.models.constants import LOOKUP_SEP
+    from django.db.models.fields.related import ForeignObjectRel as RelatedObject # noqa
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.decorators import method_decorator
@@ -32,10 +30,8 @@ from django.utils.translation import ungettext
 from django.forms.forms import pretty_name
 
 from django_mongoengine.utils import force_text
-from django_mongoengine.fields import (DateTimeField, URLField, IntField,
-                                       ListField, EmbeddedDocumentField,
-                                       ReferenceField, StringField, FileField,
-                                       ImageField)
+from django_mongoengine.fields import (ListField, EmbeddedDocumentField,
+                                       ReferenceField, StringField)
 
 from django_mongoengine.mongo_admin import helpers as mongodb_helpers
 from django_mongoengine.mongo_admin.util import RelationWrapper
@@ -45,8 +41,7 @@ from django_mongoengine.forms.document_options import DocumentMetaWrapper
 from django_mongoengine.forms.documents import (
     documentform_factory, DocumentForm,
     inlineformset_factory, BaseInlineDocumentFormSet)
-from django_mongoengine.forms import (MongoDefaultFormFieldGenerator,
-                                      save_instance)
+from django_mongoengine.forms import save_instance
 
 HORIZONTAL, VERTICAL = 1, 2
 # returns the <ul> class for a given radio_admin field
@@ -93,6 +88,7 @@ def formfield(field, form_class=None, **kwargs):
     if form_class is not None:
         return form_class(**defaults)
     else:
+        from django_mongoengine.forms.field_generator import MongoDefaultFormFieldGenerator
         return MongoDefaultFormFieldGenerator().generate(field, **defaults)
 
 
