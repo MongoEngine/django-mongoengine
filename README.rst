@@ -3,6 +3,8 @@ Django-MongoEngine
 ==================
 
 .. image:: https://travis-ci.org/MongoEngine/django-mongoengine.svg?branch=dev
+   :alt: build status
+   :target: https://travis-ci.org/MongoEngine/django-mongoengine
 
 THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
