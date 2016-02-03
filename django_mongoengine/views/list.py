@@ -2,7 +2,7 @@ from django.utils import six
 
 from mongoengine.queryset import QuerySet
 
-from django_mongoengine.utils.wrappers import WrapDocument
+from django_mongoengine.utils.wrappers import WrapDocument, copy_class
 from django_mongoengine.utils.monkey import get_patched_django_module
 
 __all__ = [
@@ -22,5 +22,6 @@ class MultipleObjectMixin(djmod.MultipleObjectMixin):
 class MultipleObjectTemplateResponseMixin(djmod.MultipleObjectTemplateResponseMixin):
     pass
 
+@copy_class(djmod.ListView)
 class ListView(MultipleObjectTemplateResponseMixin, djmod.BaseListView):
-    pass
+    __doc__ = djmod.ListView.__doc__

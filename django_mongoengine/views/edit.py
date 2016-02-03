@@ -1,5 +1,5 @@
 from django.utils import six
-from django_mongoengine.utils.wrappers import WrapDocument
+from django_mongoengine.utils.wrappers import WrapDocument, copy_class
 from django_mongoengine.utils.monkey import get_patched_django_module
 from django_mongoengine.forms.documents import documentform_factory
 
@@ -16,31 +16,25 @@ class WrapDocumentForm(WrapDocument, djmod.FormMixinBase):
     pass
 
 
+@copy_class(djmod.CreateView)
 class CreateView(six.with_metaclass(
         WrapDocumentForm,
         SingleObjectTemplateResponseMixin,
         djmod.BaseCreateView)):
-    """
-    View for creating an new object instance,
-    with a response rendered by template.
-    """
+    __doc__  = djmod.CreateView.__doc__
 
 
+@copy_class(djmod.UpdateView)
 class UpdateView(six.with_metaclass(
         WrapDocumentForm,
         SingleObjectTemplateResponseMixin,
         djmod.BaseUpdateView)):
-    """
-    View for updating an object,
-    with a response rendered by template..
-    """
+    __doc__  = djmod.UpdateView.__doc__
 
 
+@copy_class(djmod.DeleteView)
 class DeleteView(six.with_metaclass(
         WrapDocumentForm,
         SingleObjectTemplateResponseMixin,
         djmod.BaseDeleteView)):
-    """
-    View for deleting an object retrieved with `self.get_object()`,
-    with a response rendered by template.
-    """
+    __doc__  = djmod.DeleteView.__doc__

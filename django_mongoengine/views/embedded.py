@@ -3,12 +3,11 @@ from django.views.generic.edit import FormMixin, FormMixinBase
 from django.utils import six
 
 from .detail import DetailView
+from .edit import WrapDocumentForm, djmod
 from django_mongoengine.utils.wrappers import WrapDocument
 
-class WrappedDocumentFormMixinBase(FormMixinBase, WrapDocument):
-    pass
 
-class EmbeddedFormMixin(FormMixin):
+class EmbeddedFormMixin(djmod.FormMixin):
     """
     A mixin that provides a way to show and handle a documentform in a request.
     """
@@ -25,7 +24,7 @@ class EmbeddedFormMixin(FormMixin):
             raise ImproperlyConfigured(
                     "No embedded form class provided. An embedded form class must be provided.")
 
-    def get_form(self, form_class):
+    def get_form(self, form_class=None):
         """
         Returns an instance of the form to be used in this view.
         """
@@ -105,7 +104,7 @@ class BaseEmbeddedFormMixin(EmbeddedFormMixin, ProcessEmbeddedFormMixin):
     """
 
 class EmbeddedDetailView(six.with_metaclass(
-        WrappedDocumentFormMixinBase,
+        WrapDocumentForm,
         BaseEmbeddedFormMixin, DetailView)):
     """
     Renders the detail view of a document and and adds a

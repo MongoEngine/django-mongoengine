@@ -5,9 +5,8 @@ from django.views.generic import detail as djmod
 from django.utils import six
 
 from django_mongoengine.utils.wrappers import (
-    ModelDocument, WrapDocument, copy_class,
+    WrapDocument, copy_class,
 )
-from django_mongoengine import Document
 
 @six.add_metaclass(WrapDocument)
 class SingleObjectMixin(djmod.SingleObjectMixin):
@@ -19,7 +18,7 @@ class SingleObjectMixin(djmod.SingleObjectMixin):
         """
         if self.context_object_name:
             return self.context_object_name
-        elif isinstance(obj, Document):
+        elif hasattr(obj, 'get_document_options'):
             return obj.get_document_options().model_name
         else:
             return None
@@ -57,9 +56,9 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # The least-specific option is the default <app>/<model>_detail.html;
             # only use this if the object in question is a model.
             opts = None
-            if isinstance(self.object, Document):
+            if hasattr(self.object, 'get_document_options'):
                 opts = self.object.get_document_options()
-            elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, ModelDocument):
+            elif hasattr(self, 'model') and self.model is not None:
                 opts = self.model._meta
             if opts:
                 names.append("%s/%s%s.html" % (
@@ -78,7 +77,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
 
 @copy_class(djmod.BaseDetailView)
 class BaseDetailView(SingleObjectMixin, View):
-    pass
+    __doc__ = djmod.BaseDetailView.__doc__
 
 
 class DetailView(SingleObjectTemplateResponseMixin, BaseDetailView):

@@ -46,8 +46,10 @@ class WrapDocument(type):
 
 def copy_class(source):
     def decorator(cls):
-        for k in source.__dict__:
-            if k not in cls.__dict__:
-                setattr(cls, k, source.__dict__[k])
+        f = lambda (k, v): (
+            k not in cls.__dict__ and not k.startswith("__")
+        )
+        for k, v in filter(f, source.__dict__.items()):
+            setattr(cls, k, v)
         return cls
     return decorator
