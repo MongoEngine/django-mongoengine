@@ -54,7 +54,7 @@ urlpatterns = [
      views.NaiveAuthorCreate.as_view(success_url='/edit/authors/create/')),
     url(r'^edit/authors/create/interpolate_redirect/$',
      views.NaiveAuthorCreate.as_view(
-         success_url='/edit/author/%(id)s/update/')),
+         success_url='/edit/author/{id}/update/')),
     url(r'^edit/authors/create/$', views.AuthorCreate.as_view()),
     url(r'^edit/authors/create/special/$',
      views.SpecializedAuthorCreate.as_view()),
@@ -64,7 +64,7 @@ urlpatterns = [
      views.NaiveAuthorUpdate.as_view(success_url='/edit/authors/create/')),
     url(r'^edit/author/(?P<pk>\d+)/update/interpolate_redirect/$',
      views.NaiveAuthorUpdate.as_view(
-         success_url='/edit/author/%(id)s/update/')),
+         success_url='/edit/author/{id}/update/')),
     url(r'^edit/author/(?P<pk>\d+)/update/$', views.AuthorUpdate.as_view()),
     url(r'^edit/author/update/$', views.OneAuthorUpdate.as_view()),
     url(r'^edit/author/(?P<pk>\d+)/update/special/$',

@@ -12,7 +12,7 @@ try:
     django.setup()
 except AttributeError:
     pass
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TransactionTestCase
 from django.conf import settings
 
 from mongoengine import connect
@@ -23,7 +23,8 @@ class MongoTestCase(SimpleTestCase):
     """
     TestCase class that clear the collection between the tests.
     """
-    assertQuerysetEqual = TestCase.__dict__['assertQuerysetEqual']
+
+    assertQuerysetEqual = TransactionTestCase.__dict__['assertQuerysetEqual']
 
     def _pre_setup(self):
         super(MongoTestCase, self)._pre_setup()
