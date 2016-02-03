@@ -6,12 +6,12 @@ from unittest import expectedFailure
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
-from django import forms
 from django.views.generic.edit import FormMixin
+from django.test import override_settings
 
-#from django_mongoengine import forms
+from django_mongoengine import forms
 
-from .tests import TestCase
+from .tests import MongoTestCase, TestCase
 from .models import Artist, Author
 
 from . import views
@@ -25,9 +25,8 @@ class FormMixinTests(TestCase):
         initial_2 = FormMixin().get_initial()
         self.assertNotEqual(initial_1, initial_2)
 
-
-class CreateViewTests(TestCase):
-    urls = 'tests.views.urls'
+@override_settings(ROOT_URLCONF="tests.views.urls")
+class CreateViewTests(MongoTestCase):
 
     def setUp(self):
         Author.drop_collection()
