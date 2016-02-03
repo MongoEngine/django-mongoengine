@@ -90,6 +90,7 @@ class AuthorListCustomPaginator(AuthorList):
 
 class ArtistCreate(views.CreateView):
     document = Artist
+    fields = "__all__"
 
 
 class NaiveAuthorCreate(views.CreateView):
@@ -131,10 +132,12 @@ class NaiveAuthorUpdate(views.UpdateView):
 class AuthorUpdate(views.UpdateView):
     document = Author
     success_url = '/list/authors/'
+    fields = "__all__"
 
 
 class OneAuthorUpdate(views.UpdateView):
     success_url = '/list/authors/'
+    fields = "__all__"
 
     def get_object(self):
         return Author.objects.get(pk='1')
@@ -145,6 +148,7 @@ class SpecializedAuthorUpdate(views.UpdateView):
     form_class = AuthorForm
     template_name = 'views/form.html'
     context_object_name = 'thingy'
+    fields = "__all__"
 
     def get_success_url(self):
         return reverse('author_detail', args=[self.object.id])
