@@ -1,10 +1,8 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.views.generic.edit import FormMixin, FormMixinBase
 from django.utils import six
 
 from .detail import DetailView
 from .edit import WrapDocumentForm, djmod
-from django_mongoengine.utils.wrappers import WrapDocument
 
 
 class EmbeddedFormMixin(djmod.FormMixin):
@@ -28,6 +26,8 @@ class EmbeddedFormMixin(djmod.FormMixin):
         """
         Returns an instance of the form to be used in this view.
         """
+        if form_class is None:
+            form_class = self.get_form_class()
         return form_class(self.object, **self.get_form_kwargs())
 
     def get_embedded_object(self):
