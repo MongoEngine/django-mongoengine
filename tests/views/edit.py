@@ -2,7 +2,7 @@
 # coding=utf-8
 from __future__ import absolute_import, division, print_function
 
-from unittest import expectedFailure
+from unittest import TestCase, expectedFailure
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
@@ -11,7 +11,7 @@ from django.test import override_settings
 
 from django_mongoengine import forms
 
-from .tests import MongoTestCase, TestCase
+from tests import MongoTestCase
 from .models import Artist, Author
 
 from . import views
