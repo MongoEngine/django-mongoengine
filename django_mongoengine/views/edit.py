@@ -16,10 +16,28 @@ class WrapDocumentForm(WrapDocument, djmod.FormMixinBase):
     pass
 
 
+class DocumentFormFixin(object):
+
+    def get_success_url(self):
+        """
+        Returns the supplied URL.
+        """
+        if self.success_url:
+            url = self.success_url.format(**self.object._data)
+        else:
+            try:
+                url = self.object.get_absolute_url()
+            except AttributeError:
+                raise ImproperlyConfigured(
+                    "No URL to redirect to.  Either provide a url or define"
+                    " a get_absolute_url method on the Model.")
+        return url
+
 @copy_class(djmod.CreateView)
 class CreateView(six.with_metaclass(
         WrapDocumentForm,
         SingleObjectTemplateResponseMixin,
+        DocumentFormFixin,
         djmod.BaseCreateView)):
     __doc__  = djmod.CreateView.__doc__
 
@@ -28,6 +46,7 @@ class CreateView(six.with_metaclass(
 class UpdateView(six.with_metaclass(
         WrapDocumentForm,
         SingleObjectTemplateResponseMixin,
+        DocumentFormFixin,
         djmod.BaseUpdateView)):
     __doc__  = djmod.UpdateView.__doc__
 
@@ -36,5 +55,6 @@ class UpdateView(six.with_metaclass(
 class DeleteView(six.with_metaclass(
         WrapDocumentForm,
         SingleObjectTemplateResponseMixin,
+        DocumentFormFixin,
         djmod.BaseDeleteView)):
     __doc__  = djmod.DeleteView.__doc__
