@@ -94,6 +94,7 @@ class ArtistCreate(views.CreateView):
 
 class NaiveAuthorCreate(views.CreateView):
     queryset = Author.objects.all()
+    fields = "__all__"
 
 
 class AuthorCreate(views.CreateView):
@@ -107,6 +108,7 @@ class SpecializedAuthorCreate(views.CreateView):
     form_class = AuthorForm
     template_name = 'views/form.html'
     context_object_name = 'thingy'
+    fields = "__all__"
 
     def get_success_url(self):
         return reverse('author_detail', args=[self.object.id, ])
@@ -118,10 +120,12 @@ class AuthorCreateRestricted(AuthorCreate):
 
 class ArtistUpdate(views.UpdateView):
     document = Artist
+    fields = "__all__"
 
 
 class NaiveAuthorUpdate(views.UpdateView):
     queryset = Author.objects.all()
+    fields = "__all__"
 
 
 class AuthorUpdate(views.UpdateView):
