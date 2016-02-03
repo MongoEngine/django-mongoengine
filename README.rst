@@ -13,9 +13,9 @@ Right now we're targeting to get things working on Django 1.9
 Working / Django 1.9
 --------------------
 
-* [x] sessions
-* [x] models/fields
-* [x] views.*
+* [ok] sessions
+* [ok] models/fields
+* [ok] views.*
 * [?] auth, need testing
 * [ ] admin
 
