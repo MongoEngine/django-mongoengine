@@ -3,6 +3,7 @@
 from mongoengine import document as me
 from mongoengine.base import metaclasses as mtc
 
+from .utils.patches import serializable_value
 from .forms.document_options import DocumentMetaWrapper
 from .queryset import QuerySetManager
 
@@ -11,6 +12,7 @@ def django_meta(meta, base):
         def __new__(cls, name, bases, attrs):
             attrs.setdefault('objects', QuerySetManager())
             attrs.setdefault('_default_manager', QuerySetManager())
+            attrs.setdefault('serializable_value', serializable_value)
             change_bases = len(bases) == 1 and (
                 bases[0].__name__ == "temporary_meta" or
                 bases[0] in [Document, DynamicDocument, EmbeddedDocument]

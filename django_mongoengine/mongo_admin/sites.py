@@ -3,9 +3,10 @@ from django.contrib.admin import sites
 from mongoengine.base import TopLevelDocumentMetaclass
 
 from django_mongoengine.mongo_admin.options import DocumentAdmin
-from django_mongoengine.forms.document_options import DocumentMetaWrapper 
+from django_mongoengine.forms.document_options import DocumentMetaWrapper
 #from django_mongoengine.mongo_admin import actions
 
+system_check_errors = []
 
 class AdminSite(sites.AdminSite):
     index_template = "mongo_admin/index.html"

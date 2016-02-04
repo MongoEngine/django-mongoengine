@@ -1,18 +1,24 @@
 from django.apps import AppConfig
-from django.conf import settings
+from django.core import checks
+from django.utils.translation import ugettext_lazy as _
 
-from django_mongoengine.mongo_admin.sites import site
+def check_admin_app(**kwargs):
+    from .sites import system_check_errors
+    return system_check_errors
 
-class MongoAdminConfig(AppConfig):
+
+class SimpleMongoAdminConfig(AppConfig):
+    """Simple AppConfig which does not do automatic discovery."""
+
     name = "django_mongoengine.mongo_admin"
-    verbose_name = "Mongo Admin"
+    verbose_name = _("Administration")
 
     def ready(self):
-        if getattr(settings, 'DJANGO_MONGOENGINE_OVERRIDE_ADMIN', False):
-            import django.contrib.admin
-            # copy already registered model admins
-            # without that the already registered models
-            # don't show up in the new admin
-            site._registry = django.contrib.admin.site._registry
+        checks.register(check_admin_app, checks.Tags.admin)
 
-            django.contrib.admin.site = site
+
+class MongoAdminConfig(SimpleMongoAdminConfig):
+
+    def ready(self):
+        super(MongoAdminConfig, self).ready()
+        self.module.autodiscover()
