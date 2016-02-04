@@ -18,10 +18,12 @@ class SingleObjectMixin(djmod.SingleObjectMixin):
         """
         if self.context_object_name:
             return self.context_object_name
-        elif hasattr(obj, 'get_document_options'):
-            return obj.get_document_options().model_name
+        elif hasattr(obj, '_meta'):
+            return obj._meta.model_name
         else:
             return None
+
+
 
 
 class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
@@ -56,8 +58,8 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # The least-specific option is the default <app>/<model>_detail.html;
             # only use this if the object in question is a model.
             opts = None
-            if hasattr(self.object, 'get_document_options'):
-                opts = self.object.get_document_options()
+            if hasattr(self.object, '_meta'):
+                opts = self.object._meta
             elif hasattr(self, 'model') and self.model is not None:
                 opts = self.model._meta
             if opts:
