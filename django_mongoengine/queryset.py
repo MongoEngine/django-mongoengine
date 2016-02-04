@@ -1,6 +1,7 @@
 from mongoengine import queryset as qs
 
 class QueryWrapper(object):
+    # XXX: copy funcs from django; now it's just wrapper
     select_related = False
     order_by = []
 
