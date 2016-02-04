@@ -12,30 +12,28 @@ try:
     django.setup()
 except AttributeError:
     pass
-from django.test import SimpleTestCase, TransactionTestCase
-from django.conf import settings
 
 from mongoengine import connect
-from mongoengine import DEFAULT_CONNECTION_NAME
+from mongoengine.connection import get_db
 
 
-class MongoTestCase(SimpleTestCase):
+class MongoTestCase(test.SimpleTestCase):
     """
-    TestCase class that clear the collection between the tests.
+    TestCase class that clear the collection between the tests
     """
+    assertQuerysetEqual = test.TransactionTestCase.__dict__['assertQuerysetEqual']
 
-    assertQuerysetEqual = TransactionTestCase.__dict__['assertQuerysetEqual']
+    def __init__(self, methodName='runtest'):
+        from django.conf import settings
+        connect(settings.MONGODB_DATABASES['default']['name'])
+        self.db = get_db()
+        super(MongoTestCase, self).__init__(methodName)
 
-    def _pre_setup(self):
-        super(MongoTestCase, self)._pre_setup()
-        db_name = 'test_%s' % settings.MONGODB_DATABASES.get(
-            DEFAULT_CONNECTION_NAME
-        ).get('name')
-        self.conn = connect(db_name)
-
-    def _post_teardown(self):
-        super(MongoTestCase, self)._post_teardown()
-        for collection in self.conn.db.collection_names():
-            if collection == 'system.indexes':
+    def dropCollections(self):
+        for collection in self.db.collection_names():
+            if collection.startswith('system.'):
                 continue
             self.db.drop_collection(collection)
+
+    def tearDown(self):
+        self.dropCollections()

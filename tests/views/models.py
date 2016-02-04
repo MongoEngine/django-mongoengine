@@ -19,7 +19,7 @@ class Artist(Document):
         verbose_name_plural = 'professional artists'
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
     @permalink
     def get_absolute_url(self):
@@ -34,7 +34,7 @@ class Author(Document):
     _meta = {"ordering": ['name'], "exclude": 'id'}
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
 
 class Book(Document):
@@ -48,7 +48,7 @@ class Book(Document):
     _meta = {"ordering": ['-pubdate']}
 
     def __unicode__(self):
-        return self.name
+        return self.name or ''
 
 
 class Page(Document):

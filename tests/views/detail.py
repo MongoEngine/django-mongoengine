@@ -9,7 +9,6 @@ from .models import Artist, Author, Page
 
 
 class DetailViewTest(TestCase):
-    urls = 'tests.views.urls'
 
     def test_simple_object(self):
         res = self.client.get('/detail/obj/')

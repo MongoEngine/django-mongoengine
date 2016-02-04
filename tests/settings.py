@@ -89,7 +89,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware'
 )
 
-ROOT_URLCONF = ''
+ROOT_URLCONF = 'tests.views.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'tumblelog.wsgi.application'

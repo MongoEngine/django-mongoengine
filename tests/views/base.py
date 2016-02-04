@@ -79,7 +79,7 @@ class ViewTest(unittest.TestCase):
         Test that a view can't be accidentally instantiated before deployment
         """
         try:
-            view = SimpleView(key='value').as_view()
+            SimpleView(key='value').as_view()
             self.fail('Should not be able to instantiate a view')
         except AttributeError:
             pass
@@ -89,7 +89,7 @@ class ViewTest(unittest.TestCase):
         Test that a view can't be accidentally instantiated before deployment
         """
         try:
-            view = SimpleView.as_view('value')
+            SimpleView.as_view('value')
             self.fail(
                 'Should not be able to use non-keyword arguments instantiating a view')
         except TypeError:
@@ -181,7 +181,6 @@ class ViewTest(unittest.TestCase):
 
 
 class TemplateViewTest(TestCase):
-    urls = 'tests.views.urls'
 
     rf = RequestFactory()
 

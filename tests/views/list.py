@@ -9,7 +9,6 @@ from .models import Author, Artist
 
 
 class ListViewTests(TestCase):
-    urls = 'tests.views.urls'
 
     def test_items(self):
         res = self.client.get('/list/dict/')
