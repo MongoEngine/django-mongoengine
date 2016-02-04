@@ -3,6 +3,8 @@ import warnings
 
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.text import capfirst
+from django.utils.encoding import smart_text
+
 try:
     from django.db.models.options import get_verbose_name
 except ImportError:
@@ -28,6 +30,13 @@ class PkWrapper(object):
         if attr != 'obj' and hasattr(self.obj, attr):
             setattr(self.obj, attr, value)
         super(PkWrapper, self).__setattr__(attr, value)
+
+    def value_to_string(self, obj):
+        """
+        Returns a string value of this field from the passed obj.
+        This is used by the serialization framework.
+        """
+        return smart_text(obj.pk)
 
 
 class DocumentMetaWrapper(object):
@@ -186,8 +195,6 @@ class DocumentMetaWrapper(object):
         for f in self.document._fields.itervalues():
             if isinstance(f, ReferenceField):
                 document = f.document_type
-                document._meta = DocumentMetaWrapper(document)
-                document._admin_opts = document._meta
                 self._field_cache[document._meta.module_name] = (f, document, False, False)
             else:
                 self._field_cache[f.name] = (f, None, True, False)
