@@ -1,3 +1,4 @@
+from django.core.exceptions import FieldDoesNotExist
 
 def serializable_value(self, field_name):
     """
@@ -12,7 +13,6 @@ def serializable_value(self, field_name):
     """
     try:
         field = self._meta.get_field(field_name)
-    except Exception as e:
-        print e
+    except FieldDoesNotExist:
         return getattr(self, field_name)
     return getattr(self, field.name)
