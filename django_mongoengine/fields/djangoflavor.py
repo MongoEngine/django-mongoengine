@@ -125,8 +125,19 @@ class URLField(StringField):
         defaults.update(kwargs)
         return super(URLField, self).formfield(**defaults)
 
-# TODO: check max/min values
-class IntField(DjangoField):
+
+class MinMaxMixin(object):
+
+    def formfield(self, **kwargs):
+        defaults = {
+            'min_value':  self.min_value,
+            'max_value':  self.max_value,
+        }
+        defaults.update(kwargs)
+        return super(MinMaxMixin, self).formfield(**defaults)
+
+
+class IntField(MinMaxMixin, DjangoField):
 
     def formfield(self, **kwargs):
         defaults = {
@@ -136,7 +147,7 @@ class IntField(DjangoField):
         return super(IntField, self).formfield(**defaults)
 
 
-class FloatField(DjangoField):
+class FloatField(MinMaxMixin, DjangoField):
 
     def formfield(self, **kwargs):
         defaults = {
@@ -146,7 +157,7 @@ class FloatField(DjangoField):
         return super(FloatField, self).formfield(**defaults)
 
 
-class DecimalField(DjangoField):
+class DecimalField(MinMaxMixin, DjangoField):
 
     def formfield(self, **kwargs):
         defaults = {
