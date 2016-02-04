@@ -19,16 +19,17 @@ def init_module():
         )
 init_module()
 
-def patch_mongoengine_fields():
+def patch_mongoengine_field(field_name):
     """
-    patch mongoengine.StringField for comparison support
+    patch mongoengine.[field_name] for comparison support
     becouse it's required in django.forms.models.fields_for_model
     importing using mongoengine internal import cache
     """
     from mongoengine import common
-    StringField = common._import_class("StringField")
+    field = common._import_class(field_name)
     for k in ["__eq__", "__lt__"]:
-        if not k in StringField.__dict__:
-            setattr(StringField, k, djangoflavor.DjangoField.__dict__[k])
+        if not k in field.__dict__:
+            setattr(field, k, djangoflavor.DjangoField.__dict__[k])
 
-patch_mongoengine_fields()
+for f in ["StringField", "ObjectIdField"]:
+    patch_mongoengine_field(f)
