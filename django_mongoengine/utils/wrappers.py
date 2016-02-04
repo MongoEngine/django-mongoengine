@@ -26,6 +26,9 @@ class ModelDocument(object):
     def __call__(self, *args, **kwargs):
         return self._document(*args, **kwargs)
 
+    def __unicode__(self):
+        return self._document.__unicode__()
+
 
 class WrapDocument(type):
     """

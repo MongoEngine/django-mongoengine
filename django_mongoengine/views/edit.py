@@ -1,9 +1,11 @@
 from django.utils import six
+from django.core.exceptions import ImproperlyConfigured
+
 from django_mongoengine.utils.wrappers import WrapDocument, copy_class
 from django_mongoengine.utils.monkey import get_patched_django_module
 from django_mongoengine.forms.documents import documentform_factory
 
-from .detail import SingleObjectTemplateResponseMixin
+from .detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
 
 djmod = get_patched_django_module(
     "django.views.generic.edit",
@@ -16,7 +18,7 @@ class WrapDocumentForm(WrapDocument, djmod.FormMixinBase):
     pass
 
 
-class DocumentFormFixin(object):
+class DocumentFormFixin(SingleObjectMixin):
 
     def get_success_url(self):
         """

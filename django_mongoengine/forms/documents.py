@@ -175,6 +175,9 @@ class BaseDocumentForm(model_forms.BaseModelForm):
     def _post_clean(self):
         opts = self._meta
 
+        # mongo MetaDict does not have fields attribute
+        # adding it here istead of rewriting code
+        self.instance._meta.fields = opts.model._meta.fields
         exclude = self._get_validation_exclusions()
 
         try:
