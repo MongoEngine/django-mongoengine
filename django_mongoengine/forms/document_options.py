@@ -204,7 +204,7 @@ class DocumentMetaWrapper(object):
         try:
             return self._meta[name]
         except KeyError as e:
-            raise AttributeError(e.message)
+            raise AttributeError(*e.args)
 
     def __setattr__(self, name, value):
         if not hasattr(self, name):
@@ -235,3 +235,6 @@ class DocumentMetaWrapper(object):
 
     def iteritems(self):
         return self._meta.iteritems()
+
+    def items(self):
+        return self._meta.items()
