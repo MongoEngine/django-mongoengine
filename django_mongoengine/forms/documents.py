@@ -201,6 +201,8 @@ class BaseDocumentForm(model_forms.BaseModelForm):
 
         if commit:
             self.instance.save()
+        else:
+            self.save_m2m = self._save_m2m
 
         return self.instance
     save.alters_data = True
