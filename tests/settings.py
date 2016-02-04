@@ -102,7 +102,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_mongoengine',
-    'tests.views'
+    'tests.views',
+    'tests.forms',
 )
 
 
