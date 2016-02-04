@@ -17,10 +17,10 @@ class WrapDocument(type):
 
 def copy_class(source):
     def decorator(cls):
-        f = lambda (k, v): (
+        f = lambda k: (
             k not in cls.__dict__ and not k.startswith("__")
         )
-        for k, v in filter(f, source.__dict__.items()):
-            setattr(cls, k, v)
+        for k in filter(f, source.__dict__.keys()):
+            setattr(cls, k, source.__dict__[k])
         return cls
     return decorator
