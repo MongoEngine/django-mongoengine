@@ -1,6 +1,5 @@
 from mongoengine import queryset as qs
 
-from .utils.wrappers import ModelDocument
 
 class QuerySet(qs.QuerySet):
     """
@@ -9,4 +8,11 @@ class QuerySet(qs.QuerySet):
 
     @property
     def model(self):
-        return ModelDocument(self._document)
+        return self._document
+
+
+class QuerySetManager(qs.QuerySetManager):
+    default = QuerySet
+
+    def all(self):
+        return self.get_queryset()

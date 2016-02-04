@@ -11,8 +11,6 @@ from django.utils import six
 from mongoengine.fields import ObjectIdField, FileField
 from mongoengine.base import ValidationError
 
-from .document_options import DocumentMetaWrapper
-
 
 def construct_instance(form, instance, fields=None, exclude=None):
     """
@@ -89,13 +87,8 @@ def save_instance(form, instance, fields=None, fail_message='saved',
 class DocumentFormOptions(model_forms.ModelFormOptions):
     def __init__(self, options=None):
         super(DocumentFormOptions, self).__init__(options)
-        # set up the document meta wrapper if document meta is a dict
         self.model = getattr(options, 'document', None) or getattr(options, 'model', None)
         if self.model is not None:
-            if not hasattr(self.model, '_meta'):
-                self.model._meta = {}
-            if isinstance(self.model._meta, dict):
-                self.model._meta = DocumentMetaWrapper(self.model)
             options.model = self.model
         self.embedded_field = getattr(options, 'embedded_field_name', None)
 

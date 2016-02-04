@@ -53,8 +53,12 @@ class DocumentMetaWrapper(object):
     _meta = None
 
     def __init__(self, document):
+        if isinstance(document._meta, DocumentMetaWrapper):
+            meta = document._meta._meta
+        else:
+            meta = document._meta
         self.document = document
-        self._meta = document._meta or {}
+        self._meta = meta or {}
         self.concrete_model = document
         self.concrete_fields = document._fields.values()
         self.fields = self.concrete_fields
@@ -210,6 +214,9 @@ class DocumentMetaWrapper(object):
 
     def __getitem__(self, key):
         return self._meta[key]
+
+    def __setitem__(self, key, value):
+        self._meta[key] = value
 
     def __contains__(self, key):
         return key in self._meta

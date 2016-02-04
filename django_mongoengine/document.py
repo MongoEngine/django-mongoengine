@@ -1,30 +1,27 @@
+#from django.utils import six
+
 from mongoengine import document as me
+from mongoengine.base import metaclasses as mtc
 
 from .forms.document_options import DocumentMetaWrapper
-from .queryset import QuerySet
+from .queryset import QuerySetManager
 
-class DocumentMixin(object):
+def django_meta(meta, *bases):
+    class metaclass(meta):
+        def __new__(cls, name, this_bases, attrs):
+            attrs.setdefault('objects', QuerySetManager())
+            attrs.setdefault('_default_manager', QuerySetManager())
+            new_cls = meta.__new__(cls, name, bases, attrs)
+            new_cls._meta = DocumentMetaWrapper(new_cls)
+            return new_cls
 
-    @classmethod
-    def get_document_options(cls):
-        return DocumentMetaWrapper(cls)
+    return type.__new__(metaclass, 'temporary_meta', (), {})
 
+class Document(django_meta(mtc.TopLevelDocumentMetaclass, me.Document)):
+    pass
 
-class Document(me.Document, DocumentMixin):
-    """Abstract document with extra helpers in the queryset class"""
-    meta = {
-        'abstract': True,
-        'queryset_class': QuerySet,
-    }
+class DynamicDocument(django_meta(mtc.TopLevelDocumentMetaclass, me.DynamicDocument)):
+    pass
 
-
-
-class DynamicDocument(me.DynamicDocument, DocumentMixin):
-    """Abstract Dynamic document with extra helpers in the queryset class"""
-    meta = {
-        'abstract': True,
-        'queryset_class': QuerySet,
-    }
-
-
-EmbeddedDocument = me.EmbeddedDocument
+class EmbeddedDocument(django_meta(mtc.DocumentMetaclass, me.EmbeddedDocument)):
+    pass

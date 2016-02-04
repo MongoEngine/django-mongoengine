@@ -14,7 +14,6 @@ class Comment(EmbeddedDocument):
     email  = fields.EmailField(verbose_name="Email")
     body = fields.StringField(verbose_name="Comment", required=True)
 
-
 class Post(Document):
     created_at = fields.DateTimeField(
         default=datetime.datetime.now, required=True, editable=False,

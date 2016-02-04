@@ -1,4 +1,4 @@
-from django.utils.encoding import smart_str, smart_text
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.models import _user_has_perm, _user_get_all_permissions, _user_has_module_perms
@@ -333,9 +333,6 @@ class User(document.Document):
             except (ImportError, ImproperlyConfigured):
                 raise SiteProfileNotAvailable
         return self._profile_cache
-
-User._meta.pk = User._fields["id"]
-User._meta.pk.value_to_string = lambda obj: smart_text(obj.pk)
 
 
 class MongoUser(models.Model):
