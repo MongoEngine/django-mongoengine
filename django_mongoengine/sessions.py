@@ -67,7 +67,7 @@ class SessionStore(SessionBase):
             else:
                 return s.session_data
         except (IndexError, SuspiciousOperation):
-            self.create()
+            self._session_key = None
             return {}
 
     def exists(self, session_key):
