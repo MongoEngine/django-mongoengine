@@ -7,14 +7,20 @@ from mongoengine import fields
 from django_mongoengine.forms import fields as formfields
 from django_mongoengine.forms.field_generator import MongoFormFieldGenerator
 
+_field_defaults = (
+    ("editable", True),
+    ("blank", False),
+    ("null", False),
+    ("verbose_name", None),
+    ("help_text", None),
+    ("auto_created", False),
+)
+
 class DjangoField(object):
 
     def __init__(self, *args, **kwargs):
-        self.editable = kwargs.pop("editable", True)
-        self.blank    = kwargs.get("null", False)
-        self.verbose_name = kwargs.pop("verbose_name", None)
-        self.help_text = kwargs.pop("help_text", None)
-        self.auto_created = kwargs.pop("auto_created", False)
+        for k, v in _field_defaults:
+            kwargs.setdefault(k, v)
         super(DjangoField, self).__init__(*args, **kwargs)
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
