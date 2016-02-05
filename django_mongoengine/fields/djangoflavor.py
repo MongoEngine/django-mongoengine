@@ -14,6 +14,7 @@ class DjangoField(object):
         self.blank    = kwargs.get("null", False)
         self.verbose_name = kwargs.pop("verbose_name", None)
         self.help_text = kwargs.pop("help_text", None)
+        self.auto_created = kwargs.pop("auto_created", False)
         super(DjangoField, self).__init__(*args, **kwargs)
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
@@ -80,6 +81,9 @@ class DjangoField(object):
         if isinstance(other, fields.BaseField):
             return self.creation_counter < other.creation_counter
         return NotImplemented
+
+    def __hash__(self):
+        return hash(self.creation_counter)
 
 
 class StringField(DjangoField):

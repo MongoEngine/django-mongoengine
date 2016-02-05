@@ -1,9 +1,11 @@
-from django import forms, template
+from django import forms
 from django.forms.formsets import all_valid
 from django.core.urlresolvers import reverse
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin import widgets, helpers
-from django.contrib.admin.utils import unquote, flatten_fieldsets
+from django.contrib.admin.utils import (
+    unquote, flatten_fieldsets, get_deleted_objects,
+)
 from django.contrib.admin.options import (
     TO_FIELD_VAR, IS_POPUP_VAR,
     get_ul_class, csrf_protect_m,
@@ -15,8 +17,8 @@ try:
     from django.db.models.related import RelatedObject
 except ImportError:
     from django.db.models.fields.related import ForeignObjectRel as RelatedObject # noqa
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render_to_response
+from django.http import Http404
+from django.template.response import TemplateResponse
 from django.utils.functional import curry
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -208,7 +210,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         return super(DocumentAdmin, self).get_changelist_formset(request, **kwargs)
 
 
-    def log_addition(self, request, object):
+    def log_addition(self, request, object, message):
         """
         Log that an object has been successfully added.
 
@@ -216,15 +218,8 @@ class DocumentAdmin(BaseDocumentAdmin):
         """
         if not self.log:
             return
-        from django.contrib.admin.models import LogEntry, ADDITION
+        super(DocumentAdmin, self).log_addition(request, object, message)
 
-        LogEntry.objects.log_action(
-            user_id         = request.user.pk,
-            content_type_id = None,
-            object_id       = object.pk,
-            object_repr     = force_text(object),
-            action_flag     = ADDITION
-        )
 
     def log_change(self, request, object, message):
         """
@@ -234,15 +229,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         """
         if not self.log:
             return
-        from django.contrib.admin.models import LogEntry, CHANGE
-        LogEntry.objects.log_action(
-            user_id         = request.user.pk,
-            content_type_id = None,
-            object_id       = object.pk,
-            object_repr     = force_text(object),
-            action_flag     = CHANGE,
-            change_message  = message
-        )
+        super(DocumentAdmin, self).log_change(request, object, message)
 
     def log_deletion(self, request, object, object_repr):
         """
@@ -253,14 +240,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         """
         if not self.log:
             return
-        from django.contrib.admin.models import LogEntry, DELETION
-        LogEntry.objects.log_action(
-            user_id         = request.user.id,
-            content_type_id = None,
-            object_id       = object.pk,
-            object_repr     = object_repr,
-            action_flag     = DELETION
-        )
+        super(DocumentAdmin, self).log_deletion(request, object, object_repr)
 
     @csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
@@ -362,97 +342,113 @@ class DocumentAdmin(BaseDocumentAdmin):
         return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
 
 
-# XXX: stop here
-
     @csrf_protect_m
     def delete_view(self, request, object_id, extra_context=None):
         "The 'delete' admin view for this model."
         opts = self.model._meta
         app_label = opts.app_label
 
-        obj = self.get_object(request, unquote(object_id))
+        to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
+        if to_field and not self.to_field_allowed(request, to_field):
+            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
+
+        obj = self.get_object(request, unquote(object_id), to_field)
 
         if not self.has_delete_permission(request, obj):
             raise PermissionDenied
 
         if obj is None:
-            raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {'name': force_text(opts.verbose_name), 'key': escape(object_id)})
+            raise Http404(
+                _('%(name)s object with primary key %(key)r does not exist.') %
+                {'name': force_text(opts.verbose_name), 'key': escape(object_id)}
+            )
 
-        #using = router.db_for_write(self.model)
+        from django.db import router
+        using = router.db_for_write(self.model)
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        print("FIXME: Need to delete nested objects.")
-        #(deleted_objects, perms_needed, protected) = get_deleted_objects(
-        #    [obj], opts, request.user, self.admin_site, using)
+        (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
+            [obj], opts, request.user, self.admin_site, using)
 
-        if request.POST: # The user has already confirmed the deletion.
-            #if perms_needed:
-            #    raise PermissionDenied
+        if request.POST:  # The user has already confirmed the deletion.
+            if perms_needed:
+                raise PermissionDenied
             obj_display = force_text(obj)
+            attr = str(to_field) if to_field else opts.pk.attname
+            obj_id = obj.serializable_value(attr)
             self.log_deletion(request, obj, obj_display)
             self.delete_model(request, obj)
 
-            self.message_user(request, _('The %(name)s "%(obj)s" was deleted successfully.') % {'name': force_text(opts.verbose_name), 'obj': force_text(obj_display)})
-
-            if not self.has_change_permission(request, None):
-                return HttpResponseRedirect("../../../../")
-            return HttpResponseRedirect("../../")
+            return self.response_delete(request, obj_display, obj_id)
 
         object_name = force_text(opts.verbose_name)
 
-        #if perms_needed or protected:
-        #    title = _("Cannot delete %(name)s") % {"name": object_name}
-        #else:
-        title = _("Are you sure?")
+        if perms_needed or protected:
+            title = _("Cannot delete %(name)s") % {"name": object_name}
+        else:
+            title = _("Are you sure?")
 
-        context = {
-            "title": title,
-            "object_name": object_name,
-            "object": obj,
-            #"deleted_objects": deleted_objects,
-            #"perms_lacking": perms_needed,
-            #"protected": protected,
-            "opts": opts,
-            "root_path": self.admin_site.root_path,
-            "app_label": app_label,
-        }
+        context = dict(
+            self.admin_site.each_context(request),
+            title=title,
+            object_name=object_name,
+            object=obj,
+            deleted_objects=deleted_objects,
+            model_count=dict(model_count).items(),
+            perms_lacking=perms_needed,
+            protected=protected,
+            opts=opts,
+            app_label=app_label,
+            preserved_filters=self.get_preserved_filters(request),
+            is_popup=(IS_POPUP_VAR in request.POST or
+                      IS_POPUP_VAR in request.GET),
+            to_field=to_field,
+        )
         context.update(extra_context or {})
-        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
-        return render_to_response(self.delete_confirmation_template or [
-            "admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower()),
-            "admin/%s/delete_confirmation.html" % app_label,
-            "admin/delete_confirmation.html"
-        ], context, context_instance=context_instance)
+
+        return self.render_delete_form(request, context)
 
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
-        from django.contrib.contenttypes.models import ContentType
+        # First check if the user can see this history.
         model = self.model
+        obj = self.get_object(request, unquote(object_id))
+        if obj is None:
+            raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
+                'name': force_text(model._meta.verbose_name),
+                'key': escape(object_id),
+            })
+
+        if not self.has_change_permission(request, obj):
+            raise PermissionDenied
+
+        # Then get the history for this object.
         opts = model._meta
         app_label = opts.app_label
         action_list = LogEntry.objects.filter(
-            object_id = object_id,
-            content_type__id__exact = ContentType.objects.get_for_model(model).id
+            object_id=unquote(object_id),
+            content_type=get_content_type_for_model(model)
         ).select_related().order_by('action_time')
-        # If no history was found, see whether this object even exists.
-        obj = get_object_or_404(model, pk=unquote(object_id))
-        context = {
-            'title': _('Change history: %s') % force_text(obj),
-            'action_list': action_list,
-            'module_name': capfirst(force_text(opts.verbose_name_plural)),
-            'object': obj,
-            'root_path': self.admin_site.root_path,
-            'app_label': app_label,
-        }
+
+        context = dict(self.admin_site.each_context(request),
+            title=_('Change history: %s') % force_text(obj),
+            action_list=action_list,
+            module_name=capfirst(force_text(opts.verbose_name_plural)),
+            object=obj,
+            opts=opts,
+            preserved_filters=self.get_preserved_filters(request),
+        )
         context.update(extra_context or {})
-        context_instance = template.RequestContext(request, current_app=self.admin_site.name)
-        return render_to_response(self.object_history_template or [
-            "admin/%s/%s/object_history.html" % (app_label, opts.object_name.lower()),
+
+        request.current_app = self.admin_site.name
+
+        return TemplateResponse(request, self.object_history_template or [
+            "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
-        ], context, context_instance=context_instance)
+        ], context)
 
 
 class InlineDocumentAdmin(BaseDocumentAdmin):

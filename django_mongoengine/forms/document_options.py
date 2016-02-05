@@ -54,6 +54,7 @@ class DocumentMetaWrapper(object):
     proxy = []
     virtual_fields = []
     concrete_fields = []
+    proxied_children = []
     parents = {}
     many_to_many = []
     swapped = False
@@ -68,6 +69,7 @@ class DocumentMetaWrapper(object):
             meta = document._meta
         self.document = document
         self._meta = meta or {}
+        self.model = document
         self.concrete_model = document
         self.concrete_fields = document._fields.values()
         self.fields = self.concrete_fields
@@ -127,6 +129,10 @@ class DocumentMetaWrapper(object):
         if not hasattr(self._pk, 'attname'):
             self._init_pk()
         return self._pk
+
+    def get_fields(self, include_parents=True, include_hidden=False):
+        # XXX: simple placeholder; TODO: handle options;
+        return self.concrete_fields
 
     def _init_pk(self):
         """
