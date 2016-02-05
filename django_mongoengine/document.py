@@ -1,4 +1,4 @@
-#from django.utils import six
+from django.db.models import Model
 
 from mongoengine import document as me
 from mongoengine.base import metaclasses as mtc
@@ -13,6 +13,7 @@ def django_meta(meta, base):
             attrs.setdefault('objects', QuerySetManager())
             attrs.setdefault('_default_manager', QuerySetManager())
             attrs.setdefault('serializable_value', serializable_value)
+            attrs.setdefault('_get_pk_val', Model.__dict__['_get_pk_val'])
             change_bases = len(bases) == 1 and (
                 bases[0].__name__ == "temporary_meta" or
                 bases[0] in [Document, DynamicDocument, EmbeddedDocument]
