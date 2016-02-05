@@ -14,17 +14,31 @@ Working / Django 1.9
 --------------------
 
 * [ok] sessions
-* [ok] models/fields
-* [ok] views.*
-* [?] auth, need testing
-* [ ] admin
+* [ok] models/fields, fields needs testing
+* [ok] views
+* [ok] auth
+* [?] admin - partially working, some things broken
+
+Current status, let's call it version 0.2, still far away from public release
+-----------------------------------------------------------------------------
+
+Many parts of projects rewritten/removed;
+Instead of copying django code i try to subclass/reuse/even monkey-patch;
+Everything listed above is working; admin - just base fuctions
+like changelist/edit, not tested with every form type; need's more work.
+
+Some code just plaholder to make things work;
+`django/forms/document_options.py` - dirty hack absolutely required to
+get thigs work with django. It replaces mongo _meta on model/class and
+provide django-like interface.
+It get's replaced after class creation via some metaclass magick.
+
 
 
 TODO
 ----
 
 * Fix tests/
-* Fix example app: example/tumblelog
 * Sync some files/docs that removed from mongoengine: https://github.com/seglberg/mongoengine/commit/a34f4c1beb93f430c37da20c8fd96ce02a0f20c1?diff=unified
 * Add docs for integrating: https://github.com/hmarr/django-debug-toolbar-mongo
 * Take a look at django-mongotools: https://github.com/wpjunior/django-mongotools
