@@ -1,11 +1,11 @@
 from django.utils.text import capfirst
 from django.core.validators import RegexValidator
 from django import forms
+from django.db.models import Field
 
 from mongoengine import fields
 
 from django_mongoengine.forms import fields as formfields
-from django_mongoengine.forms.field_generator import MongoFormFieldGenerator
 
 _field_defaults = (
     ("editable", True),
@@ -18,18 +18,15 @@ _field_defaults = (
 
 class DjangoField(object):
 
+    get_choices = Field.__dict__["get_choices"]
+
     def __init__(self, *args, **kwargs):
         for k, v in _field_defaults:
             kwargs.setdefault(k, v)
+        kwargs["required"] = not kwargs["blank"]
         super(DjangoField, self).__init__(*args, **kwargs)
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
-
-
-    def oldformfield(self, **kwargs):
-        return MongoFormFieldGenerator().generate(
-            self, **kwargs
-        )
 
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
         """

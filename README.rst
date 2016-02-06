@@ -19,8 +19,8 @@ Working / Django 1.9
 * [ok] auth
 * [?] admin - partially working, some things broken
 
-Current status, let's call it version 0.2, still far away from public release
------------------------------------------------------------------------------
+Current status, let's call it version 0.2.1, still far away from public release
+-------------------------------------------------------------------------------
 
 Many parts of projects rewritten/removed;
 Instead of copying django code i try to subclass/reuse/even monkey-patch;
@@ -32,6 +32,12 @@ Some code just plaholder to make things work;
 get thigs work with django. It replaces mongo _meta on model/class and
 provide django-like interface.
 It get's replaced after class creation via some metaclass magick.
+
+Fields notes
+------------
+
+* mongo defaults Field(required=False), changed to django-style defaults
+  -> Field(blank=False), and setting required = not blank in Field.__init__
 
 
 
