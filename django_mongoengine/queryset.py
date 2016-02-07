@@ -31,7 +31,7 @@ class QuerySet(qs.QuerySet):
         return self.order_by(field_name).first()
 
     def exists(self):
-        return bool(self.limit(1))
+        return bool(self)
 
 
     def _clone(self):
