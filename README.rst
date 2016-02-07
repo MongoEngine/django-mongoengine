@@ -98,3 +98,11 @@ How to run example app
     ./env/bin/pip install .
     ./env/bin/pip install -r example/tumblelog/requirements.txt
     ./env/bin/python example/tumblelog/manage.py runserver
+
+
+How to run tests
+----------------
+.. code::
+
+    ./env/bin/pip install -r requirements_dev.txt
+    ./env/bin/python setup.py -q nosetests -x
