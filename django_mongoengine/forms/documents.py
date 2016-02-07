@@ -90,7 +90,7 @@ class DocumentFormOptions(model_forms.ModelFormOptions):
         self.model = getattr(options, 'document', None) or getattr(options, 'model', None)
         if self.model is not None:
             options.model = self.model
-        self.embedded_field = getattr(options, 'embedded_field_name', None)
+        self.embedded_field = getattr(options, 'embedded_field', None)
 
 
 class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
@@ -222,21 +222,28 @@ class EmbeddedDocumentForm(BaseDocumentForm):
     def __init__(self, parent_document, *args, **kwargs):
         super(EmbeddedDocumentForm, self).__init__(*args, **kwargs)
         self.parent_document = parent_document
-        if self._meta.embedded_field is not None and \
-                not hasattr(self.parent_document, self._meta.embedded_field):
+        if self._meta.embedded_field is None:
+            raise FieldError("%s.Meta must have defined embedded_field" % self.__class__.__name__)
+        if not hasattr(self.parent_document, self._meta.embedded_field):
             raise FieldError("Parent document must have field %s" % self._meta.embedded_field)
 
     def save(self, commit=True):
         if self.errors:
-            raise ValueError("The %s could not be saved because the data didn't"
-                         " validate." % self.instance.__class__.__name__)
+            raise ValueError(
+                "The %s could not be saved because the data didn't"
+                " validate." % self.instance.__class__.__name__
+            )
 
-        if commit:
+        def save(*args, **kwargs):
             instance = construct_instance(self, self.instance, self.fields, self._meta.exclude)
             l = getattr(self.parent_document, self._meta.embedded_field)
             l.append(instance)
             setattr(self.parent_document, self._meta.embedded_field, l)
-            self.parent_document.save()
+            self.parent_document.save(*args, **kwargs)
+        if commit:
+            save()
+        else:
+            self.instance.save = save
 
         return self.instance
 

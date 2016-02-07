@@ -7,5 +7,5 @@ class CommentForm(EmbeddedDocumentForm):
 
     class Meta:
         document = Comment
-        embedded_field_name = 'comments'
+        embedded_field = 'comments'
         exclude = ('created_at',)
