@@ -1,3 +1,5 @@
+from copy import copy
+
 from django import forms
 from django.core.validators import EMPTY_VALUES
 from django.core.exceptions import ValidationError
@@ -63,6 +65,8 @@ class ReferenceField(forms.ChoiceField):
         return super(ReferenceField, self).prepare_value(value)
 
     def _get_choices(self):
+        if hasattr(self, '_choices'):
+            return self._choices
         return MongoChoiceIterator(self)
 
     choices = property(_get_choices, forms.ChoiceField._set_choices)
@@ -88,6 +92,12 @@ class ReferenceField(forms.ChoiceField):
         except (TypeError, InvalidId, self.queryset._document.DoesNotExist):
             raise forms.ValidationError(self.error_messages['invalid_choice'] % {'value': value})
         return obj
+
+    def __deepcopy__(self, memo):
+        result = super(forms.ChoiceField, self).__deepcopy__(memo)
+        if hasattr(self, "_choices"):
+            result._choices = copy.deepcopy(self._choices, memo)
+        return result
 
 
 class DocumentMultipleChoiceField(ReferenceField):
