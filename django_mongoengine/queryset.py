@@ -24,6 +24,16 @@ class QuerySet(qs.QuerySet):
     def get_queryset(self):
         return self
 
+    def latest(self, field_name):
+        return self.order_by("-" + field_name).first()
+
+    def earliest(self, field_name):
+        return self.order_by(field_name).first()
+
+    def exists(self):
+        return bool(self.limit(1))
+
+
     def _clone(self):
         # XXX: use self.no_cache()
         return self
