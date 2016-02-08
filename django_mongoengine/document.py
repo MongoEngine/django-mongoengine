@@ -15,13 +15,15 @@ def django_meta(meta, base):
             attrs.setdefault('serializable_value', serializable_value)
             attrs.setdefault('_get_pk_val', Model.__dict__['_get_pk_val'])
             change_bases = len(bases) == 1 and (
-                bases[0].__name__ == "temporary_meta" or
-                bases[0] in [Document, DynamicDocument, EmbeddedDocument]
+                bases[0].__name__ == "temporary_meta"
             )
             if change_bases:
                 new_bases = base,
             else:
-                new_bases = bases
+                new_bases = tuple([
+                    base if getattr(b, 'swap_base', False) else b
+                    for b in bases
+                ])
             new_cls = meta.__new__(cls, name, new_bases, attrs)
             new_cls._meta = DocumentMetaWrapper(new_cls)
             return new_cls
@@ -29,10 +31,10 @@ def django_meta(meta, base):
     return type.__new__(metaclass, 'temporary_meta', (), {})
 
 class Document(django_meta(mtc.TopLevelDocumentMetaclass, me.Document)):
-    pass
+    swap_base = True
 
 class DynamicDocument(django_meta(mtc.TopLevelDocumentMetaclass, me.DynamicDocument)):
-    pass
+    swap_base = True
 
 class EmbeddedDocument(django_meta(mtc.DocumentMetaclass, me.EmbeddedDocument)):
-    pass
+    swap_base = True
