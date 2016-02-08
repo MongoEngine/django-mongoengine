@@ -37,6 +37,18 @@ class QuerySet(qs.QuerySet):
     def _clone(self):
         return self.clone()
 
+    @property
+    def ordered(self):
+        """
+        Returns True if the QuerySet is ordered -- i.e. has an order_by()
+        clause or a default ordering on the model.
+        """
+        if self._ordering:
+            return True
+        elif self._document._meta.ordering:
+            return True
+        else:
+            return False
 
 
 class QuerySetManager(qs.QuerySetManager):
