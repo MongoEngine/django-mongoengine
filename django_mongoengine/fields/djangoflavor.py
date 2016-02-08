@@ -91,7 +91,7 @@ class DjangoField(object):
 
 class StringField(DjangoField):
 
-    def formfield(self, form_class=formfields.MongoCharField, choices_form_class=None, **kwargs):
+    def formfield(self, form_class=forms.CharField, choices_form_class=None, **kwargs):
 
         defaults = {}
 

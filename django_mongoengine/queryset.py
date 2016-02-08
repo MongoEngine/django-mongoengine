@@ -35,8 +35,7 @@ class QuerySet(qs.QuerySet):
 
 
     def _clone(self):
-        # XXX: use self.no_cache()
-        return self
+        return self.clone()
 
 
 
