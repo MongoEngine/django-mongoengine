@@ -34,7 +34,6 @@ class DjangoFlavor(object):
     _default_manager = QuerySetManager()
     serializable_value = serializable_value
     _get_pk_val = Model.__dict__["_get_pk_val"]
-    swap_base = True
 
     def __init__(self, *args, **kwargs):
         self._state = ModelState(self._meta.get("db_alias", me.DEFAULT_CONNECTION_NAME))
@@ -42,12 +41,12 @@ class DjangoFlavor(object):
 
 class Document(django_meta(mtc.TopLevelDocumentMetaclass,
                            DjangoFlavor, me.Document)):
-    pass
+    swap_base = True
 
 class DynamicDocument(django_meta(mtc.TopLevelDocumentMetaclass,
                                   DjangoFlavor, me.DynamicDocument)):
-    pass
+    swap_base = True
 
 class EmbeddedDocument(django_meta(mtc.DocumentMetaclass,
                                    DjangoFlavor, me.EmbeddedDocument)):
-    pass
+    swap_base = True
