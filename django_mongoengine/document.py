@@ -39,6 +39,13 @@ class DjangoFlavor(object):
         self._state = ModelState(self._meta.get("db_alias", me.DEFAULT_CONNECTION_NAME))
         super(DjangoFlavor, self).__init__(*args, **kwargs)
 
+    def _get_unique_checks(self, exclude=None):
+        # XXX: source: django/db/models/base.py
+        # used in modelform validation
+        unique_checks, date_checks = [], []
+        return unique_checks, date_checks
+
+
 class Document(django_meta(mtc.TopLevelDocumentMetaclass,
                            DjangoFlavor, me.Document)):
     swap_base = True

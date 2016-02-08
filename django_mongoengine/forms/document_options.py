@@ -18,6 +18,7 @@ class PkWrapper(object):
     """Used to wrap the Primary Key so it can mimic Django's expectations
     """
     editable = False
+    remote_field = None
 
     def __init__(self, wrapped):
         self.obj = wrapped
@@ -25,7 +26,7 @@ class PkWrapper(object):
     def __getattr__(self, attr):
         if attr in dir(self.obj):
             return getattr(self.obj, attr)
-        raise AttributeError("%s has no %s" % attr)
+        raise AttributeError("{} has no {}".format(self, attr))
 
     def __setattr__(self, attr, value):
         if attr != 'obj' and hasattr(self.obj, attr):
