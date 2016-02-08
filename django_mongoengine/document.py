@@ -1,4 +1,5 @@
 from django.db.models import Model
+from django.db.models.base import ModelState
 
 from mongoengine import document as me
 from mongoengine.base import metaclasses as mtc
@@ -7,34 +8,46 @@ from .utils.patches import serializable_value
 from .forms.document_options import DocumentMetaWrapper
 from .queryset import QuerySetManager
 
-def django_meta(meta, base):
+def django_meta(meta, *top_bases):
     class metaclass(meta):
         def __new__(cls, name, bases, attrs):
-            attrs.setdefault('objects', QuerySetManager())
-            attrs.setdefault('_default_manager', QuerySetManager())
-            attrs.setdefault('serializable_value', serializable_value)
-            attrs.setdefault('_get_pk_val', Model.__dict__['_get_pk_val'])
             change_bases = len(bases) == 1 and (
                 bases[0].__name__ == "temporary_meta"
             )
             if change_bases:
-                new_bases = base,
+                new_bases = top_bases
             else:
-                new_bases = tuple([
-                    base if getattr(b, 'swap_base', False) else b
-                    for b in bases
-                ])
+                new_bases = ()
+                for b in bases:
+                    if getattr(b, 'swap_base', False):
+                        new_bases += top_bases
+                    else:
+                        new_bases += (b,)
             new_cls = meta.__new__(cls, name, new_bases, attrs)
             new_cls._meta = DocumentMetaWrapper(new_cls)
             return new_cls
 
     return type.__new__(metaclass, 'temporary_meta', (), {})
 
-class Document(django_meta(mtc.TopLevelDocumentMetaclass, me.Document)):
+class DjangoFlavor(object):
+    objects = QuerySetManager()
+    _default_manager = QuerySetManager()
+    serializable_value = serializable_value
+    _get_pk_val = Model.__dict__["_get_pk_val"]
     swap_base = True
 
-class DynamicDocument(django_meta(mtc.TopLevelDocumentMetaclass, me.DynamicDocument)):
-    swap_base = True
+    def __init__(self, *args, **kwargs):
+        self._state = ModelState(self._meta.get("db_alias", me.DEFAULT_CONNECTION_NAME))
+        super(DjangoFlavor, self).__init__(*args, **kwargs)
 
-class EmbeddedDocument(django_meta(mtc.DocumentMetaclass, me.EmbeddedDocument)):
-    swap_base = True
+class Document(django_meta(mtc.TopLevelDocumentMetaclass,
+                           DjangoFlavor, me.Document)):
+    pass
+
+class DynamicDocument(django_meta(mtc.TopLevelDocumentMetaclass,
+                                  DjangoFlavor, me.DynamicDocument)):
+    pass
+
+class EmbeddedDocument(django_meta(mtc.DocumentMetaclass,
+                                   DjangoFlavor, me.EmbeddedDocument)):
+    pass

@@ -3,9 +3,7 @@ from functools import partial
 from django.forms.forms import DeclarativeFieldsMetaclass
 from django.forms.models import ALL_FIELDS
 from django.core.exceptions import FieldError, ImproperlyConfigured
-from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms import models as model_forms
-from django.utils.translation import ugettext_lazy as _
 from django.utils import six
 
 from mongoengine.fields import ObjectIdField, FileField
@@ -248,104 +246,16 @@ class EmbeddedDocumentForm(BaseDocumentForm):
         return self.instance
 
 
-class BaseDocumentFormSet(BaseFormSet):
+class BaseDocumentFormSet(model_forms.BaseModelFormSet):
     """
     A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """
 
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 queryset=None, **kwargs):
-        self.queryset = queryset
-        self._queryset = self.queryset
-        self.initial = self.construct_initial()
-        defaults = {'data': data, 'files': files, 'auto_id': auto_id,
-                    'prefix': prefix, 'initial': self.initial}
-        defaults.update(kwargs)
-        super(BaseDocumentFormSet, self).__init__(**defaults)
 
-    def construct_initial(self):
-        initial = []
-        try:
-            for d in self.get_queryset():
-                initial.append(model_forms.model_to_dict(d))
-        except TypeError:
-            pass
-        return initial
-
-    def initial_form_count(self):
-        """Returns the number of forms that are required in this FormSet."""
-        if not (self.data or self.files):
-            return len(self.get_queryset())
-        return super(BaseDocumentFormSet, self).initial_form_count()
-
-    def get_queryset(self):
-        return self._queryset
-
-    def save_object(self, form):
-        obj = form.save(commit=False)
-        return obj
-
-    def save(self, commit=True):
-        """
-        Saves model instances for every form, adding and changing instances
-        as necessary, and returns the list of instances.
-        """
-        saved = []
-        for form in self.forms:
-            if not form.has_changed() and not form in self.initial_forms:
-                continue
-            obj = self.save_object(form)
-
-            if form in self.deleted_forms:
-                try:
-                    obj.delete()
-                except AttributeError:
-                    # if it has no delete method it is an
-                    # embedded object. We just don't add to the list
-                    # and it's gone. Cook huh?
-                    continue
-            saved.append(obj)
-        return saved
-
-    def clean(self):
-        self.validate_unique()
-
-    def validate_unique(self):
-        errors = []
-        for form in self.forms:
-            if not hasattr(form, 'cleaned_data'):
-                continue
-            errors += form.validate_unique()
-
-        if errors:
-            raise ValidationError(errors)
-
-    def get_date_error_message(self, date_check):
-        return _("Please correct the duplicate data for %(field_name)s "
-            "which must be unique for the %(lookup)s in %(date_field)s.") % {
-            'field_name': date_check[2],
-            'date_field': date_check[3],
-            'lookup': unicode(date_check[1]),
-        }
-
-    def get_form_error(self):
-        return _("Please correct the duplicate values below.")
-
-
-def documentformset_factory(document, form=DocumentForm, formfield_callback=None,
-                         formset=BaseDocumentFormSet,
-                         extra=1, can_delete=False, can_order=False,
-                         max_num=None, fields=None, exclude=None):
-    """
-    Returns a FormSet class for the given Django model class.
-    """
-    form = documentform_factory(document, form=form, fields=fields, exclude=exclude,
-                             formfield_callback=formfield_callback)
-    FormSet = formset_factory(form, formset, extra=extra, max_num=max_num,
-                              can_order=can_order, can_delete=can_delete)
-    FormSet.model = document
-    FormSet.document = document
-    return FormSet
+documentformset_factory = partial(
+    model_forms.modelformset_factory,
+    form=DocumentForm, formset=BaseDocumentFormSet,
+)
 
 
 class BaseInlineDocumentFormSet(BaseDocumentFormSet):
