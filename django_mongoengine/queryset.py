@@ -5,8 +5,9 @@ class QueryWrapper(object):
     select_related = False
     order_by = []
 
-    def __init__(self, q):
+    def __init__(self, q, ordering):
         self.q = q
+        self.order_by = ordering
 
 class QuerySet(qs.QuerySet):
     """
@@ -19,7 +20,7 @@ class QuerySet(qs.QuerySet):
 
     @property
     def query(self):
-        return QueryWrapper(self._query)
+        return QueryWrapper(self._query, self._ordering)
 
     def get_queryset(self):
         return self
