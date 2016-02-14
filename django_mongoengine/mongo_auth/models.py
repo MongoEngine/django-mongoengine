@@ -164,35 +164,44 @@ class User(document.Document):
     """A User document that aims to mirror most of the API specified by Django
     at http://docs.djangoproject.com/en/dev/topics/auth/#users
     """
-    username = fields.StringField(max_length=30, required=True,
-                           verbose_name=_('username'),
-                           help_text=_("Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"))
+    username = fields.StringField(
+        max_length=30, verbose_name=_('username'),
+        help_text=_("Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"),
+    )
 
-    first_name = fields.StringField(max_length=30,
-                             verbose_name=_('first name'))
+    first_name = fields.StringField(
+        max_length=30, blank=True, verbose_name=_('first name'),
+    )
 
-    last_name = fields.StringField(max_length=30,
-                            verbose_name=_('last name'))
-    email = fields.EmailField(verbose_name=_('e-mail address'))
-    password = fields.StringField(max_length=128,
-                           verbose_name=_('password'),
-                           help_text=_("Use '[algo]$[iterations]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."))
-    is_staff = fields.BooleanField(default=False,
-                            verbose_name=_('staff status'),
-                            help_text=_("Designates whether the user can log into this admin site."))
-    is_active = fields.BooleanField(default=True,
-                             verbose_name=_('active'),
-                             help_text=_("Designates whether this user should be treated as active. Unselect this instead of deleting accounts."))
-    is_superuser = fields.BooleanField(default=False,
-                                verbose_name=_('superuser status'),
-                                help_text=_("Designates that this user has all permissions without explicitly assigning them."))
-    last_login = fields.DateTimeField(default=timezone.now,
-                               verbose_name=_('last login'))
-    date_joined = fields.DateTimeField(default=timezone.now,
-                                verbose_name=_('date joined'))
+    last_name = fields.StringField(
+        max_length=30, blank=True, verbose_name=_('last name'))
+    email = fields.EmailField(verbose_name=_('e-mail address'), blank=True)
+    password = fields.StringField(
+        max_length=128,
+        verbose_name=_('password'),
+        help_text=_("Use '[algo]$[iterations]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."))
+    is_staff = fields.BooleanField(
+        default=False,
+        verbose_name=_('staff status'),
+        help_text=_("Designates whether the user can log into this admin site."))
+    is_active = fields.BooleanField(
+        default=True,
+        verbose_name=_('active'),
+        help_text=_("Designates whether this user should be treated as active. Unselect this instead of deleting accounts."))
+    is_superuser = fields.BooleanField(
+        default=False,
+        verbose_name=_('superuser status'),
+        help_text=_("Designates that this user has all permissions without explicitly assigning them."))
+    last_login = fields.DateTimeField(
+        default=timezone.now,
+        verbose_name=_('last login'))
+    date_joined = fields.DateTimeField(
+        default=timezone.now,
+        verbose_name=_('date joined'))
 
-    user_permissions = fields.ListField(fields.ReferenceField(Permission), verbose_name=_('user permissions'),
-                                                help_text=_('Permissions for the user.'))
+    user_permissions = fields.ListField(
+        fields.ReferenceField(Permission), verbose_name=_('user permissions'),
+        blank=True, help_text=_('Permissions for the user.'))
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
