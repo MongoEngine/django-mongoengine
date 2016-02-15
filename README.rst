@@ -66,6 +66,29 @@ In your **settings.py** file, add following lines::
 
     INSTALLED_APPS += ["django_mongoengine"]
 
+Documents
+=========
+Inhherit your documents from ``django_mongoengine.Document``,
+and define fields using ``django_mongoengine.fields``.::
+
+    from django_mongoengine import Document, EmbeddedDocument, fields
+
+    class Comment(EmbeddedDocument):
+        created_at = fields.DateTimeField(
+            default=datetime.datetime.now, required=True, editable=False,
+        )
+        author = fields.StringField(verbose_name="Name", max_length=255, required=True)
+        email  = fields.EmailField(verbose_name="Email")
+        body = fields.StringField(verbose_name="Comment", required=True)
+
+    class Post(Document):
+        created_at = fields.DateTimeField(
+            default=datetime.datetime.now, required=True, editable=False,
+        )
+        title = fields.StringField(max_length=255, required=True)
+        slug = fields.StringField(max_length=255, required=True, primary_key=True)
+        comments = fields.ListField(fields.EmbeddedDocumentField('Comment'))
+
 
 Sessions
 ========
