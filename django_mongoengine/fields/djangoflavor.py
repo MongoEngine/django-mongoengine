@@ -2,6 +2,7 @@ from django.utils.text import capfirst
 from django.core.validators import RegexValidator
 from django import forms
 from django.db.models import Field
+from django.utils.functional import cached_property
 
 from mongoengine import fields
 
@@ -72,6 +73,10 @@ class DjangoField(object):
 
     def value_from_object(self, obj):
         return getattr(obj, self.name)
+
+    @cached_property
+    def attname(self):
+        return self.db_field
 
     def __eq__(self, other):
         # Needed for @total_ordering

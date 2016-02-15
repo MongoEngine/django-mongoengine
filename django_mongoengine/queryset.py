@@ -1,3 +1,9 @@
+import sys
+
+from django.utils import six
+from django.db.models.query import QuerySet as DjangoQuerySet
+
+from mongoengine.errors import NotUniqueError
 from mongoengine import queryset as qs
 
 class QueryWrapper(object):
@@ -51,9 +57,28 @@ class QuerySet(qs.QuerySet):
         else:
             return False
 
+    get_or_create = DjangoQuerySet.__dict__["get_or_create"]
+
+    _extract_model_params = DjangoQuerySet.__dict__["_extract_model_params"]
+
+    def _create_object_from_params(self, lookup, params):
+        """
+        Tries to create an object using passed params.
+        Used by get_or_create and update_or_create
+        """
+        try:
+            obj = self.create(**params)
+            return obj, True
+        except NotUniqueError:
+            exc_info = sys.exc_info()
+            try:
+                return self.get(**lookup), False
+            except self.model.DoesNotExist:
+                pass
+            six.reraise(*exc_info)
+
+
+
 
 class QuerySetManager(qs.QuerySetManager):
     default = QuerySet
-
-    def all(self):
-        return self.get_queryset()
