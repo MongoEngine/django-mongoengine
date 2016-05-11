@@ -87,6 +87,7 @@ class SessionStore(SessionBase):
     def save(self, must_create=False):
         if self.session_key is None:
             self.create()
+            return 
         s = MongoSession(session_key=self.session_key)
         if MONGOENGINE_SESSION_DATA_ENCODE:
             s.session_data = self.encode(self._get_session(no_load=must_create))
