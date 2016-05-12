@@ -87,7 +87,6 @@ class SessionStore(SessionBase):
             except CreateError:
                 continue
             self.modified = True
-            self._session_cache = {}
             return
 
     def save(self, must_create=False):
