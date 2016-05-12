@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.views.generic import View
 
 from django_mongoengine.forms.fields import DictField
 from django_mongoengine.views import (
@@ -86,3 +87,10 @@ class ImageFileView(DetailView):
             image.read(),
             content_type='image/%s' % image.format.lower(),
         )
+
+
+class TestSessionView(View):
+    def get(self, request, *args, **kwargs):
+        test_data = request.session.get('test', None)
+        request.session['test'] = 'abc123'
+        return  HttpResponse('test=%s' % test_data)
