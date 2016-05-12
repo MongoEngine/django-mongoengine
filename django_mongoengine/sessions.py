@@ -1,7 +1,9 @@
-from bson import json_util
+import logging
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
+
+from bson import json_util
 
 from mongoengine.document import Document
 from mongoengine import fields
@@ -66,7 +68,11 @@ class SessionStore(SessionBase):
                 return self.decode(force_text(s.session_data))
             else:
                 return s.session_data
-        except (IndexError, SuspiciousOperation):
+        except (IndexError, SuspiciousOperation) as e:
+            if isinstance(e, SuspiciousOperation):
+                logger = logging.getLogger('django.security.%s' %
+                        e.__class__.__name__)
+                logger.warning(force_text(e))
             self._session_key = None
             return {}
 
