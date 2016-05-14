@@ -13,7 +13,7 @@ class QueryWrapper(object):
 
     def __init__(self, q, ordering):
         self.q = q
-        self.order_by = ordering
+        self.order_by = ordering or []
 
 class QuerySet(qs.QuerySet):
     """
