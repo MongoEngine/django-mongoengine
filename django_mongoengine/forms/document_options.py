@@ -58,6 +58,7 @@ class DocumentMetaWrapper(object):
     concrete_fields = []
     proxied_children = []
     parents = {}
+    private_fields = []
     many_to_many = []
     swapped = False
     _field_cache = None

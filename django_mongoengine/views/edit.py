@@ -14,7 +14,13 @@ djmod = get_patched_django_module(
     )
 )
 
-class WrapDocumentForm(WrapDocument, djmod.FormMixinBase):
+try:
+    FormMixin = djmod.FormMixinBase
+except AttributeError:
+    # django 1.10
+    FormMixin = djmod.FormMixin
+
+class WrapDocumentForm(WrapDocument, FormMixin):
     pass
 
 
