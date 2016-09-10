@@ -356,7 +356,8 @@ class MongoUser(models.Model):
     """
 
     objects = MongoUserManager()
-
+    is_anonymous = False
+    is_authenticated = False
     class Meta:
         app_label = 'mongo_auth'
 
