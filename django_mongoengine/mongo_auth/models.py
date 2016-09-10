@@ -1,7 +1,10 @@
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.contrib.auth.models import _user_has_perm, _user_get_all_permissions, _user_has_module_perms
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    _user_has_perm, _user_get_all_permissions, _user_has_module_perms,
+)
 from django.db import models
 from django.contrib.contenttypes.models import ContentTypeManager
 from django.contrib import auth
@@ -37,6 +40,12 @@ except ImportError:
         salt = get_hexdigest(algo, str(random()), str(random()))[:5]
         hash = get_hexdigest(algo, salt, raw_password)
         return '%s$%s$%s' % (algo, salt, hash)
+
+
+class BaseUser(object):
+
+    is_anonymous = AbstractBaseUser.is_anonymous
+    is_authenticated = AbstractBaseUser.is_authenticated
 
 
 class ContentType(document.Document):
@@ -160,7 +169,7 @@ class Group(document.Document):
         return self.name
 
 
-class User(document.Document):
+class User(BaseUser, document.Document):
     """A User document that aims to mirror most of the API specified by Django
     at http://docs.djangoproject.com/en/dev/topics/auth/#users
     """
@@ -221,12 +230,6 @@ class User(document.Document):
         """
         full_name = u'%s %s' % (self.first_name or '', self.last_name or '')
         return full_name.strip()
-
-    def is_anonymous(self):
-        return False
-
-    def is_authenticated(self):
-        return True
 
     def set_password(self, raw_password):
         """Sets the user's password - always use this rather than directly
@@ -344,8 +347,9 @@ class User(document.Document):
         return self._profile_cache
 
 
-class MongoUser(models.Model):
-    """"Dummy user model for Django.
+class MongoUser(BaseUser, models.Model):
+    """"
+    Dummy user model for Django.
 
     MongoUser is used to replace Django's UserManager with MongoUserManager.
     The actual user document class is django_mongoengine.auth.models.User or any
@@ -356,13 +360,13 @@ class MongoUser(models.Model):
     """
 
     objects = MongoUserManager()
-    is_anonymous = False
-    is_authenticated = False
+
     class Meta:
         app_label = 'mongo_auth'
 
     def set_password(self, password):
         """Doesn't do anything, but works around the issue with Django 1.6."""
         make_password(password)
+
 
 MongoUser._meta.pk.to_python = ObjectId
