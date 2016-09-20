@@ -44,8 +44,8 @@ except ImportError:
 
 class BaseUser(object):
 
-    is_anonymous = AbstractBaseUser.is_anonymous
-    is_authenticated = AbstractBaseUser.is_authenticated
+    is_anonymous = AbstractBaseUser.__dict__['is_anonymous']
+    is_authenticated = AbstractBaseUser.__dict__['is_authenticated']
 
 
 class ContentType(document.Document):
