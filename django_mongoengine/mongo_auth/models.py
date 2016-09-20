@@ -169,7 +169,7 @@ class Group(document.Document):
         return self.name
 
 
-class User(BaseUser, document.Document):
+class AbstractUser(BaseUser, document.Document):
     """A User document that aims to mirror most of the API specified by Django
     at http://docs.djangoproject.com/en/dev/topics/auth/#users
     """
@@ -216,7 +216,7 @@ class User(BaseUser, document.Document):
     REQUIRED_FIELDS = ['email']
 
     meta = {
-        'allow_inheritance': True,
+        'abstract': True,
         'indexes': [
             {'fields': ['username'], 'unique': True, 'sparse': True}
         ]
@@ -346,6 +346,9 @@ class User(BaseUser, document.Document):
                 raise SiteProfileNotAvailable
         return self._profile_cache
 
+
+class User(AbstractUser):
+    meta = {'allow_inheritance': True}
 
 class MongoUser(BaseUser, models.Model):
     """"
