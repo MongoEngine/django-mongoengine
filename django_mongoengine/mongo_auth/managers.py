@@ -79,4 +79,4 @@ class MongoUserManager(UserManager):
         raise NotImplementedError
 
     def get_queryset(self):
-        return self.model.objects
+        return get_user_document().objects
