@@ -169,7 +169,7 @@ class Group(document.Document):
         return self.name
 
 
-class User(BaseUser, document.Document):
+class User(document.Document):
     """A User document that aims to mirror most of the API specified by Django
     at http://docs.djangoproject.com/en/dev/topics/auth/#users
     """
@@ -224,6 +224,20 @@ class User(BaseUser, document.Document):
 
     def __unicode__(self):
         return self.username
+
+    def is_anonymous(self):
+        """
+        Always returns False. This is a way of comparing User objects to
+        anonymous users.
+        """
+        return False
+
+    def is_authenticated(self):
+        """
+        Always return True. This is a way to tell if the user has been
+        authenticated in templates.
+        """
+        return True
 
     def get_full_name(self):
         """Returns the users first and last names, separated by a space.
