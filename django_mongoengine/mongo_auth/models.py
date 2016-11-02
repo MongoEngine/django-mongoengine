@@ -174,8 +174,8 @@ class AbstractUser(BaseUser, document.Document):
     at http://docs.djangoproject.com/en/dev/topics/auth/#users
     """
     username = fields.StringField(
-        max_length=30, verbose_name=_('username'),
-        help_text=_("Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"),
+        max_length=150, verbose_name=_('username'),
+        help_text=_("Required. 150 characters or fewer. Letters, numbers and @/./+/-/_ characters"),
     )
 
     first_name = fields.StringField(
