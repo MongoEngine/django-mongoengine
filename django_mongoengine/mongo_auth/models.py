@@ -1,6 +1,7 @@
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser,
     _user_has_perm, _user_get_all_permissions, _user_has_module_perms,
@@ -212,8 +213,8 @@ class AbstractUser(BaseUser, document.Document):
         fields.ReferenceField(Permission), verbose_name=_('user permissions'),
         blank=True, help_text=_('Permissions for the user.'))
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = getattr(settings, 'MONGOENGINE_USERNAME_FIELDS', 'username')
+    REQUIRED_FIELDS = getattr(settings, 'MONGOENGINE_USER_REQUIRED_FIELDS', ['email'])
 
     meta = {
         'abstract': True,
@@ -323,7 +324,6 @@ class AbstractUser(BaseUser, document.Document):
         SiteProfileNotAvailable if this site does not allow profiles.
         """
         if not hasattr(self, '_profile_cache'):
-            from django.conf import settings
             if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
                 raise SiteProfileNotAvailable('You need to set AUTH_PROFILE_MO'
                                               'DULE in your project settings')
