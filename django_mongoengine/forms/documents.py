@@ -7,7 +7,7 @@ from django.forms import models as model_forms
 from django.utils import six
 
 from mongoengine.fields import ObjectIdField, FileField
-from mongoengine.base import ValidationError
+from mongoengine.errors import ValidationError
 
 
 def construct_instance(form, instance, fields=None, exclude=None):
