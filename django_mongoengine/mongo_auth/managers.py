@@ -70,7 +70,7 @@ class MongoUserManager(UserManager):
     def get(self, *args, **kwargs):
         try:
             return self.get_queryset().get(*args, **kwargs)
-        except self.model.DoesNotExist:
+        except get_user_document().DoesNotExist:
             # ModelBackend expects this exception
             raise self.dj_model.DoesNotExist
 
