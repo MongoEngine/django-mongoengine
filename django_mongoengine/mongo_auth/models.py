@@ -250,10 +250,10 @@ class AbstractUser(BaseUser, document.Document):
         return check_password(raw_password, self.password)
 
     @classmethod
-    def create_user(cls, username, password, email=None):
+    def _create_user(cls, username, password, email=None, create_superuser=False):
         """Create (and save) a new user with the given username, password and
-        email address.
-        """
+                email address.
+                """
         now = timezone.now()
 
         # Normalize the address by lowercasing the domain part of the email
@@ -268,8 +268,19 @@ class AbstractUser(BaseUser, document.Document):
 
         user = cls(username=username, email=email, date_joined=now)
         user.set_password(password)
+        if create_superuser:
+            user.is_staff = True
+            user.is_superuser = True
         user.save()
         return user
+
+    @classmethod
+    def create_user(cls, username, password, email=None):
+        return cls._create_user(username, password, email)
+
+    @classmethod
+    def create_superuser(cls, username, password, email=None):
+        return cls._create_user(username, password, email, create_superuser=True)
 
     def get_group_permissions(self, obj=None):
         """
