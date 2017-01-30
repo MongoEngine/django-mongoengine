@@ -6,8 +6,8 @@ import re
 import sys
 from optparse import make_option
 
-from django_mongoengine.mongo_auth import MongoUser
-from django_mongoengine.connection import DEFAULT_CONNECTION_NAME
+from django_mongoengine.mongo_auth.models import MongoUser
+from django_mongoengine.sessions import DEFAULT_CONNECTION_NAME
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import ugettext as _
