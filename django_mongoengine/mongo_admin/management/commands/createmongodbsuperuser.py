@@ -29,23 +29,27 @@ def is_valid_email(value):
 
 class Command(BaseCommand):
     help = 'Used to create a superuser.'
-    
+
     def add_arguments(self, parser):
-        """
-        add custom arguments.
-        """
-        parser.add_argument('--username', dest='username', default=None,
-                            help='Specifies the username for the superuser.')
-        parser.add_argument('--email', dest='email', default=None,
-                            help='Specifies the email address for the superuser.')
-        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
-                            help=('Tells Django to NOT prompt the user for input of any kind. '
-                                  'You must use --username and --email with --noinput, and '
-                                  'superusers created with --noinput will not be able to log '
-                                  'in until they\'re given a valid password.'))
-        parser.add_argument('--database', action='store', dest='database',
-                            default=DEFAULT_CONNECTION_NAME,
-                            help='Specifies the database to use. Default is "default".')
+        parser.add_argument(
+            '--username', dest='username', default=None,
+            help='Specifies the username for the superuser.'
+        )
+        parser.add_argument(
+            '--email', dest='email', default=None,
+            help='Specifies the email address for the superuser.'
+        )
+        parser.add_argument(
+            '--noinput', action='store_false', dest='interactive', default=True,
+            help=('Tells Django to NOT prompt the user for input of any kind. '
+                  'You must use --username and --email with --noinput, and '
+                  'superusers created with --noinput will not be able to log '
+                  'in until they\'re given a valid password.')
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database',
+            default=DEFAULT_CONNECTION_NAME, help='Specifies the database to use. Default is "default".'
+        )
 
     def handle(self, *args, **options):
         username = options.get('username', None)
@@ -80,7 +84,10 @@ class Command(BaseCommand):
                         input_msg = 'Username'
                         if default_username:
                             input_msg += ' (leave blank to use %r)' % default_username
-                        username = input(input_msg + ': ')
+                        if sys.version_info < (3,):
+                            username = raw_input(input_msg + ': ')
+                        else:
+                            username = input(input_msg + ': ')
                     if default_username and username == '':
                         username = default_username
                     if not RE_VALID_USERNAME.match(username):
@@ -98,7 +105,10 @@ class Command(BaseCommand):
                 # Get an email
                 while 1:
                     if not email:
-                        email = input('E-mail address: ')
+                        if sys.version_info < (3,):
+                            email = raw_input('E-mail address: ')
+                        else:
+                            email = input('E-mail address: ')
                     try:
                         is_valid_email(email)
                     except exceptions.ValidationError:

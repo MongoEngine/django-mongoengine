@@ -5,6 +5,7 @@ from django.contrib.auth.models import UserManager
 from django.db.models import CharField, BooleanField, DateTimeField, DateField
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from mongoengine.errors import DoesNotExist
 
 
 MONGOENGINE_USER_DOCUMENT = getattr(
@@ -86,7 +87,7 @@ class MongoUserManager(UserManager):
     def get(self, *args, **kwargs):
         try:
             return self.get_queryset().get(*args, **kwargs)
-        except get_user_document().DoesNotExist:
+        except DoesNotExist:
             # ModelBackend expects this exception
             raise self.dj_model.DoesNotExist
 
@@ -97,22 +98,9 @@ class MongoUserManager(UserManager):
     def get_queryset(self):
         return get_user_document().objects
 
-    def _create_user(self, username, email, password,
-                     is_staff, is_superuser, **extra_fields):
-        """Create (and save) a new user with the given username, password and
-        email address.
+    def create_superuser(self, username, email, password, **extra_fields):
+        """since we use mongo as our database, we don't use
+        django's rule to create a superuser, such as 'python manage.py createsuperuser'.
+        We use mongo's rule --'python manage.py createmongosuperuser instead.
         """
-        now = timezone.now()
-        if not username:
-            raise ValueError('The given username must be set')
-        email = self.normalize_email(email)
-        model = get_user_document()
-        print(self.__dict__)
-        print(self.model.__dict__)
-        user = model(username=username, email=email,
-                          is_staff=is_staff, is_active=True,
-                          is_superuser=is_superuser,
-                          date_joined=now, **extra_fields)
-        user.set_password(password)
-        user.save()
-        return user
+        return get_user_document().create_superuser(username, password, email)

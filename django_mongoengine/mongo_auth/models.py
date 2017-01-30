@@ -249,6 +249,39 @@ class AbstractUser(BaseUser, document.Document):
         """
         return check_password(raw_password, self.password)
 
+    @classmethod
+    def _create_user(cls, username, password, email=None, create_superuser=False):
+        """Create (and save) a new user with the given username, password and
+                email address.
+                """
+        now = timezone.now()
+
+        # Normalize the address by lowercasing the domain part of the email
+        # address.
+        if email is not None:
+            try:
+                email_name, domain_part = email.strip().split('@', 1)
+            except ValueError:
+                pass
+            else:
+                email = '@'.join([email_name, domain_part.lower()])
+
+        user = cls(username=username, email=email, date_joined=now)
+        user.set_password(password)
+        if create_superuser:
+            user.is_staff = True
+            user.is_superuser = True
+        user.save()
+        return user
+
+    @classmethod
+    def create_user(cls, username, password, email=None):
+        return cls._create_user(username, password, email)
+
+    @classmethod
+    def create_superuser(cls, username, password, email=None):
+        return cls._create_user(username, password, email, create_superuser=True)
+
     def get_group_permissions(self, obj=None):
         """
         Returns a list of permission strings that this user has through his/her
