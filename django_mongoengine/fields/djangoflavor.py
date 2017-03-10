@@ -207,7 +207,10 @@ class DateTimeField(DjangoField):
 class ReferenceField(DjangoField):
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': formfields.ReferenceField}
+        defaults = {
+          'form_class': formfields.ReferenceField,
+          'queryset': self.document_type.objects,
+        }
         defaults.update(kwargs)
         return super(ReferenceField, self).formfield(**defaults)
 
