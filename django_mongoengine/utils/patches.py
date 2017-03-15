@@ -1,4 +1,4 @@
-from mongoengine.errors import FieldDoesNotExist
+from django.db.models.fields import FieldDoesNotExist
 
 def serializable_value(self, field_name):
     """
