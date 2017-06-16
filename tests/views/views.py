@@ -147,7 +147,6 @@ class SpecializedAuthorUpdate(views.UpdateView):
     form_class = AuthorForm
     template_name = 'views/form.html'
     context_object_name = 'thingy'
-    fields = "__all__"
 
     def get_success_url(self):
         return reverse('author_detail', args=[self.object.id])
