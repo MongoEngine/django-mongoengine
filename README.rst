@@ -2,7 +2,7 @@
 Django-MongoEngine
 ==================
 
-.. image:: https://travis-ci.org/MongoEngine/django-mongoengine.svg?branch=dev
+.. image:: https://travis-ci.org/MongoEngine/django-mongoengine.svg?branch=master
    :alt: build status
    :target: https://travis-ci.org/MongoEngine/django-mongoengine
 
