@@ -49,7 +49,6 @@ class TestCase(MongoTestCase):
         }).save()
 
 
-from .base import *   # noqa
 from .detail import * # noqa
 from .edit import *   # noqa
 from .list import *   # noqa
