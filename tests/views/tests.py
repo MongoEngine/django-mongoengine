@@ -10,7 +10,8 @@ from .models import Artist, Author, Book, Page
 
 
 class TestCase(MongoTestCase):
-    def _fixture_setup(self):
+
+    def setUp(self):
         Artist.drop_collection()
         Author.drop_collection()
         Book.drop_collection()
@@ -37,6 +38,7 @@ class TestCase(MongoTestCase):
             "name": "Dreaming in Code",
             "slug": "dreaming-in-code",
             "pages": "300",
+            "authors": [scott],
             "pubdate": datetime.datetime(2006, 5, 1)
         }).save()
 

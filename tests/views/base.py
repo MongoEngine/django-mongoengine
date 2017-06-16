@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from django.test import RequestFactory
 from django.views.generic import View, TemplateView, RedirectView
 
-from tests import MongoTestCase as TestCase
+from tests import MongoTestCase
 
 
 class SimpleView(View):
@@ -180,7 +180,7 @@ class ViewTest(unittest.TestCase):
         self.assertTrue(DecoratedDispatchView.as_view().is_decorated)
 
 
-class TemplateViewTest(TestCase):
+class TemplateViewTest(MongoTestCase):
 
     rf = RequestFactory()
 

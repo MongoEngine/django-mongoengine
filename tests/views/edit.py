@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 from __future__ import absolute_import, division, print_function
-
-from unittest import TestCase, expectedFailure
+import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
@@ -12,17 +11,19 @@ from django_mongoengine import forms
 
 from tests import MongoTestCase
 from .models import Artist, Author
+from .tests import TestCase
 
 from . import views
 
 
-class FormMixinTests(TestCase):
+class FormMixinTests(unittest.TestCase):
     def test_initial_data(self):
         """ Test instance independence of initial data dict (see #16138) """
         initial_1 = FormMixin().get_initial()
         initial_1['foo'] = 'bar'
         initial_2 = FormMixin().get_initial()
         self.assertNotEqual(initial_1, initial_2)
+
 
 class CreateViewTests(MongoTestCase):
 
@@ -120,6 +121,7 @@ class CreateViewTests(MongoTestCase):
         except ImproperlyConfigured:
             pass
 
+
 class UpdateViewTests(TestCase):
 
     def setUp(self):
@@ -146,7 +148,7 @@ class UpdateViewTests(TestCase):
         self.assertQuerysetEqual(Author.objects.all(),
                                  ['<Author: Randall Munroe (xkcd)>'])
 
-    @expectedFailure
+    @unittest.expectedFailure
     def test_update_put(self):
         a = Author.objects.create(id='1',
                                   name='Randall Munroe',
