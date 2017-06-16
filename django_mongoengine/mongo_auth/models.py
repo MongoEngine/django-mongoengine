@@ -160,7 +160,7 @@ class Group(document.Document):
     e-mail messages.
     """
     name = fields.StringField(max_length=80, unique=True, verbose_name=_('name'))
-    permissions = fields.ListField(fields.ReferenceField(Permission, verbose_name=_('permissions'), required=False))
+    permissions = fields.ListField(fields.ReferenceField(Permission, verbose_name=_('permissions')))
 
     class Meta:
         verbose_name = _('group')

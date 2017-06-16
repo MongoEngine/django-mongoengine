@@ -8,18 +8,18 @@ import datetime
 
 class Comment(EmbeddedDocument):
     created_at = fields.DateTimeField(
-        default=datetime.datetime.now, required=True, editable=False,
+        default=datetime.datetime.now, editable=False,
     )
-    author = fields.StringField(verbose_name="Name", max_length=255, required=True)
-    email  = fields.EmailField(verbose_name="Email")
-    body = fields.StringField(verbose_name="Comment", required=True)
+    author = fields.StringField(verbose_name="Name", max_length=255)
+    email  = fields.EmailField(verbose_name="Email", blank=True)
+    body = fields.StringField(verbose_name="Comment")
 
 class Post(Document):
     created_at = fields.DateTimeField(
-        default=datetime.datetime.now, required=True, editable=False,
+        default=datetime.datetime.now, editable=False,
     )
-    title = fields.StringField(max_length=255, required=True)
-    slug = fields.StringField(max_length=255, required=True, primary_key=True)
+    title = fields.StringField(max_length=255)
+    slug = fields.StringField(max_length=255, primary_key=True)
     comments = fields.ListField(fields.EmbeddedDocumentField('Comment'))
 
     def get_absolute_url(self):
@@ -40,22 +40,22 @@ class Post(Document):
 
 
 class BlogPost(Post):
-    body = fields.StringField(required=True)
+    body = fields.StringField()
 
 
 class Video(Post):
-    embed_code = fields.StringField(required=True)
+    embed_code = fields.StringField()
 
 
 class Image(Post):
-    image = fields.ImageField(required=True)
+    image = fields.ImageField()
 
 
 class Quote(Post):
-    body = fields.StringField(required=True)
-    author = fields.StringField(verbose_name="Author Name", required=True, max_length=255)
+    body = fields.StringField()
+    author = fields.StringField(verbose_name="Author Name", max_length=255)
 
 
 class Music(Post):
-    url = fields.StringField(max_length=100, verbose_name="Music Url", required=True)
-    music_parameters = fields.DictField(verbose_name="Music Parameters", required=True)
+    url = fields.StringField(max_length=100, verbose_name="Music Url")
+    music_parameters = fields.DictField(verbose_name="Music Parameters")
