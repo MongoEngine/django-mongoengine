@@ -4,6 +4,7 @@ import warnings
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.text import capfirst
 from django.utils.encoding import smart_text
+from django.db.models.options import Options
 
 try:
     from django.db.models.options import get_verbose_name
@@ -64,6 +65,8 @@ class DocumentMetaWrapper(object):
     _field_cache = None
     document = None
     _meta = None
+    default_apps = Options.default_apps
+    app_config = Options.__dict__["app_config"]
 
     def __init__(self, document):
         if isinstance(document._meta, DocumentMetaWrapper):
@@ -76,6 +79,7 @@ class DocumentMetaWrapper(object):
         self.concrete_model = document
         self.concrete_fields = document._fields.values()
         self.fields = self.concrete_fields
+        self.apps = self.default_apps
 
         try:
             self.object_name = self.document.__name__
