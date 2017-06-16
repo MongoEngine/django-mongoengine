@@ -1,5 +1,6 @@
 from django.utils.text import capfirst
 from django.core.validators import RegexValidator
+from django.core.exceptions import ImproperlyConfigured
 from django import forms
 from django.db.models import Field
 from django.utils.functional import cached_property
@@ -24,6 +25,8 @@ class DjangoField(object):
     def __init__(self, *args, **kwargs):
         for k, v in _field_defaults:
             kwargs.setdefault(k, v)
+        if "required" in kwargs:
+            raise ImproperlyConfigured("`required` option is not supported. Use Django-style `blank` instead.")
         kwargs["required"] = not kwargs["blank"]
         super(DjangoField, self).__init__(*args, **kwargs)
         if self.verbose_name is None and self.name:
