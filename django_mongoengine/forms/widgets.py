@@ -95,6 +95,7 @@ class Dictionary(MultiWidget):
             for widget in self.widgets:
                 widget.is_localized = self.is_localized
         output = []
+        attrs = attrs or {}
         final_attrs = self.build_attrs(attrs)
         id_ = final_attrs.get('id')
         for i, widget in enumerate(self.widgets):
