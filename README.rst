@@ -74,19 +74,21 @@ and define fields using ``django_mongoengine.fields``.::
 
     class Comment(EmbeddedDocument):
         created_at = fields.DateTimeField(
-            default=datetime.datetime.now, required=True, editable=False,
+            default=datetime.datetime.now, editable=False,
         )
-        author = fields.StringField(verbose_name="Name", max_length=255, required=True)
+        author = fields.StringField(verbose_name="Name", max_length=255)
         email  = fields.EmailField(verbose_name="Email")
-        body = fields.StringField(verbose_name="Comment", required=True)
+        body = fields.StringField(verbose_name="Comment",)
 
     class Post(Document):
         created_at = fields.DateTimeField(
-            default=datetime.datetime.now, required=True, editable=False,
+            default=datetime.datetime.now, editable=False,
         )
-        title = fields.StringField(max_length=255, required=True)
-        slug = fields.StringField(max_length=255, required=True, primary_key=True)
-        comments = fields.ListField(fields.EmbeddedDocumentField('Comment'))
+        title = fields.StringField(max_length=255)
+        slug = fields.StringField(max_length=255, primary_key=True)
+        comments = fields.ListField(
+            fields.EmbeddedDocumentField('Comment'), blank=True,
+        )
 
 
 Sessions
