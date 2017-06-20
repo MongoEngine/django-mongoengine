@@ -78,7 +78,7 @@ and define fields using ``django_mongoengine.fields``.::
         )
         author = fields.StringField(verbose_name="Name", max_length=255)
         email  = fields.EmailField(verbose_name="Email")
-        body = fields.StringField(verbose_name="Comment",)
+        body = fields.StringField(verbose_name="Comment")
 
     class Post(Document):
         created_at = fields.DateTimeField(
