@@ -65,7 +65,10 @@ class DocumentMetaWrapper(object):
     _field_cache = None
     document = None
     _meta = None
-    default_apps = Options.default_apps
+    try:
+        default_apps = Options.default_apps
+    except AttributeError:
+        pass
     app_config = Options.__dict__["app_config"]
 
     def __init__(self, document):
@@ -79,8 +82,10 @@ class DocumentMetaWrapper(object):
         self.concrete_model = document
         self.concrete_fields = document._fields.values()
         self.fields = self.concrete_fields
-        self.apps = self.default_apps
-
+        try:
+            self.apps = self.default_apps
+        except AttributeError:
+            pass
         try:
             self.object_name = self.document.__name__
         except AttributeError:
