@@ -130,13 +130,21 @@ class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
                 # fields from the model"
                 opts.fields = None
 
-            fields = model_forms.fields_for_model(
-                opts.model, opts.fields, opts.exclude,
-                opts.widgets, formfield_callback,
-                opts.localized_fields, opts.labels,
-                opts.help_texts, opts.error_messages,
-                opts.field_classes,
-            )
+            if hasattr(opts, 'field_classes'):
+                fields = model_forms.fields_for_model(
+                    opts.model, opts.fields, opts.exclude,
+                    opts.widgets, formfield_callback,
+                    opts.localized_fields, opts.labels,
+                    opts.help_texts, opts.error_messages,
+                    opts.field_classes,
+                ) 
+            else:
+                fields = model_forms.fields_for_model(
+                    opts.model, opts.fields, opts.exclude,
+                    opts.widgets, formfield_callback,
+                    opts.localized_fields, opts.labels,
+                    opts.help_texts, opts.error_messages,
+                )
 
             # make sure opts.fields doesn't specify an invalid field
             none_model_fields = [k for k, v in six.iteritems(fields) if not v]
