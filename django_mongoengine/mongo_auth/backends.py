@@ -1,4 +1,4 @@
-from django.contrib import auth
+from django.contrib.auth import backends as django_backends
 
 
 class MongoEngineBackend(object):
@@ -9,9 +9,9 @@ class MongoEngineBackend(object):
     supports_anonymous_user = False
     supports_inactive_user = False
 
-    authenticate = auth.backends.ModelBackend.__dict__["authenticate"]
-    get_user = auth.backends.ModelBackend.__dict__["get_user"]
+    authenticate = django_backends.ModelBackend.__dict__["authenticate"]
+    get_user = django_backends.ModelBackend.__dict__["get_user"]
     try:
-        user_can_authenticate = auth.backends.ModelBackend.__dict__["user_can_authenticate"]
+        user_can_authenticate = django_backends.ModelBackend.__dict__["user_can_authenticate"]
     except KeyError:
         pass # it's okay for django < 1.9
