@@ -20,7 +20,7 @@ class Post(Document):
     )
     title = fields.StringField(max_length=255)
     slug = fields.StringField(max_length=255, primary_key=True)
-    comments = fields.ListField(fields.EmbeddedDocumentField('Comment'))
+    comments = fields.ListField(fields.EmbeddedDocumentField('Comment'), default=[])
 
     def get_absolute_url(self):
         return reverse('post', kwargs={"slug": self.slug})
