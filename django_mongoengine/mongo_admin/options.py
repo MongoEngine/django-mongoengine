@@ -432,7 +432,8 @@ class DocumentAdmin(BaseDocumentAdmin):
             content_type=get_content_type_for_model(model)
         ).select_related().order_by('action_time')
 
-        context = dict(self.admin_site.each_context(request),
+        context = dict(
+            self.admin_site.each_context(request),
             title=_('Change history: %s') % force_text(obj),
             action_list=action_list,
             module_name=capfirst(force_text(opts.verbose_name_plural)),
