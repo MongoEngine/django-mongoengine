@@ -13,10 +13,10 @@ _field_defaults = (
     ("editable", True),
     ("blank", False),
     ("null", False),
-    ("verbose_name", None),
-    ("help_text", None),
+    ("help_text", ""),
     ("auto_created", False),
 )
+
 
 class DjangoField(object):
 
@@ -28,9 +28,18 @@ class DjangoField(object):
         if "required" in kwargs:
             raise ImproperlyConfigured("`required` option is not supported. Use Django-style `blank` instead.")
         kwargs["required"] = not kwargs["blank"]
+        self.verbose_name = kwargs.pop("verbose_name", None)
         super(DjangoField, self).__init__(*args, **kwargs)
-        if self.verbose_name is None and self.name:
-            self.verbose_name = self.name.replace('_', ' ')
+        self.remote_field = None
+        self.is_relation = self.remote_field is not None
+
+    def _get_verbose_name(self):
+        return self._verbose_name or self.db_field.replace('_', ' ')
+
+    def _set_verbose_name(self, val):
+        self._verbose_name = val
+
+    verbose_name = property(_get_verbose_name, _set_verbose_name)
 
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
         """
