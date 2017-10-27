@@ -1,3 +1,6 @@
+import operator
+from functools import reduce
+
 from django import forms
 from django.forms.formsets import all_valid
 from django.core.urlresolvers import reverse
@@ -26,6 +29,8 @@ from django.forms.forms import pretty_name
 from django.conf import settings
 from django.apps import apps
 
+from mongoengine import Q
+
 from django_mongoengine.utils import force_text
 from django_mongoengine.fields import (ListField, EmbeddedDocumentField,
                                        ReferenceField, StringField)
@@ -47,6 +52,7 @@ djmod = get_patched_django_module(
     "django.contrib.admin.options",
     get_content_type_for_model=get_content_type_for_model,
 )
+
 
 class BaseDocumentAdmin(djmod.BaseModelAdmin):
     """Functionality common to both ModelAdmin and InlineAdmin."""
@@ -120,7 +126,6 @@ class BaseDocumentAdmin(djmod.BaseModelAdmin):
                 )
         return db_field.formfield(**kwargs)
 
-
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
         """
         Get a form Field for a ManyToManyField.
@@ -152,7 +157,6 @@ class BaseDocumentAdmin(djmod.BaseModelAdmin):
 @copy_class(djmod.ModelAdmin)
 class DocumentAdmin(BaseDocumentAdmin):
     "Encapsulates all admin options and functionality for a given model."
-
 
     def __init__(self, model, admin_site):
         self.model = model
@@ -204,11 +208,9 @@ class DocumentAdmin(BaseDocumentAdmin):
         kwargs.setdefault("form", DocumentForm)
         return super(DocumentAdmin, self).get_changelist_form(request, **kwargs)
 
-
     def get_changelist_formset(self, request, **kwargs):
         kwargs.setdefault("form", DocumentForm)
         return super(DocumentAdmin, self).get_changelist_formset(request, **kwargs)
-
 
     def log_addition(self, request, object, message):
         """
@@ -219,7 +221,6 @@ class DocumentAdmin(BaseDocumentAdmin):
         if not self.log:
             return
         super(DocumentAdmin, self).log_addition(request, object, message)
-
 
     def log_change(self, request, object, message):
         """
@@ -341,7 +342,6 @@ class DocumentAdmin(BaseDocumentAdmin):
 
         return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
 
-
     @csrf_protect_m
     def delete_view(self, request, object_id, extra_context=None):
         "The 'delete' admin view for this model."
@@ -449,6 +449,34 @@ class DocumentAdmin(BaseDocumentAdmin):
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
         ], context)
+
+    def get_search_results(self, request, queryset, search_term):
+        """
+        Returns a tuple containing a queryset to implement the search,
+        and a boolean indicating if the results may contain duplicates.
+        """
+        # Apply keyword searches.
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
+        use_distinct = False
+        search_fields = self.get_search_fields(request)
+        if search_fields and search_term:
+            orm_lookups = [construct_search(str(search_field))
+                           for search_field in search_fields]
+            for bit in search_term.split():
+                or_queries = [Q(**{orm_lookup: bit})
+                              for orm_lookup in orm_lookups]
+                queryset = queryset.filter(reduce(operator.or_, or_queries))
+
+        return queryset, use_distinct
 
 
 class InlineDocumentAdmin(BaseDocumentAdmin):
