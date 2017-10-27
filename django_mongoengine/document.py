@@ -8,6 +8,7 @@ from .utils.patches import serializable_value
 from .forms.document_options import DocumentMetaWrapper
 from .queryset import QuerySetManager
 
+
 def django_meta(meta, *top_bases):
     class metaclass(meta):
         def __new__(cls, name, bases, attrs):
@@ -28,6 +29,7 @@ def django_meta(meta, *top_bases):
             return new_cls
 
     return type.__new__(metaclass, 'temporary_meta', (), {})
+
 
 class DjangoFlavor(object):
     objects = QuerySetManager()
