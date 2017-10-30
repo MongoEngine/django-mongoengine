@@ -4,9 +4,10 @@ from mongoengine.base import TopLevelDocumentMetaclass
 
 from django_mongoengine.mongo_admin.options import DocumentAdmin
 from django_mongoengine.forms.document_options import DocumentMetaWrapper
-#from django_mongoengine.mongo_admin import actions
+# from django_mongoengine.mongo_admin import actions
 
 system_check_errors = []
+
 
 class AdminSite(sites.AdminSite):
     index_template = "mongo_admin/index.html"
@@ -30,4 +31,4 @@ class AdminSite(sites.AdminSite):
 
 # This global object represents the default admin site, for the common case.
 # You can instantiate AdminSite in your own code to create a custom admin site.
-site = AdminSite(name="mongoadmin")
+site = AdminSite(name="mongo_admin")
