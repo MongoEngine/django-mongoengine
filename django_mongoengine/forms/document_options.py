@@ -61,6 +61,7 @@ class DocumentMetaWrapper(object):
     parents = {}
     private_fields = []
     many_to_many = []
+    related_fkey_lookups = []
     swapped = False
     _field_cache = None
     document = None
