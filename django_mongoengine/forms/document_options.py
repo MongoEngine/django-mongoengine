@@ -114,8 +114,11 @@ class DocumentMetaWrapper(object):
         return self.model_name
 
     def get_app_label(self):
-        model_module = sys.modules[self.document.__module__]
-        return model_module.__name__.split('.')[-2]
+        if 'app_label' in self._meta:
+            return self._meta['app_label']
+        else:
+            model_module = sys.modules[self.document.__module__]
+            return model_module.__name__.split('.')[-2]
 
     def get_verbose_name(self):
         """
