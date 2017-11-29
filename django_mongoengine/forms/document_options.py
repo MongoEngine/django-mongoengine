@@ -53,6 +53,7 @@ class DocumentMetaWrapper(object):
     model_name = None
     verbose_name = None
     has_auto_field = False
+    abstract = False
     object_name = None
     proxy = []
     virtual_fields = []
