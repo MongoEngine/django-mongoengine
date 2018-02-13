@@ -201,7 +201,7 @@ class DocumentMetaWrapper(object):
                 return self._field_cache[name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r'
-                    % (self.object_name, name))
+                                    % (self.object_name, name))
 
     def _init_field_cache(self):
         if self._field_cache is None:
