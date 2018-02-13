@@ -7,8 +7,7 @@ python:
   - "pypy"
 env:
   - DJANGO_VERSION=1.8.18
-  - DJANGO_VERSION=1.10.7
-  - DJANGO_VERSION=1.11.2
+  - DJANGO_VERSION=1.11.10
 # command to install dependencies
 install:
     - pip install -r requirements.txt
