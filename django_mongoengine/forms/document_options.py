@@ -72,6 +72,10 @@ class DocumentMetaWrapper(object):
     except AttributeError:
         pass
     app_config = Options.__dict__["app_config"]
+    try:
+        _property_names = Options.__dict__["_property_names"]
+    except AttributeError:
+        pass
 
     def __init__(self, document):
         if isinstance(document._meta, DocumentMetaWrapper):
