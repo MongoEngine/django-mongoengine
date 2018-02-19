@@ -1,5 +1,5 @@
 import operator
-from functools import reduce
+from functools import reduce, partial
 
 from django import forms
 from django.forms.formsets import all_valid
@@ -26,6 +26,7 @@ from django.utils.functional import curry
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 from django.forms.forms import pretty_name
+from django.forms.models import modelform_defines_fields
 from django.conf import settings
 from django.apps import apps
 
@@ -40,7 +41,7 @@ from django_mongoengine.mongo_admin.util import RelationWrapper
 from django_mongoengine.utils.wrappers import copy_class
 from django_mongoengine.utils.monkey import get_patched_django_module
 from django_mongoengine.forms.documents import (
-    DocumentForm,
+    DocumentForm, documentform_factory, documentformset_factory,
     inlineformset_factory, BaseInlineDocumentFormSet)
 
 
@@ -52,7 +53,6 @@ djmod = get_patched_django_module(
     "django.contrib.admin.options",
     get_content_type_for_model=get_content_type_for_model,
 )
-
 
 class BaseDocumentAdmin(djmod.BaseModelAdmin):
     """Functionality common to both ModelAdmin and InlineAdmin."""
@@ -205,12 +205,32 @@ class DocumentAdmin(BaseDocumentAdmin):
             self.inline_instances.append(inline_instance)
 
     def get_changelist_form(self, request, **kwargs):
-        kwargs.setdefault("form", DocumentForm)
-        return super(DocumentAdmin, self).get_changelist_form(request, **kwargs)
+        """
+        Returns a Form class for use in the Formset on the changelist page.
+        """
+        defaults = {
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
+        }
+        defaults.update(kwargs)
+        if defaults.get('fields') is None and not modelform_defines_fields(defaults.get('form')):
+            defaults['fields'] = forms.ALL_FIELDS
+
+        return documentform_factory(self.model, **defaults)
 
     def get_changelist_formset(self, request, **kwargs):
-        kwargs.setdefault("form", DocumentForm)
-        return super(DocumentAdmin, self).get_changelist_formset(request, **kwargs)
+        """
+        Returns a FormSet class for use on the changelist page if list_editable
+        is used.
+        """
+        defaults = {
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
+        }
+        defaults.update(kwargs)
+        return documentformset_factory(
+            self.model, self.get_changelist_form(request), extra=0,
+            fields=self.list_editable, **defaults
+        )
+
 
     def log_addition(self, request, object, message):
         """
