@@ -38,7 +38,8 @@ class DjangoFlavor(object):
     _get_pk_val = Model.__dict__["_get_pk_val"]
 
     def __init__(self, *args, **kwargs):
-        self._state = ModelState(self._meta.get("db_alias", me.DEFAULT_CONNECTION_NAME))
+        self._state = ModelState()
+        self._state.db = self._meta.get("db_alias", me.DEFAULT_CONNECTION_NAME)
         super(DjangoFlavor, self).__init__(*args, **kwargs)
 
     def _get_unique_checks(self, exclude=None):
