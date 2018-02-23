@@ -244,7 +244,7 @@ class UpdateViewTests(TestCase):
                                  ['<Author: Randall Munroe (author of xkcd)>'])
 
     def test_update_without_redirect(self):
-        try:
+        with self.assertRaises(ImproperlyConfigured):
             a = Author.objects.create(id='1',
                                       name='Randall Munroe',
                                       slug='randall-munroe', )
@@ -252,10 +252,6 @@ class UpdateViewTests(TestCase):
                 'id': '1',
                 'name': 'Randall Munroe (author of xkcd)',
                 'slug': 'randall-munroe'})
-            self.fail(
-                'Should raise exception -- No redirect URL provided, and no get_absolute_url provided')
-        except ImproperlyConfigured:
-            pass
 
     def test_update_get_object(self):
         a = Author.objects.create(pk='1',
