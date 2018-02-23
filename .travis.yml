@@ -6,7 +6,6 @@ python:
   - "3.5"
   - "pypy"
 env:
-  - DJANGO_VERSION=1.8.18
   - DJANGO_VERSION=1.11.10
 # command to install dependencies
 install:
