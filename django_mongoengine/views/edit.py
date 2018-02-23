@@ -20,6 +20,7 @@ except AttributeError:
     # django 1.10
     FormMixin = djmod.FormMixin
 
+
 class WrapDocumentForm(WrapDocument, FormMixin):
     pass
 
@@ -40,6 +41,7 @@ class DocumentFormFixin(SingleObjectMixin):
                     "No URL to redirect to.  Either provide a url or define"
                     " a get_absolute_url method on the Model.")
         return url
+
 
 @copy_class(djmod.CreateView)
 class CreateView(six.with_metaclass(
