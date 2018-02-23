@@ -52,14 +52,17 @@ class Document(django_meta(mtc.TopLevelDocumentMetaclass,
                            DjangoFlavor, me.Document)):
     swap_base = True
 
+
 class DynamicDocument(django_meta(mtc.TopLevelDocumentMetaclass,
                                   DjangoFlavor, me.DynamicDocument)):
     swap_base = True
+
 
 class EmbeddedDocument(django_meta(mtc.DocumentMetaclass,
                                    DjangoFlavor, me.EmbeddedDocument)):
     swap_base = True
 
+
 class DynamicEmbeddedDocument(django_meta(mtc.DocumentMetaclass,
-                                   DjangoFlavor, me.DynamicEmbeddedDocument)):
+                                          DjangoFlavor, me.DynamicEmbeddedDocument)):
     swap_base = True
