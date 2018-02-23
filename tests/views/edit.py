@@ -43,7 +43,7 @@ class CreateViewTests(MongoTestCase):
                                 'name': 'Randall Munroe',
                                 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(),
                                  ['<Author: Randall Munroe>'])
 
@@ -63,7 +63,7 @@ class CreateViewTests(MongoTestCase):
                                 'name': 'Rene Magritte'})
         self.assertEqual(res.status_code, 302)
         artist = Artist.objects.get(name='Rene Magritte')
-        self.assertRedirects(res, 'http://testserver/detail/artist/%s/' %
+        self.assertRedirects(res, '/detail/artist/%s/' %
                              artist.pk)
         self.assertQuerysetEqual(Artist.objects.all(),
                                  ['<Artist: Rene Magritte>'])
@@ -74,7 +74,7 @@ class CreateViewTests(MongoTestCase):
                                 'name': 'Randall Munroe',
                                 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/edit/authors/create/')
+        self.assertRedirects(res, '/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(),
                                  ['<Author: Randall Munroe>'])
 
@@ -87,7 +87,7 @@ class CreateViewTests(MongoTestCase):
                                  ['<Author: Randall Munroe>'])
         self.assertEqual(res.status_code, 302)
         pk = Author.objects.all()[0].pk
-        self.assertRedirects(res, 'http://testserver/edit/author/%s/update/' %
+        self.assertRedirects(res, '/edit/author/%s/update/' %
                              pk)
 
     def test_create_with_special_properties(self):
@@ -112,10 +112,10 @@ class CreateViewTests(MongoTestCase):
 
     def test_create_without_redirect(self):
         try:
-            self.client.post('/edit/authors/create/naive/',
-                                   {'id': 1,
-                                    'name': 'Randall Munroe',
-                                    'slug': 'randall-munroe'})
+            self.client.post('/edit/authors/create/naive/', {
+                'id': 1,
+                'name': 'Randall Munroe',
+                'slug': 'randall-munroe'})
             self.fail(
                 'Should raise exception -- No redirect URL provided, and no get_absolute_url provided')
         except ImproperlyConfigured:
@@ -144,7 +144,7 @@ class UpdateViewTests(TestCase):
                                 'name': 'Randall Munroe (xkcd)',
                                 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(),
                                  ['<Author: Randall Munroe (xkcd)>'])
 
@@ -165,7 +165,7 @@ class UpdateViewTests(TestCase):
         # the form will be invalid and redisplayed with errors (status code 200).
         # See also #12635
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(),
                                  ['<Author: Randall Munroe (author of xkcd)>'])
 
@@ -189,7 +189,7 @@ class UpdateViewTests(TestCase):
                                {'id': '1',
                                 'name': 'Rene Magritte'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/detail/artist/%s/' % a.pk)
+        self.assertRedirects(res, '/detail/artist/%s/' % a.pk)
         self.assertQuerysetEqual(Artist.objects.all(),
                                  ['<Artist: Rene Magritte>'])
 
@@ -202,7 +202,7 @@ class UpdateViewTests(TestCase):
                                 'name': 'Randall Munroe (author of xkcd)',
                                 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/edit/authors/create/')
+        self.assertRedirects(res, '/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(),
                                  ['<Author: Randall Munroe (author of xkcd)>'])
 
@@ -219,7 +219,7 @@ class UpdateViewTests(TestCase):
                                  ['<Author: Randall Munroe (author of xkcd)>'])
         self.assertEqual(res.status_code, 302)
         pk = Author.objects.all()[0].pk
-        self.assertRedirects(res, 'http://testserver/edit/author/%s/update/' %
+        self.assertRedirects(res, '/edit/author/%s/update/' %
                              pk)
 
     def test_update_with_special_properties(self):
@@ -239,7 +239,7 @@ class UpdateViewTests(TestCase):
                                 'name': 'Randall Munroe (author of xkcd)',
                                 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/detail/author/%s/' % a.pk)
+        self.assertRedirects(res, '/detail/author/%s/' % a.pk)
         self.assertQuerysetEqual(Author.objects.all(),
                                  ['<Author: Randall Munroe (author of xkcd)>'])
 
@@ -248,10 +248,10 @@ class UpdateViewTests(TestCase):
             a = Author.objects.create(id='1',
                                       name='Randall Munroe',
                                       slug='randall-munroe', )
-            self.client.post('/edit/author/%s/update/naive/' % a.pk,
-                                   {'id': '1',
-                                    'name': 'Randall Munroe (author of xkcd)',
-                                    'slug': 'randall-munroe'})
+            self.client.post('/edit/author/%s/update/naive/' % a.pk, {
+                'id': '1',
+                'name': 'Randall Munroe (author of xkcd)',
+                'slug': 'randall-munroe'})
             self.fail(
                 'Should raise exception -- No redirect URL provided, and no get_absolute_url provided')
         except ImproperlyConfigured:
@@ -274,7 +274,7 @@ class UpdateViewTests(TestCase):
                                 'name': 'Randall Munroe (xkcd)',
                                 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(),
                                  ['<Author: Randall Munroe (xkcd)>'])
 
@@ -297,7 +297,7 @@ class DeleteViewTests(MongoTestCase):
         # Deletion with POST
         res = self.client.post('/edit/author/%s/delete/' % a.pk)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_by_delete(self):
@@ -307,7 +307,7 @@ class DeleteViewTests(MongoTestCase):
                                      'slug': 'randall-munroe'})
         res = self.client.delete('/edit/author/%s/delete/' % a.pk)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_with_redirect(self):
@@ -316,7 +316,7 @@ class DeleteViewTests(MongoTestCase):
                                      'slug': 'randall-munroe'})
         res = self.client.post('/edit/author/%s/delete/redirect/' % a.pk)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/edit/authors/create/')
+        self.assertRedirects(res, '/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_with_special_properties(self):
@@ -332,7 +332,7 @@ class DeleteViewTests(MongoTestCase):
 
         res = self.client.post('/edit/author/%s/delete/special/' % a.pk)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_without_redirect(self):
