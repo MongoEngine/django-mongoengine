@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.views.generic.edit import FormMixin
 
 from django_mongoengine import forms

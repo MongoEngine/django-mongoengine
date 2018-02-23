@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
