@@ -263,6 +263,14 @@ class DocumentAdmin(BaseDocumentAdmin):
             return
         super(DocumentAdmin, self).log_deletion(request, object, object_repr)
 
+    def _media(self):
+        js = [
+            'vendor/jquery/jquery.min.js',
+            'jquery.init.js',
+        ]
+        return forms.Media(js=['%s%s' % ('admin/js/', url) for url in js])
+    media = property(_media)
+
     @csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
 
