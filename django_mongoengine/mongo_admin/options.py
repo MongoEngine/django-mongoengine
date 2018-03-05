@@ -263,6 +263,10 @@ class DocumentAdmin(BaseDocumentAdmin):
             return
         super(DocumentAdmin, self).log_deletion(request, object, object_repr)
 
+    @property
+    def media(self):
+        return djmod.ModelAdmin.media.fget(self)
+
     @csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
 
