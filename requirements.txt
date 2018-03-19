@@ -1,2 +1,2 @@
 django>=1.11
-mongoengine>=0.8.3
+mongoengine>=0.14
