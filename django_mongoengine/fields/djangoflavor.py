@@ -196,6 +196,11 @@ class DecimalField(MinMaxMixin, DjangoField):
 
 class BooleanField(DjangoField):
 
+    def __init__(self, *args, **kwargs):
+        kwargs['blank'] = True
+
+        super(BooleanField, self).__init__(*args, **kwargs)
+
     def formfield(self, **kwargs):
         # Unlike most fields, BooleanField figures out include_blank from
         # self.null instead of self.blank.
@@ -229,7 +234,6 @@ class ReferenceField(DjangoField):
 
 # TODO: test field.field.choices?
 class ListField(DjangoField):
-
     def formfield(self, **kwargs):
         if self.field.choices:
             defaults = {
