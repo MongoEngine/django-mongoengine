@@ -15,7 +15,23 @@ from mongoengine import ImproperlyConfigured
 
 from django_mongoengine import document
 from django_mongoengine import fields
+from django_mongoengine.queryset import QuerySetManager
 from .managers import MongoUserManager
+
+
+def ct_init(self, *args, **kwargs):
+    super(QuerySetManager, self).__init__(*args, **kwargs)
+    self._cache = {}
+
+
+ContentTypeManager = type(
+    "ContentTypeManager",
+    (QuerySetManager,),
+    dict(
+        ContentTypeManager.__dict__,
+        __init__=ct_init,
+    ),
+)
 
 try:
     from django.contrib.auth.hashers import check_password, make_password
@@ -88,7 +104,7 @@ class SiteProfileNotAvailable(Exception):
     pass
 
 
-class PermissionManager(models.Manager):
+class PermissionManager(QuerySetManager):
     def get_by_natural_key(self, codename, app_label, model):
         return self.get(
             codename=codename,
@@ -134,9 +150,10 @@ class Permission(document.Document):
 
     def __unicode__(self):
         return u"%s | %s | %s" % (
-            unicode(self.content_type.app_label),
-            unicode(self.content_type),
-            unicode(self.name))
+            self.content_type.app_label,
+            self.content_type,
+            self.name,
+        )
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
