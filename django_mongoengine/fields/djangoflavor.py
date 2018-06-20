@@ -28,6 +28,8 @@ class DjangoField(object):
         if "required" in kwargs:
             raise ImproperlyConfigured("`required` option is not supported. Use Django-style `blank` instead.")
         kwargs["required"] = not kwargs["blank"]
+        if hasattr(self, "auto_created"):
+            kwargs.pop("auto_created")
         self.verbose_name = kwargs.pop("verbose_name", None)
         super(DjangoField, self).__init__(*args, **kwargs)
         self.remote_field = None
