@@ -54,7 +54,7 @@ djmod = get_patched_django_module(
     get_content_type_for_model=get_content_type_for_model,
 )
 
-class BaseDocumentAdmin(djmod.BaseModelAdmin):
+class BaseDocumentAdmin(djmod.ModelAdmin):
     """Functionality common to both ModelAdmin and InlineAdmin."""
     form = DocumentForm
 
@@ -62,7 +62,6 @@ class BaseDocumentAdmin(djmod.BaseModelAdmin):
         """
         Hook for specifying the form Field instance for a given database Field
         instance.
-
         If kwargs are given, they're passed to the form Field's constructor.
         """
         request = kwargs.pop("request", None)
@@ -162,10 +161,11 @@ class DocumentAdmin(BaseDocumentAdmin):
         self.model = model
         self.opts = model._meta
         self.admin_site = admin_site
-        super(DocumentAdmin, self).__init__()
+        super(DocumentAdmin, self).__init__(model, admin_site)
         self.log = not settings.DATABASES.get('default', {}).get(
             'ENGINE', 'django.db.backends.dummy'
         ).endswith('dummy')
+        self.change_list_template = 'admin/change_document_list.html'
 
 # XXX: add inline init somewhere
     def _get_inline_instances(self):
@@ -231,11 +231,17 @@ class DocumentAdmin(BaseDocumentAdmin):
             fields=self.list_editable, **defaults
         )
 
+    def get_changelist(self, request, **kwargs):
+        """
+        Returns the ChangeList class for use on the changelist page.
+        """
+        from django_mongoengine.mongo_admin.views import DocumentChangeList
+        return DocumentChangeList
+
 
     def log_addition(self, request, object, message):
         """
         Log that an object has been successfully added.
-
         The default implementation creates an admin LogEntry object.
         """
         if not self.log:
@@ -245,7 +251,6 @@ class DocumentAdmin(BaseDocumentAdmin):
     def log_change(self, request, object, message):
         """
         Log that an object has been successfully changed.
-
         The default implementation creates an admin LogEntry object.
         """
         if not self.log:
@@ -256,7 +261,6 @@ class DocumentAdmin(BaseDocumentAdmin):
         """
         Log that an object will be deleted. Note that this method is called
         before the deletion.
-
         The default implementation creates an admin LogEntry object.
         """
         if not self.log:
@@ -475,39 +479,10 @@ class DocumentAdmin(BaseDocumentAdmin):
             "admin/object_history.html"
         ], context)
 
-    def get_search_results(self, request, queryset, search_term):
-        """
-        Returns a tuple containing a queryset to implement the search,
-        and a boolean indicating if the results may contain duplicates.
-        """
-        # Apply keyword searches.
-        def construct_search(field_name):
-            if field_name.startswith('^'):
-                return "%s__istartswith" % field_name[1:]
-            elif field_name.startswith('='):
-                return "%s__iexact" % field_name[1:]
-            elif field_name.startswith('@'):
-                return "%s__search" % field_name[1:]
-            else:
-                return "%s__icontains" % field_name
-
-        use_distinct = False
-        search_fields = self.get_search_fields(request)
-        if search_fields and search_term:
-            orm_lookups = [construct_search(str(search_field))
-                           for search_field in search_fields]
-            for bit in search_term.split():
-                or_queries = [Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
-                queryset = queryset.filter(reduce(operator.or_, or_queries))
-
-        return queryset, use_distinct
-
 
 class InlineDocumentAdmin(BaseDocumentAdmin):
     """
     Options for inline editing of ``model`` instances.
-
     Provide ``name`` to specify the attribute name of the ``ForeignKey`` from
     ``model`` to its parent. This is required if ``model`` has more than one
     ``ForeignKey`` to its parent.
