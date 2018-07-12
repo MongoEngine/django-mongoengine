@@ -9,6 +9,7 @@ from django.core.paginator import InvalidPage
 from django.utils.encoding import smart_str
 
 from mongoengine import Q
+from functools import reduce
 
 
 class DocumentChangeList(ChangeList):
@@ -20,6 +21,7 @@ class DocumentChangeList(ChangeList):
                 request, model, list_display, list_display_links, list_filter,
                 date_hierarchy, search_fields, list_select_related,
                 list_per_page, list_max_show_all, list_editable, model_admin)
+            
         except TypeError:
             self.list_max_show_all = list_max_show_all
             # The init for django <= 1.3 takes one parameter less
@@ -30,6 +32,17 @@ class DocumentChangeList(ChangeList):
         self.pk_attname = self.lookup_opts.pk_name
 
     def get_results(self, request):
+        # query_set has been changed to queryset
+        try:
+            self.query_set
+        except:
+            self.query_set = self.queryset
+        # root_query_set has been changed to root_queryset
+        try:
+            self.root_query_set
+        except:
+            self.root_query_set = self.root_queryset
+    
         paginator = self.model_admin.get_paginator(request, self.query_set,
                                                    self.list_per_page)
         # Get the number of objects, with admin filters applied.
@@ -106,9 +119,12 @@ class DocumentChangeList(ChangeList):
                     continue # Invalid ordering specified, skip it.
 
         # Add the given query's ordering fields, if any.
-        sign = lambda t: t[1] > 0 and '+' or '-'
-        qs_ordering = [sign(t) + t[0] for t in queryset._ordering]
-        ordering.extend(qs_ordering)
+        try:
+            sign = lambda t: t[1] > 0 and '+' or '-'
+            qs_ordering = [sign(t) + t[0] for t in queryset._ordering]
+            ordering.extend(qs_ordering)
+        except:
+            pass
 
         # Ensure that the primary key is systematically present in the list of
         # ordering fields so we can guarantee a deterministic order across all
@@ -152,7 +168,12 @@ class DocumentChangeList(ChangeList):
                 )
         return lookup_params
 
-    def get_query_set(self, request=None):
+    def get_queryset(self, request=None):
+        # root_query_set has been changed to root_queryset
+        try:
+            self.root_query_set
+        except:
+            self.root_query_set = self.root_queryset
         # First, we collect all the declared list filters.
         qs = self.root_query_set.clone()
 
