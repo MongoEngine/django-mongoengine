@@ -6,11 +6,17 @@ python:
   - "3.5"
   - "pypy"
 env:
-  - DJANGO_VERSION=1.8.18
-  - DJANGO_VERSION=1.11.10
+  - DJANGO="Django>=1.11,<2.0"
+  - DJANGO="Django>=2.0,<2.2"
+matrix:
+  exclude:
+    - python: "2.7"
+      env: DJANGO="Django>=2.0,<2.2"
+    - python: "pypy"
+      env: DJANGO="Django>=2.0,<2.2"
 # command to install dependencies
 install:
     - pip install -r requirements.txt
-    - pip install -q Django==$DJANGO_VERSION
+    - pip install -q $DJANGO
 # command to run tests
 script: python setup.py -q nosetests

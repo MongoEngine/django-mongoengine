@@ -4,16 +4,25 @@ Examples
 
 Embedded Fields
 ===============
-
 **models.py**::
 
-    class ContactInfo(fields.EmbeddedDocument):
+    from django.db import models
+    from django_mongoengine import Document, EmbeddedDocument, fields
+
+    class Product(Document):
+        name = fields.StringField()
+        retail_price = fields.DecimalField(
+            max_digits=15, decimal_places=2, default=0)
+        inventory_price = fields.DecimalField(
+            max_digits=15, decimal_places=2, default=0)
+
+    class ContactInfo(EmbeddedDocument):
         web = fields.URLField(help_text=_("""List of languages for your application (the first one will be the default language)"""))
         email = fields.EmailField(verbose_name=_('e-mail address'))
         phone = fields.StringField(verbose_name=_('phone number'))
 
     class Application(Document):
-        name = fields.StringField(max_length=255, required=True)
+        name = fields.StringField(max_length=255, blank=False)
         contact = fields.EmbeddedDocumentField(ContactInfo)
         LOCALES = (('es', 'Spanish'), ('en', 'English'), ('de', 'German'), ('fr', 'French'), ('it', 'Italian'), ('ru', 'Russian'))
         locales = fields.ListField(fields.StringField(choices=LOCALES), help_text=_("""List of languages for your application (the first one will be the default language)"""))

@@ -8,10 +8,17 @@ Django-MongoEngine
 
 THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
-Right now we're targeting to get things working on Django 1.9
+Right now we're targeting to get things working on Django 1.11;
+2.0 support added, but not tested in production.
 
-Working / Django 1.9
---------------------
+WARNING:
+--------
+Maybe there is better option for mongo support, take a look at https://nesdis.github.io/djongo/;
+It's python3 only and i have not tried it yet, but looks promising.
+
+
+Working / Django 1.11
+---------------------
 
 * [ok] sessions
 * [ok] models/fields, fields needs testing

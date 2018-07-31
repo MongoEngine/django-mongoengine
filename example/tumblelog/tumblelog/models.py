@@ -1,4 +1,7 @@
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 from django_mongoengine import Document, EmbeddedDocument
 from django_mongoengine import fields
@@ -13,6 +16,7 @@ class Comment(EmbeddedDocument):
     author = fields.StringField(verbose_name="Name", max_length=255)
     email  = fields.EmailField(verbose_name="Email", blank=True)
     body = fields.StringField(verbose_name="Comment")
+
 
 class Post(Document):
     created_at = fields.DateTimeField(

@@ -38,7 +38,8 @@ class DjangoFlavor(object):
     _get_pk_val = Model.__dict__["_get_pk_val"]
 
     def __init__(self, *args, **kwargs):
-        self._state = ModelState(self._meta.get("db_alias", me.DEFAULT_CONNECTION_NAME))
+        self._state = ModelState()
+        self._state.db = self._meta.get("db_alias", me.DEFAULT_CONNECTION_NAME)
         super(DjangoFlavor, self).__init__(*args, **kwargs)
 
     def _get_unique_checks(self, exclude=None):
@@ -52,14 +53,17 @@ class Document(django_meta(mtc.TopLevelDocumentMetaclass,
                            DjangoFlavor, me.Document)):
     swap_base = True
 
+
 class DynamicDocument(django_meta(mtc.TopLevelDocumentMetaclass,
                                   DjangoFlavor, me.DynamicDocument)):
     swap_base = True
+
 
 class EmbeddedDocument(django_meta(mtc.DocumentMetaclass,
                                    DjangoFlavor, me.EmbeddedDocument)):
     swap_base = True
 
+
 class DynamicEmbeddedDocument(django_meta(mtc.DocumentMetaclass,
-                                   DjangoFlavor, me.DynamicEmbeddedDocument)):
+                                          DjangoFlavor, me.DynamicEmbeddedDocument)):
     swap_base = True
