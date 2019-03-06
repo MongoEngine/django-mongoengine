@@ -40,7 +40,7 @@ class AddPostView(CreateView):
         post_type = self.kwargs.get('post_type', 'post')
         return self.doc_map.get(post_type)
 
-    def get_form(self, form_class):
+    def get_form(self, form_class=None):
         form = super(AddPostView, self).get_form(form_class)
         music_parameters = form.fields.get('music_parameters', None)
         if music_parameters is not None:
