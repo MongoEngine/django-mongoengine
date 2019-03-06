@@ -16,7 +16,7 @@ import sys
 import os
 
 
-__version__ = '0.3'
+__version__ = '0.3.1'
 __description__ = 'Django support for MongoDB via MongoEngine',
 __license__ = 'BSD'
 __author__ = 'Ross Lawley',
