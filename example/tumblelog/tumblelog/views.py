@@ -93,4 +93,4 @@ class TestSessionView(View):
     def get(self, request, *args, **kwargs):
         test_data = request.session.get('test', None)
         request.session['test'] = 'abc123'
-        return  HttpResponse('test=%s' % test_data)
+        return HttpResponse('test=%s' % test_data)
