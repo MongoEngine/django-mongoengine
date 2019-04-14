@@ -10,7 +10,7 @@ from django_mongoengine.views import (
 )
 
 from tumblelog.models import Post, BlogPost, Video, Image, Quote, Music
-from tumblelog.forms import CommentForm
+from tumblelog import forms
 
 
 class PostIndexView(ListView):
@@ -24,7 +24,7 @@ class PostDetailView(EmbeddedDetailView):
     template_name = "_details.html"
     context_object_name = 'post'
     embedded_context_name = 'form'
-    embedded_form_class = CommentForm
+    embedded_form_class = forms.CommentForm
     success_message = "Comment Posted!"
 
 
