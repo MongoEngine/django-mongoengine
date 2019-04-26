@@ -7,9 +7,9 @@ from django.utils.encoding import smart_text
 from django.db.models.options import Options
 
 try:
-    from django.db.models.options import get_verbose_name
+    from django.db.models.options import get_verbose_name as camel_case_to_spaces
 except ImportError:
-    from django.utils.text import camel_case_to_spaces as get_verbose_name
+    from django.utils.text import camel_case_to_spaces, format_lazy
 
 
 from mongoengine.fields import ReferenceField
@@ -132,18 +132,21 @@ class DocumentMetaWrapper(object):
         Checks the original meta dict first. If it is not found
         then generates a verbose name from from the object name.
         """
-        try:
-            return capfirst(get_verbose_name(self._meta['verbose_name']))
-        except KeyError:
-            return capfirst(get_verbose_name(self.object_name))
+        if 'verbose_name' in self._meta:
+            return self._meta['verbose_name']
+        else:
+            return capfirst(camel_case_to_spaces(self.object_name))
 
     @property
     def verbose_name_raw(self):
-        return self.verbose_name
+        return str(self.verbose_name)
 
     @property
     def verbose_name_plural(self):
-        return "%ss" % self.verbose_name
+        if 'verbose_name_plural' in self._meta:
+            return self.meta['verbose_name_plural']
+        else:
+            return format_lazy("{}s", self.verbose_name)
 
     @property
     def pk(self):
