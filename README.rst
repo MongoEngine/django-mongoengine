@@ -17,7 +17,7 @@ Maybe there is better option for mongo support, take a look at https://nesdis.gi
 It's python3 only and i have not tried it yet, but looks promising.
 
 
-Working / Django 1.11
+Working / Django 2.0
 ---------------------
 
 * [ok] sessions
@@ -26,7 +26,7 @@ Working / Django 1.11
 * [ok] auth
 * [?] admin - partially working, some things broken
 
-Current status, let's call it version 0.2.1, still far away from public release
+Current status
 -------------------------------------------------------------------------------
 
 Many parts of projects rewritten/removed;
