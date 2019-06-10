@@ -4,7 +4,7 @@ Django-MongoEngine
 
 Django support for MongoDB using MongoEngine.
 
-This is work-in-progress. Some thing working, some don't. Fix what you need and make
+This is work-in-progress. Some things working, some don't. Fix what you need and make
 pull-request.
 
 Links
