@@ -29,9 +29,6 @@ __email__ = 'ross.lawley@gmail.com'
 sys.path.insert(0, os.path.dirname(__file__))
 
 
-REQUIRES = [i.strip() for i in open("requirements.txt").readlines()]
-
-
 setup(
     name='django-mongoengine',
     version=__version__,
@@ -45,7 +42,7 @@ setup(
     test_suite='nose.collector',
     zip_safe=False,
     platforms='any',
-    install_requires=REQUIRES,
+    install_requires=["django>1.11", "mongoengine>=0.14"],
     packages=find_packages(exclude=('doc', 'docs',)),
     include_package_data=True,
     # use python setup.py nosetests to test

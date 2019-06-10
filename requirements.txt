@@ -1,2 +1,0 @@
-django>=1.11
-mongoengine>=0.14
