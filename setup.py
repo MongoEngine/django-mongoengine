@@ -17,10 +17,10 @@ import os
 
 
 __version__ = '0.3.1'
-__description__ = 'Django support for MongoDB via MongoEngine',
+__description__ = 'Django support for MongoDB via MongoEngine'
 __license__ = 'BSD'
-__author__ = 'Ross Lawley',
-__email__ = 'ross.lawley@gmail.com',
+__author__ = 'Ross Lawley'
+__email__ = 'ross.lawley@gmail.com'
 
 
 sys.path.insert(0, os.path.dirname(__file__))
