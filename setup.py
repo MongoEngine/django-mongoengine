@@ -4,11 +4,14 @@ Django-MongoEngine
 
 Django support for MongoDB using MongoEngine.
 
+This is work-in-progress. Some things working, some don't. Fix what you need and make
+pull-request.
+
 Links
 `````
 
 * `development version
-  <https://github.com/MongoEngine/django-mongoengine/raw/master#egg=Django-MongoEngine-dev>`_
+  <https://github.com/MongoEngine/django-mongoengine>`_
 
 """
 from setuptools import setup, find_packages
@@ -16,11 +19,11 @@ import sys
 import os
 
 
-__version__ = '0.3.1'
-__description__ = 'Django support for MongoDB via MongoEngine',
+__version__ = '0.3.2'
+__description__ = 'Django support for MongoDB via MongoEngine'
 __license__ = 'BSD'
-__author__ = 'Ross Lawley',
-__email__ = 'ross.lawley@gmail.com',
+__author__ = 'Ross Lawley'
+__email__ = 'ross.lawley@gmail.com'
 
 
 sys.path.insert(0, os.path.dirname(__file__))
