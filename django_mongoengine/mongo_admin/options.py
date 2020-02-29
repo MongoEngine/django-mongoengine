@@ -1,6 +1,11 @@
 import operator
 from functools import reduce, partial
 
+try:
+    from functools import partialmethod
+except ImportError:
+    from django.utils.functional import curry as partialmethod
+
 from django import forms
 from django.forms.formsets import all_valid
 from django.urls import reverse
@@ -22,7 +27,6 @@ except ImportError:
     from django.db.models.fields.related import ForeignObjectRel as RelatedObject # noqa
 from django.http import Http404
 from django.template.response import TemplateResponse
-from django.utils.functional import curry
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 from django.forms.forms import pretty_name
@@ -532,7 +536,7 @@ class InlineDocumentAdmin(BaseDocumentAdmin):
             "formset": self.formset,
             "fields": fields,
             "exclude": exclude,
-            "formfield_callback": curry(self.formfield_for_dbfield, request=request),
+            "formfield_callback": partialmethod(self.formfield_for_dbfield, request=request),
             "extra": self.extra,
             "max_num": self.max_num,
             "can_delete": self.can_delete,
