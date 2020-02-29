@@ -1,4 +1,4 @@
-from django.utils import six
+import six
 from django.core.exceptions import ImproperlyConfigured
 
 from django_mongoengine.utils.wrappers import WrapDocument, copy_class

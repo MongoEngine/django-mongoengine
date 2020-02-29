@@ -42,7 +42,7 @@ setup(
     test_suite='nose.collector',
     zip_safe=False,
     platforms='any',
-    install_requires=["django>1.11,<3", "mongoengine>=0.14"],
+    install_requires=["django>1.11,<3.1", "six", "mongoengine>=0.14"],
     packages=find_packages(exclude=('doc', 'docs',)),
     include_package_data=True,
     # use python setup.py nosetests to test

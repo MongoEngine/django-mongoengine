@@ -2,7 +2,7 @@ from collections import OrderedDict
 from functools import partial
 
 from django.forms.fields import Field
-from django.utils import six
+import six
 
 
 def patch_document(function, instance):

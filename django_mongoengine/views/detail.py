@@ -2,7 +2,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic.base import View
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic import detail as djmod
-from django.utils import six
+import six
 
 from django_mongoengine.utils.wrappers import (
     WrapDocument, copy_class,

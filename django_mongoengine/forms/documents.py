@@ -4,7 +4,7 @@ from django.forms.forms import DeclarativeFieldsMetaclass
 from django.forms.models import ALL_FIELDS
 from django.core.exceptions import FieldError, ImproperlyConfigured
 from django.forms import models as model_forms
-from django.utils import six
+import six
 
 from mongoengine.fields import ObjectIdField, FileField
 from mongoengine.errors import ValidationError

@@ -13,7 +13,7 @@ from django.contrib.admin.options import (
     TO_FIELD_VAR, IS_POPUP_VAR,
     get_ul_class, csrf_protect_m,
 )
-from django.utils import six
+import six
 from django.utils.html import escape
 from django.core.exceptions import PermissionDenied
 try:

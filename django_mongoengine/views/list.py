@@ -1,4 +1,4 @@
-from django.utils import six
+import six
 
 from mongoengine.queryset import QuerySet
 
