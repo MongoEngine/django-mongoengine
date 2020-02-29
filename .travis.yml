@@ -15,9 +15,10 @@ matrix:
       env: DJANGO="Django>=2.0,<2.3"
     - python: "pypy"
       env: DJANGO="Django>=2.0,<2.3"
-# command to install dependencies
+before_install:
+  - pip install poetry
 install:
-    - pip install -r requirements.txt
-    - pip install -q $DJANGO
+    - poetry install
+    - poetry run pip install -q $DJANGO
 # command to run tests
-script: python setup.py -q nosetests
+script: poetry run python setup.py -q nosetests
