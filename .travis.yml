@@ -13,13 +13,17 @@ env:
 matrix:
   exclude:
     - python: "2.7"
-      env: DJANGO="Django>=2.0,<2.3" DJANGO="Django>=3.0,<3.1"
+      env: DJANGO="Django>=2.0,<2.3"
+    - python: "2.7"
+      env: DJANGO="Django>=3.0,<3.1"
     - python: "pypy"
-      env: DJANGO="Django>=2.0,<2.3" DJANGO="Django>=3.0,<3.1"
+      env: DJANGO="Django>=2.0,<2.3"
+    - python: "pypy"
+      env: DJANGO="Django>=3.0,<3.1"
 before_install:
   - pip install poetry
 install:
-    - poetry install
+    - poetry install -q
     - poetry run pip install -q $DJANGO
 # command to run tests
 script: poetry run python setup.py -q nosetests
