@@ -6,6 +6,9 @@ Django-MongoEngine
    :alt: build status
    :target: https://travis-ci.org/MongoEngine/django-mongoengine
 
+.. image:: https://img.shields.io/osslifecycle/MongoEngine/django-mongoengine
+   :alt: OSS Lifecycle
+
 THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
 Right now we're targeting to get things working on Django 2.0;
