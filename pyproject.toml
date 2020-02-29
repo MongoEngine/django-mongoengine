@@ -6,7 +6,7 @@ authors = ["Ross Lawley <ross.lawley@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.6"
-django = "<3"
+django = ">1.11"
 mongoengine = ">=0.14"
 
 [tool.poetry.dev-dependencies]
