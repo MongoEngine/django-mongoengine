@@ -38,7 +38,7 @@ from django_mongoengine.fields import (ListField, EmbeddedDocumentField,
                                        ReferenceField, StringField)
 
 from django_mongoengine.mongo_admin.util import RelationWrapper
-
+from django_mongoengine.paginator import Paginator
 from django_mongoengine.utils.wrappers import copy_class
 from django_mongoengine.utils.monkey import get_patched_django_module
 from django_mongoengine.forms.documents import (
@@ -59,6 +59,7 @@ djmod = get_patched_django_module(
 class BaseDocumentAdmin(djmod.ModelAdmin):
     """Functionality common to both ModelAdmin and InlineAdmin."""
     form = DocumentForm
+    paginator = Paginator
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
@@ -159,6 +160,7 @@ class BaseDocumentAdmin(djmod.ModelAdmin):
 @copy_class(djmod.ModelAdmin)
 class DocumentAdmin(BaseDocumentAdmin):
     "Encapsulates all admin options and functionality for a given model."
+    paginator = Paginator
 
     def __init__(self, model, admin_site):
         self.model = model
