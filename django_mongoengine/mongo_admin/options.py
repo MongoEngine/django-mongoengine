@@ -1,5 +1,4 @@
-import operator
-from functools import reduce, partial
+from functools import partial
 
 try:
     from functools import partialmethod
@@ -34,8 +33,6 @@ from django.forms.models import modelform_defines_fields
 from django.conf import settings
 from django.apps import apps
 
-from mongoengine import Q
-
 from django_mongoengine.utils import force_text
 from django_mongoengine.fields import (ListField, EmbeddedDocumentField,
                                        ReferenceField, StringField)
@@ -57,6 +54,7 @@ djmod = get_patched_django_module(
     "django.contrib.admin.options",
     get_content_type_for_model=get_content_type_for_model,
 )
+
 
 class BaseDocumentAdmin(djmod.ModelAdmin):
     """Functionality common to both ModelAdmin and InlineAdmin."""
@@ -87,11 +85,12 @@ class BaseDocumentAdmin(djmod.ModelAdmin):
             form_field = db_field.formfield(**kwargs)
             if db_field.name not in self.raw_id_fields:
                 related_modeladmin = self.admin_site._registry.get(db_field.document_type)
-                can_add_related = bool(related_modeladmin and
-                            related_modeladmin.has_add_permission(request))
+                can_add_related = bool(
+                    related_modeladmin and related_modeladmin.has_add_permission(request)
+                )
                 form_field.widget = widgets.RelatedFieldWidgetWrapper(
-                            form_field.widget, RelationWrapper(db_field.document_type), self.admin_site,
-                            can_add_related=can_add_related)
+                    form_field.widget, RelationWrapper(db_field.document_type), self.admin_site,
+                    can_add_related=can_add_related)
                 return form_field
 
         if isinstance(db_field, StringField):
@@ -124,7 +123,7 @@ class BaseDocumentAdmin(djmod.ModelAdmin):
                 })
             if 'choices' not in kwargs:
                 kwargs['choices'] = db_field.get_choices(
-                    include_blank = db_field.blank,
+                    include_blank=db_field.blank,
                     blank_choice=[('', _('None'))]
                 )
         return db_field.formfield(**kwargs)
@@ -242,7 +241,6 @@ class DocumentAdmin(BaseDocumentAdmin):
         from django_mongoengine.mongo_admin.views import DocumentChangeList
         return DocumentChangeList
 
-
     def log_addition(self, request, object, message):
         """
         Log that an object has been successfully added.
@@ -348,7 +346,8 @@ class DocumentAdmin(BaseDocumentAdmin):
         for inline_formset in inline_formsets:
             media = media + inline_formset.media
 
-        context = dict(self.admin_site.each_context(request),
+        context = dict(
+            self.admin_site.each_context(request),
             title=(_('Add %s') if add else _('Change %s')) % force_text(opts.verbose_name),
             adminform=adminForm,
             object_id=object_id,
@@ -551,6 +550,7 @@ class InlineDocumentAdmin(BaseDocumentAdmin):
         fields = form.base_fields.keys() + list(self.get_readonly_fields(request, obj))
         return [(None, {'fields': fields})]
 
+
 class EmbeddedDocumentAdmin(InlineDocumentAdmin):
     def __init__(self, field, parent_document, admin_site):
         if hasattr(field, 'field'):
@@ -572,9 +572,9 @@ class EmbeddedDocumentAdmin(InlineDocumentAdmin):
         super(EmbeddedDocumentAdmin, self).__init__(parent_document, admin_site)
 
     def queryset(self, request):
-        if isinstance(self.field, ListField): # list field
+        if isinstance(self.field, ListField):  # list field
             self.doc_list = getattr(self.parent_document, self.rel_name)
-        else: # embedded field
+        else:  # embedded field
             emb_doc = getattr(self.parent_document, self.rel_name)
             if emb_doc is None:
                 self.doc_list = []
@@ -582,11 +582,14 @@ class EmbeddedDocumentAdmin(InlineDocumentAdmin):
                 self.doc_list = [emb_doc]
         return self.doc_list
 
+
 class StackedDocumentInline(InlineDocumentAdmin):
     template = 'admin/edit_inline/stacked.html'
 
+
 class EmbeddedStackedDocumentAdmin(EmbeddedDocumentAdmin):
     template = 'admin/edit_inline/stacked.html'
+
 
 class TabularDocumentInline(InlineDocumentAdmin):
     template = 'admin/edit_inline/tabular.html'
