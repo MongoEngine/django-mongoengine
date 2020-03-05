@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-mongoengine"
-version = "0.4.0"
+version = "0.4.1"
 description = "Django support for MongoDB via MongoEngine"
 authors = ["Ross Lawley <ross.lawley@gmail.com>"]
 
