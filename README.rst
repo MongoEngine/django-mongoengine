@@ -2,12 +2,19 @@
 Django-MongoEngine
 ==================
 
-.. image:: https://travis-ci.org/MongoEngine/django-mongoengine.svg?branch=master
+|build| |lifecycle| |gitter|
+
+.. |build| image:: https://travis-ci.org/MongoEngine/django-mongoengine.svg?branch=master
    :alt: build status
    :target: https://travis-ci.org/MongoEngine/django-mongoengine
 
-.. image:: https://img.shields.io/osslifecycle/MongoEngine/django-mongoengine
+.. |lifecycle| image:: https://img.shields.io/osslifecycle/MongoEngine/django-mongoengine
    :alt: OSS Lifecycle
+
+.. |gitter| image:: https://badges.gitter.im/gitterHQ/gitter.png
+   :target: https://gitter.im/MongoEngine/django-mongoengine
+   :alt: Gitter chat
+
 
 THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
