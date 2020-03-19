@@ -9,8 +9,9 @@ Django-MongoEngine
 .. image:: https://img.shields.io/osslifecycle/MongoEngine/django-mongoengine
    :alt: OSS Lifecycle
    
-.. |Gitter chat| image:: https://badges.gitter.im/gitterHQ/gitter.png
+.. image:: https://badges.gitter.im/gitterHQ/gitter.png
    :target: https://gitter.im/MongoEngine/django-mongoengine
+   :alt: Gitter chat
 
 THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
