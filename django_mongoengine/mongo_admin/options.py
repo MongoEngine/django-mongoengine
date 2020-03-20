@@ -1,6 +1,13 @@
+from functools import partial
+
+try:
+    from functools import partialmethod
+except ImportError:
+    from django.utils.functional import curry as partialmethod
+
 from django import forms
 from django.forms.formsets import all_valid
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin import widgets, helpers
 from django.contrib.admin.utils import (
@@ -10,7 +17,7 @@ from django.contrib.admin.options import (
     TO_FIELD_VAR, IS_POPUP_VAR,
     get_ul_class, csrf_protect_m,
 )
-from django.utils import six
+import six
 from django.utils.html import escape
 from django.core.exceptions import PermissionDenied
 try:
@@ -19,10 +26,10 @@ except ImportError:
     from django.db.models.fields.related import ForeignObjectRel as RelatedObject # noqa
 from django.http import Http404
 from django.template.response import TemplateResponse
-from django.utils.functional import curry
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 from django.forms.forms import pretty_name
+from django.forms.models import modelform_defines_fields
 from django.conf import settings
 from django.apps import apps
 
@@ -31,11 +38,11 @@ from django_mongoengine.fields import (ListField, EmbeddedDocumentField,
                                        ReferenceField, StringField)
 
 from django_mongoengine.mongo_admin.util import RelationWrapper
-
+from django_mongoengine.paginator import Paginator
 from django_mongoengine.utils.wrappers import copy_class
 from django_mongoengine.utils.monkey import get_patched_django_module
 from django_mongoengine.forms.documents import (
-    DocumentForm,
+    DocumentForm, documentform_factory, documentformset_factory,
     inlineformset_factory, BaseInlineDocumentFormSet)
 
 
@@ -48,15 +55,16 @@ djmod = get_patched_django_module(
     get_content_type_for_model=get_content_type_for_model,
 )
 
-class BaseDocumentAdmin(djmod.BaseModelAdmin):
+
+class BaseDocumentAdmin(djmod.ModelAdmin):
     """Functionality common to both ModelAdmin and InlineAdmin."""
     form = DocumentForm
+    paginator = Paginator
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
         Hook for specifying the form Field instance for a given database Field
         instance.
-
         If kwargs are given, they're passed to the form Field's constructor.
         """
         request = kwargs.pop("request", None)
@@ -78,11 +86,12 @@ class BaseDocumentAdmin(djmod.BaseModelAdmin):
             form_field = db_field.formfield(**kwargs)
             if db_field.name not in self.raw_id_fields:
                 related_modeladmin = self.admin_site._registry.get(db_field.document_type)
-                can_add_related = bool(related_modeladmin and
-                            related_modeladmin.has_add_permission(request))
+                can_add_related = bool(
+                    related_modeladmin and related_modeladmin.has_add_permission(request)
+                )
                 form_field.widget = widgets.RelatedFieldWidgetWrapper(
-                            form_field.widget, RelationWrapper(db_field.document_type), self.admin_site,
-                            can_add_related=can_add_related)
+                    form_field.widget, RelationWrapper(db_field.document_type), self.admin_site,
+                    can_add_related=can_add_related)
                 return form_field
 
         if isinstance(db_field, StringField):
@@ -115,11 +124,10 @@ class BaseDocumentAdmin(djmod.BaseModelAdmin):
                 })
             if 'choices' not in kwargs:
                 kwargs['choices'] = db_field.get_choices(
-                    include_blank = db_field.blank,
+                    include_blank=db_field.blank,
                     blank_choice=[('', _('None'))]
                 )
         return db_field.formfield(**kwargs)
-
 
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
         """
@@ -152,16 +160,17 @@ class BaseDocumentAdmin(djmod.BaseModelAdmin):
 @copy_class(djmod.ModelAdmin)
 class DocumentAdmin(BaseDocumentAdmin):
     "Encapsulates all admin options and functionality for a given model."
-
+    paginator = Paginator
 
     def __init__(self, model, admin_site):
         self.model = model
         self.opts = model._meta
         self.admin_site = admin_site
-        super(DocumentAdmin, self).__init__()
+        super(DocumentAdmin, self).__init__(model, admin_site)
         self.log = not settings.DATABASES.get('default', {}).get(
             'ENGINE', 'django.db.backends.dummy'
         ).endswith('dummy')
+        self.change_list_template = 'admin/change_document_list.html'
 
 # XXX: add inline init somewhere
     def _get_inline_instances(self):
@@ -201,30 +210,51 @@ class DocumentAdmin(BaseDocumentAdmin):
             self.inline_instances.append(inline_instance)
 
     def get_changelist_form(self, request, **kwargs):
-        kwargs.setdefault("form", DocumentForm)
-        return super(DocumentAdmin, self).get_changelist_form(request, **kwargs)
+        """
+        Returns a Form class for use in the Formset on the changelist page.
+        """
+        defaults = {
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
+        }
+        defaults.update(kwargs)
+        if defaults.get('fields') is None and not modelform_defines_fields(defaults.get('form')):
+            defaults['fields'] = forms.ALL_FIELDS
 
+        return documentform_factory(self.model, **defaults)
 
     def get_changelist_formset(self, request, **kwargs):
-        kwargs.setdefault("form", DocumentForm)
-        return super(DocumentAdmin, self).get_changelist_formset(request, **kwargs)
+        """
+        Returns a FormSet class for use on the changelist page if list_editable
+        is used.
+        """
+        defaults = {
+            "formfield_callback": partial(self.formfield_for_dbfield, request=request),
+        }
+        defaults.update(kwargs)
+        return documentformset_factory(
+            self.model, self.get_changelist_form(request), extra=0,
+            fields=self.list_editable, **defaults
+        )
 
+    def get_changelist(self, request, **kwargs):
+        """
+        Returns the ChangeList class for use on the changelist page.
+        """
+        from django_mongoengine.mongo_admin.views import DocumentChangeList
+        return DocumentChangeList
 
     def log_addition(self, request, object, message):
         """
         Log that an object has been successfully added.
-
         The default implementation creates an admin LogEntry object.
         """
         if not self.log:
             return
         super(DocumentAdmin, self).log_addition(request, object, message)
 
-
     def log_change(self, request, object, message):
         """
         Log that an object has been successfully changed.
-
         The default implementation creates an admin LogEntry object.
         """
         if not self.log:
@@ -235,12 +265,15 @@ class DocumentAdmin(BaseDocumentAdmin):
         """
         Log that an object will be deleted. Note that this method is called
         before the deletion.
-
         The default implementation creates an admin LogEntry object.
         """
         if not self.log:
             return
         super(DocumentAdmin, self).log_deletion(request, object, object_repr)
+
+    @property
+    def media(self):
+        return djmod.ModelAdmin.media.fget(self)
 
     @csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
@@ -315,7 +348,8 @@ class DocumentAdmin(BaseDocumentAdmin):
         for inline_formset in inline_formsets:
             media = media + inline_formset.media
 
-        context = dict(self.admin_site.each_context(request),
+        context = dict(
+            self.admin_site.each_context(request),
             title=(_('Add %s') if add else _('Change %s')) % force_text(opts.verbose_name),
             adminform=adminForm,
             object_id=object_id,
@@ -340,7 +374,6 @@ class DocumentAdmin(BaseDocumentAdmin):
         context.update(extra_context or {})
 
         return self.render_change_form(request, context, add=add, change=not add, obj=obj, form_url=form_url)
-
 
     @csrf_protect_m
     def delete_view(self, request, object_id, extra_context=None):
@@ -432,7 +465,8 @@ class DocumentAdmin(BaseDocumentAdmin):
             content_type=get_content_type_for_model(model)
         ).select_related().order_by('action_time')
 
-        context = dict(self.admin_site.each_context(request),
+        context = dict(
+            self.admin_site.each_context(request),
             title=_('Change history: %s') % force_text(obj),
             action_list=action_list,
             module_name=capfirst(force_text(opts.verbose_name_plural)),
@@ -454,7 +488,6 @@ class DocumentAdmin(BaseDocumentAdmin):
 class InlineDocumentAdmin(BaseDocumentAdmin):
     """
     Options for inline editing of ``model`` instances.
-
     Provide ``name`` to specify the attribute name of the ``ForeignKey`` from
     ``model`` to its parent. This is required if ``model`` has more than one
     ``ForeignKey`` to its parent.
@@ -482,16 +515,7 @@ class InlineDocumentAdmin(BaseDocumentAdmin):
         if self.verbose_name_plural is None:
             self.verbose_name_plural = self.model._meta.verbose_name_plural
 
-    def _media(self):
-        from django.conf import settings
-        js = ['js/jquery.min.js', 'js/jquery.init.js', 'js/inlines.min.js']
-        if self.prepopulated_fields:
-            js.append('js/urlify.js')
-            js.append('js/prepopulate.min.js')
-        if self.filter_vertical or self.filter_horizontal:
-            js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
-        return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
-    media = property(_media)
+    media = djmod.ModelAdmin.media
 
     def get_formset(self, request, obj=None, **kwargs):
         """Returns a BaseInlineFormSet class for use in admin add/change views."""
@@ -513,7 +537,7 @@ class InlineDocumentAdmin(BaseDocumentAdmin):
             "formset": self.formset,
             "fields": fields,
             "exclude": exclude,
-            "formfield_callback": curry(self.formfield_for_dbfield, request=request),
+            "formfield_callback": partialmethod(self.formfield_for_dbfield, request=request),
             "extra": self.extra,
             "max_num": self.max_num,
             "can_delete": self.can_delete,
@@ -527,6 +551,7 @@ class InlineDocumentAdmin(BaseDocumentAdmin):
         form = self.get_formset(request).form
         fields = form.base_fields.keys() + list(self.get_readonly_fields(request, obj))
         return [(None, {'fields': fields})]
+
 
 class EmbeddedDocumentAdmin(InlineDocumentAdmin):
     def __init__(self, field, parent_document, admin_site):
@@ -549,9 +574,9 @@ class EmbeddedDocumentAdmin(InlineDocumentAdmin):
         super(EmbeddedDocumentAdmin, self).__init__(parent_document, admin_site)
 
     def queryset(self, request):
-        if isinstance(self.field, ListField): # list field
+        if isinstance(self.field, ListField):  # list field
             self.doc_list = getattr(self.parent_document, self.rel_name)
-        else: # embedded field
+        else:  # embedded field
             emb_doc = getattr(self.parent_document, self.rel_name)
             if emb_doc is None:
                 self.doc_list = []
@@ -559,11 +584,14 @@ class EmbeddedDocumentAdmin(InlineDocumentAdmin):
                 self.doc_list = [emb_doc]
         return self.doc_list
 
+
 class StackedDocumentInline(InlineDocumentAdmin):
     template = 'admin/edit_inline/stacked.html'
 
+
 class EmbeddedStackedDocumentAdmin(EmbeddedDocumentAdmin):
     template = 'admin/edit_inline/stacked.html'
+
 
 class TabularDocumentInline(InlineDocumentAdmin):
     template = 'admin/edit_inline/tabular.html'

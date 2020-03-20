@@ -3,15 +3,27 @@ services: mongodb
 language: python
 python:
   - "2.7"
-  - "3.5"
+  - "3.7"
+  - "3.8"
   - "pypy"
 env:
-  - DJANGO_VERSION=1.8.18
-  - DJANGO_VERSION=1.10.7
-  - DJANGO_VERSION=1.11.2
-# command to install dependencies
+  - DJANGO="Django>=1.11,<2.0"
+  - DJANGO="Django>=2.0,<2.3"
+  - DJANGO="Django>=3.0,<3.1"
+matrix:
+  exclude:
+    - python: "2.7"
+      env: DJANGO="Django>=2.0,<2.3"
+    - python: "2.7"
+      env: DJANGO="Django>=3.0,<3.1"
+    - python: "pypy"
+      env: DJANGO="Django>=2.0,<2.3"
+    - python: "pypy"
+      env: DJANGO="Django>=3.0,<3.1"
+before_install:
+  - pip install poetry
 install:
-    - pip install -r requirements.txt
-    - pip install -q Django==$DJANGO_VERSION
+    - poetry install -q
+    - poetry run pip install -q $DJANGO
 # command to run tests
-script: python setup.py -q nosetests
+script: poetry run python setup.py -q nosetests

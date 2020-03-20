@@ -2,16 +2,33 @@
 Django-MongoEngine
 ==================
 
-.. image:: https://travis-ci.org/MongoEngine/django-mongoengine.svg?branch=master
+|build| |lifecycle| |gitter|
+
+.. |build| image:: https://travis-ci.org/MongoEngine/django-mongoengine.svg?branch=master
    :alt: build status
    :target: https://travis-ci.org/MongoEngine/django-mongoengine
 
+.. |lifecycle| image:: https://img.shields.io/osslifecycle/MongoEngine/django-mongoengine
+   :alt: OSS Lifecycle
+
+.. |gitter| image:: https://badges.gitter.im/gitterHQ/gitter.png
+   :target: https://gitter.im/MongoEngine/django-mongoengine
+   :alt: Gitter chat
+
+
 THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
-Right now we're targeting to get things working on Django 1.9
+Right now we're targeting to get things working on Django 2.0;
+3.0 support added, but not tested in production.
 
-Working / Django 1.9
---------------------
+WARNING:
+--------
+Maybe there is better option for mongo support, take a look at https://nesdis.github.io/djongo/;
+It's python3 only and i have not tried it yet, but looks promising.
+
+
+Working / Django 2.0
+---------------------
 
 * [ok] sessions
 * [ok] models/fields, fields needs testing
@@ -19,7 +36,7 @@ Working / Django 1.9
 * [ok] auth
 * [?] admin - partially working, some things broken
 
-Current status, let's call it version 0.2.1, still far away from public release
+Current status
 -------------------------------------------------------------------------------
 
 Many parts of projects rewritten/removed;

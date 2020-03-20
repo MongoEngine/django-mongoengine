@@ -4,7 +4,7 @@ from django.forms.forms import DeclarativeFieldsMetaclass
 from django.forms.models import ALL_FIELDS
 from django.core.exceptions import FieldError, ImproperlyConfigured
 from django.forms import models as model_forms
-from django.utils import six
+import six
 
 from mongoengine.fields import ObjectIdField, FileField
 from mongoengine.errors import ValidationError
@@ -218,8 +218,15 @@ class BaseDocumentForm(model_forms.BaseModelForm):
 class DocumentForm(BaseDocumentForm):
     pass
 
-
-documentform_factory = partial(model_forms.modelform_factory, form=DocumentForm)
+def documentform_factory(
+    model, form=DocumentForm, fields=None, exclude=None, formfield_callback=None,
+    widgets=None, localized_fields=None, labels=None, help_texts=None,
+    error_messages=None, *args, **kwargs
+):
+    return model_forms.modelform_factory(
+        model, form, fields, exclude, formfield_callback, widgets, localized_fields,
+        labels, help_texts, error_messages, *args, **kwargs
+    )
 
 
 @six.add_metaclass(DocumentFormMetaclass)
@@ -259,11 +266,18 @@ class BaseDocumentFormSet(model_forms.BaseModelFormSet):
     A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """
 
-
-documentformset_factory = partial(
-    model_forms.modelformset_factory,
-    form=DocumentForm, formset=BaseDocumentFormSet,
-)
+def documentformset_factory(
+    model, form=DocumentForm, formfield_callback=None, formset=BaseDocumentFormSet,
+    extra=1, can_delete=False, can_order=False, max_num=None, fields=None,
+    exclude=None, widgets=None, validate_max=False, localized_fields=None,
+    labels=None, help_texts=None, error_messages=None, min_num=None,
+    validate_min=False, *args, **kwargs
+):
+    return model_forms.modelformset_factory(
+        model, form, formfield_callback, formset, extra, can_delete, can_order,
+        max_num, fields, exclude, widgets, validate_max, localized_fields, labels,
+        help_texts, error_messages, min_num, validate_min, *args, **kwargs
+    )
 
 
 class BaseInlineDocumentFormSet(BaseDocumentFormSet):

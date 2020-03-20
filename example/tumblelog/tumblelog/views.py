@@ -10,7 +10,7 @@ from django_mongoengine.views import (
 )
 
 from tumblelog.models import Post, BlogPost, Video, Image, Quote, Music
-from tumblelog.forms import CommentForm
+from tumblelog import forms
 
 
 class PostIndexView(ListView):
@@ -24,7 +24,7 @@ class PostDetailView(EmbeddedDetailView):
     template_name = "_details.html"
     context_object_name = 'post'
     embedded_context_name = 'form'
-    embedded_form_class = CommentForm
+    embedded_form_class = forms.CommentForm
     success_message = "Comment Posted!"
 
 
@@ -40,7 +40,7 @@ class AddPostView(CreateView):
         post_type = self.kwargs.get('post_type', 'post')
         return self.doc_map.get(post_type)
 
-    def get_form(self, form_class):
+    def get_form(self, form_class=None):
         form = super(AddPostView, self).get_form(form_class)
         music_parameters = form.fields.get('music_parameters', None)
         if music_parameters is not None:
@@ -93,4 +93,4 @@ class TestSessionView(View):
     def get(self, request, *args, **kwargs):
         test_data = request.session.get('test', None)
         request.session['test'] = 'abc123'
-        return  HttpResponse('test=%s' % test_data)
+        return HttpResponse('test=%s' % test_data)

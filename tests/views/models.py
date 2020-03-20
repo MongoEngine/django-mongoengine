@@ -3,8 +3,8 @@
 from __future__ import absolute_import, division, print_function
 
 from bson import ObjectId
-from django.db.models import permalink
 
+from django.urls import reverse
 from django_mongoengine import Document
 from django_mongoengine import fields
 
@@ -21,9 +21,8 @@ class Artist(Document):
     def __unicode__(self):
         return self.name or ''
 
-    @permalink
     def get_absolute_url(self):
-        return ('artist_detail', (), {'pk': self.id})
+        return reverse('artist_detail', args=(self.id, ))
 
 
 class Author(Document):

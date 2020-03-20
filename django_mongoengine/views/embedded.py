@@ -1,5 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import six
+import six
 
 from .detail import DetailView
 from .edit import WrapDocumentForm, djmod

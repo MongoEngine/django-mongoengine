@@ -1,11 +1,11 @@
-from django_mongoengine.forms import EmbeddedDocumentForm
+from django_mongoengine import forms
 
-from tumblelog.models import Comment
+from tumblelog import models
 
 
-class CommentForm(EmbeddedDocumentForm):
+class CommentForm(forms.EmbeddedDocumentForm):
 
     class Meta:
-        document = Comment
+        document = models.Comment
         embedded_field = 'comments'
         exclude = ('created_at',)

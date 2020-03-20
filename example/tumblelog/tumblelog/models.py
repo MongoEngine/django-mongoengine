@@ -1,4 +1,7 @@
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 from django_mongoengine import Document, EmbeddedDocument
 from django_mongoengine import fields
@@ -14,13 +17,18 @@ class Comment(EmbeddedDocument):
     email  = fields.EmailField(verbose_name="Email", blank=True)
     body = fields.StringField(verbose_name="Comment")
 
+
 class Post(Document):
     created_at = fields.DateTimeField(
         default=datetime.datetime.now, editable=False,
     )
     title = fields.StringField(max_length=255)
     slug = fields.StringField(max_length=255, primary_key=True)
-    comments = fields.ListField(fields.EmbeddedDocumentField('Comment'), default=[])
+    comments = fields.ListField(
+        fields.EmbeddedDocumentField('Comment'),
+        default=[],
+        blank=True,
+    )
 
     def get_absolute_url(self):
         return reverse('post', kwargs={"slug": self.slug})

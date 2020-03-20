@@ -9,6 +9,8 @@ docs/_build
 build/
 dist/
 env/
+.venv
+Pipfile.lock
 .settings
 .project
 .pydevproject
