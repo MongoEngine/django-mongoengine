@@ -2,24 +2,12 @@ sudo: false
 services: mongodb
 language: python
 python:
-  - "2.7"
   - "3.7"
   - "3.8"
-  - "pypy"
+  - "pypy3"
 env:
-  - DJANGO="Django>=1.11,<2.0"
   - DJANGO="Django>=2.0,<2.3"
   - DJANGO="Django>=3.0,<3.1"
-matrix:
-  exclude:
-    - python: "2.7"
-      env: DJANGO="Django>=2.0,<2.3"
-    - python: "2.7"
-      env: DJANGO="Django>=3.0,<3.1"
-    - python: "pypy"
-      env: DJANGO="Django>=2.0,<2.3"
-    - python: "pypy"
-      env: DJANGO="Django>=3.0,<3.1"
 before_install:
   - pip install poetry
 install:
