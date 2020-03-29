@@ -52,6 +52,7 @@ class BaseQuerySet(object):
     def exists(self):
         return bool(self)
 
+
     def _clone(self):
         return self.clone()
 
