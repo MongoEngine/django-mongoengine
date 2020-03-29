@@ -64,6 +64,13 @@ class BaseUser(object):
     is_anonymous = AbstractBaseUser.__dict__['is_anonymous']
     is_authenticated = AbstractBaseUser.__dict__['is_authenticated']
 
+    @classmethod
+    def get_email_field_name(cls):
+        try:
+            return cls.EMAIL_FIELD
+        except AttributeError:
+            return 'email'
+
 
 class ContentType(document.Document):
     name = fields.StringField(max_length=100)
