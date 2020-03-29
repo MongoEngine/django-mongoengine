@@ -401,8 +401,14 @@ class DocumentAdmin(BaseDocumentAdmin):
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-            [obj], opts, request.user, self.admin_site, using)
+        try:
+            # Django 2.x/3.x
+            (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
+                [obj], request, self.admin_site)
+        except TypeError:
+            # Django 1.x
+            (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
+                [obj], opts, request.user, self.admin_site, using)
 
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
