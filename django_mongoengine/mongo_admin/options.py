@@ -396,19 +396,10 @@ class DocumentAdmin(BaseDocumentAdmin):
                 {'name': force_text(opts.verbose_name), 'key': escape(object_id)}
             )
 
-        from django.db import router
-        using = router.db_for_write(self.model)
-
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        try:
-            # Django 2.x/3.x
-            (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-                [obj], request, self.admin_site)
-        except TypeError:
-            # Django 1.x
-            (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-                [obj], opts, request.user, self.admin_site, using)
+        (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
+            [obj], request, self.admin_site)
 
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:

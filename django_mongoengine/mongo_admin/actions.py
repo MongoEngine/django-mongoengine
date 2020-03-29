@@ -39,13 +39,11 @@ def _delete_selected(modeladmin, request, queryset):
     if not modeladmin.has_delete_permission(request):
         raise PermissionDenied
 
-    using = router.db_for_write(modeladmin.model)
-
     # Populate deletable_objects, a data structure of all related objects that
     # will also be deleted.
     # TODO: Permissions would be so cool...
     deletable_objects, perms_needed, protected = get_deleted_objects(
-        queryset, opts, request.user, modeladmin.admin_site, using)
+        queryset, request, modeladmin.admin_site)
 
     # The user has already confirmed the deletion.
     # Do the deletion and return a None to display the change list view again.
