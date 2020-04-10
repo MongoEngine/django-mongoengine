@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser,
-    _user_has_perm, _user_get_all_permissions, _user_has_module_perms,
+    _user_has_perm, _user_get_permissions, _user_has_module_perms,
 )
 from django.db import models
 from django.contrib.contenttypes.models import ContentTypeManager
@@ -319,7 +319,7 @@ class AbstractUser(BaseUser, document.Document):
         return permissions
 
     def get_all_permissions(self, obj=None):
-        return _user_get_all_permissions(self, obj)
+        return _user_get_permissions(self, obj, 'all')
 
     def has_perm(self, perm, obj=None):
         """
