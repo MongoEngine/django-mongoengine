@@ -1,6 +1,6 @@
 from django.utils.encoding import smart_text, smart_str
 from django.forms.forms import pretty_name
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
 from django.utils import formats
 
 from mongoengine import fields

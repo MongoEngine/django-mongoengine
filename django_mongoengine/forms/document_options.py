@@ -1,7 +1,7 @@
 import sys
 import warnings
 
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
 from django.utils.text import capfirst
 from django.utils.encoding import smart_text
 from django.db.models.options import Options

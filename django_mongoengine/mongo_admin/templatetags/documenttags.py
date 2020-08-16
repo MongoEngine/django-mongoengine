@@ -2,7 +2,7 @@ from django.template import Library
 
 from django.contrib.admin.templatetags.admin_list import (result_hidden_fields, ResultList, items_for_result,
                                                           result_headers)
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
 
 from django_mongoengine.forms.utils import patch_document
 
