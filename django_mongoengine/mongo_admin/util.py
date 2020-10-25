@@ -1,5 +1,5 @@
 from django.utils.encoding import smart_text, smart_str
-from django.forms.forms import pretty_name
+from django.forms.utils import pretty_name
 from django.core.exceptions import FieldDoesNotExist
 from django.utils import formats
 
