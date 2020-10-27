@@ -6,7 +6,7 @@ python:
   - "3.8"
   - "pypy3"
 env:
-  - DJANGO="Django>=2.0,<2.3"
+  - DJANGO="Django>=2.2,<2.3"
   - DJANGO="Django>=3.0,<3.2"
 before_install:
   - pip install poetry
