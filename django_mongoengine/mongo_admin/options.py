@@ -28,7 +28,7 @@ from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
-from django.forms.forms import pretty_name
+from django.forms.utils import pretty_name
 from django.forms.models import modelform_defines_fields
 from django.conf import settings
 from django.apps import apps
