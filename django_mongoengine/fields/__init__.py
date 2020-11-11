@@ -20,9 +20,6 @@ def init_module():
         )
 
 
-init_module()
-
-
 def patch_mongoengine_field(field_name):
     """
     patch mongoengine.[field_name] for comparison support
@@ -31,13 +28,15 @@ def patch_mongoengine_field(field_name):
     """
     from mongoengine import common
     field = common._import_class(field_name)
-    for k in ["__eq__", "__lt__", "__hash__", "attname"]:
+    for k in ["__eq__", "__lt__", "__hash__", "attname", "get_internal_type"]:
         if k not in field.__dict__:
             setattr(field, k, djangoflavor.DjangoField.__dict__[k])
     # set auto_created False for check in django db model when delete
     if field_name == "ObjectIdField":
         setattr(field, "auto_created", False)
 
+
+init_module()
 
 for f in ["StringField", "ObjectIdField"]:
     patch_mongoengine_field(f)

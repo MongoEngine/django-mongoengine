@@ -8,6 +8,7 @@ from django.utils.functional import cached_property
 from mongoengine import fields
 
 from django_mongoengine.forms import fields as formfields
+from .internal import INTERNAL_DJANGO_FIELDS_MAP
 
 _field_defaults = (
     ("editable", True),
@@ -82,6 +83,11 @@ class DjangoField(object):
             form_class = forms.CharField
         return form_class(**defaults)
 
+    def get_internal_type(self):
+        return INTERNAL_DJANGO_FIELDS_MAP.get(
+            self.__class__.__name__,
+            "CharField",
+        )
 
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)

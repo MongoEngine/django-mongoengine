@@ -41,6 +41,9 @@ class PkWrapper(object):
         """
         return smart_text(obj.pk)
 
+    def get_internal_type(self):
+        return "CharField"
+
 
 class DocumentMetaWrapper(object):
     """
