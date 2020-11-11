@@ -170,7 +170,6 @@ class DocumentAdmin(BaseDocumentAdmin):
         self.log = not settings.DATABASES.get('default', {}).get(
             'ENGINE', 'django.db.backends.dummy'
         ).endswith('dummy')
-        self.change_list_template = 'admin/change_document_list.html'
 
 # XXX: add inline init somewhere
     def _get_inline_instances(self):
