@@ -15,8 +15,9 @@ def init_module():
         fieldcls = getattr(fields, name)
         mixin = getattr(djangoflavor, name, djangoflavor.DjangoField)
         setattr(
-            current_module, name,
-            type(name, (mixin, fieldcls), {})
+            current_module,
+            name,
+            type(name, (mixin, fieldcls), {}),
         )
 
 
