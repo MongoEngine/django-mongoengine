@@ -1,4 +1,6 @@
+from bson import ObjectId
 from mongoengine.errors import FieldDoesNotExist
+
 
 def serializable_value(self, field_name):
     """
@@ -15,4 +17,7 @@ def serializable_value(self, field_name):
         field = self._meta.get_field(field_name)
     except FieldDoesNotExist:
         return getattr(self, field_name)
-    return getattr(self, field.name)
+    value = field.to_mongo(getattr(self, field.name))
+    if isinstance(value, ObjectId):
+        return str(value)
+    return value
