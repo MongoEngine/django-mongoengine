@@ -12,9 +12,7 @@ from .queryset import QuerySetManager
 def django_meta(meta, *top_bases):
     class metaclass(meta):
         def __new__(cls, name, bases, attrs):
-            change_bases = len(bases) == 1 and (
-                bases[0].__name__ == "temporary_meta"
-            )
+            change_bases = len(bases) == 1 and (bases[0].__name__ == "temporary_meta")
             if change_bases:
                 new_bases = top_bases
             else:
@@ -68,21 +66,29 @@ class DjangoFlavor(object):
         return value
 
 
-class Document(django_meta(mtc.TopLevelDocumentMetaclass,
-                           DjangoFlavor, me.Document)):
+class Document(
+    django_meta(
+        mtc.TopLevelDocumentMetaclass,
+        DjangoFlavor,
+        me.Document,
+    )
+):
     swap_base = True
 
 
-class DynamicDocument(django_meta(mtc.TopLevelDocumentMetaclass,
-                                  DjangoFlavor, me.DynamicDocument)):
+class DynamicDocument(
+    django_meta(mtc.TopLevelDocumentMetaclass, DjangoFlavor, me.DynamicDocument)
+):
     swap_base = True
 
 
-class EmbeddedDocument(django_meta(mtc.DocumentMetaclass,
-                                   DjangoFlavor, me.EmbeddedDocument)):
+class EmbeddedDocument(
+    django_meta(mtc.DocumentMetaclass, DjangoFlavor, me.EmbeddedDocument)
+):
     swap_base = True
 
 
-class DynamicEmbeddedDocument(django_meta(mtc.DocumentMetaclass,
-                                          DjangoFlavor, me.DynamicEmbeddedDocument)):
+class DynamicEmbeddedDocument(
+    django_meta(mtc.DocumentMetaclass, DjangoFlavor, me.DynamicEmbeddedDocument)
+):
     swap_base = True
