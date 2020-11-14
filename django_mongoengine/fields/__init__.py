@@ -1,5 +1,4 @@
 from . import djangoflavor
-from .drf_patches import patch_drf_spectacular
 
 
 def init_module():
@@ -38,12 +37,7 @@ def patch_mongoengine_field(field_name):
         setattr(field, "auto_created", False)
 
 
-def patch_mongoengine():
-    fields = ["StringField", "ObjectIdField"]
-    for f in fields:
-        patch_mongoengine_field(f)
-
-
 init_module()
-patch_mongoengine()
-patch_drf_spectacular()
+
+for f in ["StringField", "ObjectIdField"]:
+    patch_mongoengine_field(f)
