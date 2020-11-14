@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.5-beta.2](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5-beta.1...v0.4.5-beta.2) (2020-11-14)
+
+
+### Features
+
+* **drf-spectacular:** AutoSchema generator for drf-spectacular support. ([2ef9529](https://github.com/MongoEngine/django-mongoengine/commit/2ef9529e330d482957acf582a56ac7aeabe853c6))
+
 ### [0.4.5-beta.1](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5-beta.0...v0.4.5-beta.1) (2020-11-11)
 
 ### [0.4.5-beta.0](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.4...v0.4.5-beta.0) (2020-11-11)
