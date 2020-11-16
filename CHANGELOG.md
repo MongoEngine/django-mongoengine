@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.5-beta.3](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5-beta.2...v0.4.5-beta.3) (2020-11-16)
+
+
+### Bug Fixes
+
+* Add missing __init__.py ([bb11d36](https://github.com/MongoEngine/django-mongoengine/commit/bb11d36cf754bfd19bcff1e643fabd28c44f9e38))
+
 ### [0.4.5-beta.2](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5-beta.1...v0.4.5-beta.2) (2020-11-14)
 
 
