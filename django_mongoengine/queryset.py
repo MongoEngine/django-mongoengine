@@ -2,6 +2,7 @@ import sys
 
 import six
 from django.db.models.query import QuerySet as DjangoQuerySet
+from django.db.models.utils import resolve_callables
 
 from mongoengine.errors import NotUniqueError
 from mongoengine import queryset as qs
@@ -52,7 +53,6 @@ class BaseQuerySet(object):
     def exists(self):
         return bool(self)
 
-
     def _clone(self):
         return self.clone()
 
@@ -69,25 +69,46 @@ class BaseQuerySet(object):
         else:
             return False
 
-    get_or_create = DjangoQuerySet.__dict__["get_or_create"]
-
-    _extract_model_params = DjangoQuerySet.__dict__["_extract_model_params"]
-
-    def _create_object_from_params(self, lookup, params):
+    def get_or_create(self, defaults=None, **kwargs):
         """
-        Tries to create an object using passed params.
-        Used by get_or_create and update_or_create
+        Look up an object with the given kwargs, creating one if necessary.
+        Return a tuple of (object, created), where created is a boolean
+        specifying whether an object was created.
         """
         try:
-            obj = self.create(**params)
-            return obj, True
-        except NotUniqueError:
-            exc_info = sys.exc_info()
+            return self.get(**kwargs), False
+        except self.model.DoesNotExist:
+            params = self._extract_model_params(defaults, **kwargs)
+            # Try to create an object using passed params.
             try:
-                return self.get(**lookup), False
-            except self.model.DoesNotExist:
-                pass
-            six.reraise(*exc_info)
+                params = dict(resolve_callables(params))
+                return self.create(**params), True
+            except IntegrityError:
+                try:
+                    return self.get(**kwargs), False
+                except self.model.DoesNotExist:
+                    pass
+                raise
+
+    def update_or_create(self, defaults=None, **kwargs):
+        """
+        Look up an object with the given kwargs, updating one with defaults
+        if it exists, otherwise create a new one.
+        Return a tuple (object, created), where created is a boolean
+        specifying whether an object was created.
+        """
+        defaults = defaults or {}
+        self._for_write = True
+        obj, created = self.get_or_create(defaults, **kwargs)
+        if created:
+            return obj, created
+        for k, v in resolve_callables(defaults):
+            setattr(obj, k, v)
+        obj.save()
+        return obj, False
+
+
+    _extract_model_params = DjangoQuerySet.__dict__["_extract_model_params"]
 
 
 class QuerySet(BaseQuerySet, qs.QuerySet):
