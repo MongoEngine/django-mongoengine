@@ -16,3 +16,8 @@ try:
 except ImportError:
     # some very old django versions
     from django.utils.encoding import force_unicode as force_text
+
+try:
+    from django.db.models.utils import resolve_callables
+except ImportError:
+    from .backports import resolve_callables
