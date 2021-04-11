@@ -2,10 +2,11 @@ import sys
 
 import six
 from django.db.models.query import QuerySet as DjangoQuerySet
-from django.db.models.utils import resolve_callables
 
 from mongoengine.errors import NotUniqueError
 from mongoengine import queryset as qs
+
+from .utils import resolve_callables
 
 
 class QueryWrapper(object):
