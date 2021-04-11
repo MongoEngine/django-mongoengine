@@ -4,7 +4,6 @@ from django.forms.forms import DeclarativeFieldsMetaclass
 from django.forms.models import ALL_FIELDS
 from django.core.exceptions import FieldError, ImproperlyConfigured
 from django.forms import models as model_forms
-import six
 
 from mongoengine.fields import ObjectIdField, FileField
 from mongoengine.errors import ValidationError
@@ -67,8 +66,11 @@ def save_instance(form, instance, fields=None, fail_message='saved',
         # see BaseDocumentForm._post_clean for an explanation
         if hasattr(form, '_delete_before_save'):
             fields = instance._fields
-            new_fields = dict([(n, f) for n, f in six.iteritems(fields)
-                                if not n in form._delete_before_save])
+            new_fields = dict([
+                (n, f)
+                for n, f in fields.items()
+                if n not in form._delete_before_save
+            ])
             if hasattr(instance, '_changed_fields'):
                 for field in form._delete_before_save:
                     instance._changed_fields.remove(field)
@@ -107,7 +109,7 @@ class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
         # of ('foo',)
         for opt in ['fields', 'exclude', 'localized_fields']:
             value = getattr(opts, opt)
-            if isinstance(value, six.string_types) and value != ALL_FIELDS:
+            if isinstance(value, str) and value != ALL_FIELDS:
                 msg = ("%(model)s.Meta.%(opt)s cannot be a string. "
                        "Did you mean to type: ('%(value)s',)?" % {
                            'model': new_class.__name__,
@@ -147,7 +149,7 @@ class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
                 )
 
             # make sure opts.fields doesn't specify an invalid field
-            none_model_fields = [k for k, v in six.iteritems(fields) if not v]
+            none_model_fields = [k for k, v in fields.items() if not v]
             missing_fields = (set(none_model_fields) -
                               set(new_class.declared_fields.keys()))
             if missing_fields:
@@ -214,9 +216,9 @@ class BaseDocumentForm(model_forms.BaseModelForm):
     save.alters_data = True
 
 
-@six.add_metaclass(DocumentFormMetaclass)
-class DocumentForm(BaseDocumentForm):
+class DocumentForm(BaseDocumentForm, metaclass=DocumentFormMetaclass):
     pass
+
 
 def documentform_factory(
     model, form=DocumentForm, fields=None, exclude=None, formfield_callback=None,
@@ -229,8 +231,7 @@ def documentform_factory(
     )
 
 
-@six.add_metaclass(DocumentFormMetaclass)
-class EmbeddedDocumentForm(BaseDocumentForm):
+class EmbeddedDocumentForm(BaseDocumentForm, metaclass=DocumentFormMetaclass):
 
     def __init__(self, parent_document, *args, **kwargs):
         super(EmbeddedDocumentForm, self).__init__(*args, **kwargs)

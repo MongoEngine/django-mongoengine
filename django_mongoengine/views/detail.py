@@ -2,14 +2,13 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic.base import View
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic import detail as djmod
-import six
 
 from django_mongoengine.utils.wrappers import (
     WrapDocument, copy_class,
 )
 
-@six.add_metaclass(WrapDocument)
-class SingleObjectMixin(djmod.SingleObjectMixin):
+
+class SingleObjectMixin(djmod.SingleObjectMixin, metaclass=WrapDocument):
     document = None
 
     def get_context_object_name(self, obj):
@@ -22,8 +21,6 @@ class SingleObjectMixin(djmod.SingleObjectMixin):
             return obj._meta.model_name
         else:
             return None
-
-
 
 
 class SingleObjectTemplateResponseMixin(TemplateResponseMixin):

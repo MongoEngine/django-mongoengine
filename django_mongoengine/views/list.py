@@ -1,5 +1,3 @@
-import six
-
 from mongoengine.queryset import QuerySet
 
 from django_mongoengine.paginator import Paginator
@@ -17,13 +15,14 @@ djmod = get_patched_django_module(
 )
 
 
-@six.add_metaclass(WrapDocument)
-class MultipleObjectMixin(djmod.MultipleObjectMixin):
+class MultipleObjectMixin(djmod.MultipleObjectMixin, metaclass=WrapDocument):
     paginator_class = Paginator
 
 
-@six.add_metaclass(WrapDocument)
-class MultipleObjectTemplateResponseMixin(djmod.MultipleObjectTemplateResponseMixin):
+class MultipleObjectTemplateResponseMixin(
+    djmod.MultipleObjectTemplateResponseMixin,
+    metaclass=WrapDocument,
+):
     pass
 
 

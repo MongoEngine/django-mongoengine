@@ -1,6 +1,3 @@
-import sys
-
-import six
 from django.db.models.query import QuerySet as DjangoQuerySet
 
 from mongoengine.errors import NotUniqueError
@@ -84,7 +81,7 @@ class BaseQuerySet(object):
             try:
                 params = dict(resolve_callables(params))
                 return self.create(**params), True
-            except IntegrityError:
+            except NotUniqueError:
                 try:
                     return self.get(**kwargs), False
                 except self.model.DoesNotExist:

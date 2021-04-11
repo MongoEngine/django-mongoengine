@@ -8,7 +8,6 @@ authors = ["Ross Lawley <ross.lawley@gmail.com>"]
 python = ">=3.7,<4"
 django = "~3"
 mongoengine = ">=0.14"
-six = "^1.15"
 pytest-django = "^4.2.0"
 
 [tool.poetry.dev-dependencies]
