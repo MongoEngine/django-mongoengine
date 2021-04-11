@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.5-beta.4](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5-beta.3...v0.4.5-beta.4) (2021-04-11)
+
 ### [0.4.5-beta.3](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5-beta.2...v0.4.5-beta.3) (2020-11-16)
 
 
