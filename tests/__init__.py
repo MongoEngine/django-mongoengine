@@ -1,27 +1,16 @@
-#!/usr/bin/env python
-# coding=utf-8
-from __future__ import absolute_import, division, print_function
-
-import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.settings")
-
-from django import test
-test.utils.setup_test_environment()
-try:
-    import django
-    django.setup()
-except AttributeError:
-    pass
+from django.test import SimpleTestCase, TransactionTestCase
 
 from mongoengine import connect
 from mongoengine.connection import get_db
 
+__all__ = ["MongoTestCase"]
 
-class MongoTestCase(test.SimpleTestCase):
+
+class MongoTestCase(SimpleTestCase):
     """
     TestCase class that clear the collection between the tests
     """
-    assertQuerysetEqual = test.TransactionTestCase.__dict__['assertQuerysetEqual']
+    assertQuerysetEqual = TransactionTestCase.__dict__['assertQuerysetEqual']
 
     def __init__(self, methodName='runtest'):
         from django.conf import settings
