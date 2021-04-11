@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.4.6](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5...v0.4.6) (2021-04-11)
+
+
+### Bug Fixes
+
+* **deps:** Move pytests dependency int dev-dependencies ([f7e37a7](https://github.com/MongoEngine/django-mongoengine/commit/f7e37a75e6612a4243ccc9abdb22f2dc72f53d9e))
+
 ### [0.4.5](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5-beta.4...v0.4.5) (2021-04-11)
 
 
