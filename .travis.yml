@@ -16,4 +16,4 @@ install:
     - poetry install -q
     - poetry run pip install -q $DJANGO
 # command to run tests
-script: poetry run pytest
+script: poetry run python -m pytest
