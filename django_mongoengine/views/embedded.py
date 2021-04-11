@@ -1,5 +1,4 @@
 from django.core.exceptions import ImproperlyConfigured
-import six
 
 from .detail import DetailView
 from .edit import WrapDocumentForm, djmod
@@ -103,13 +102,14 @@ class BaseEmbeddedFormMixin(EmbeddedFormMixin, ProcessEmbeddedFormMixin):
     adds the form into the template context.
     """
 
-class EmbeddedDetailView(six.with_metaclass(
-        WrapDocumentForm,
-        BaseEmbeddedFormMixin, DetailView)):
+class EmbeddedDetailView(
+    BaseEmbeddedFormMixin,
+    DetailView,
+    metaclass=WrapDocumentForm,
+):
     """
     Renders the detail view of a document and and adds a
     form for an embedded object into the template.
 
     See BaseEmbeddedFormMixin for details on the form.
     """
-

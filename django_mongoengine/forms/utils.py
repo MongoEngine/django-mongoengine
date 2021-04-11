@@ -2,7 +2,6 @@ from collections import OrderedDict
 from functools import partial
 
 from django.forms.fields import Field
-import six
 
 
 def patch_document(function, instance):
@@ -23,7 +22,7 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
 
     fields = [
         (field_name, attrs.pop(field_name))
-        for field_name, obj in list(six.iteritems(attrs)) if isinstance(obj, Field)
+        for field_name, obj in attrs.items() if isinstance(obj, Field)
     ]
     fields.sort(key=lambda x: x[1].creation_counter)
 
@@ -33,10 +32,10 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
     if with_base_fields:
         for base in bases[::-1]:
             if hasattr(base, 'base_fields'):
-                fields = list(six.iteritems(base.base_fields)) + fields
+                fields = list(base.base_fields.items()) + fields
     else:
         for base in bases[::-1]:
             if hasattr(base, 'declared_fields'):
-                fields = list(six.iteritems(base.declared_fields)) + fields
+                fields = list(base.declared_fields.items()) + fields
 
     return OrderedDict(fields)

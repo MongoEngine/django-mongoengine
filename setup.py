@@ -41,7 +41,7 @@ setup(
     long_description=__doc__,
     zip_safe=False,
     platforms='any',
-    install_requires=["django>2.2,<3.3", "six", "mongoengine>=0.14"],
+    install_requires=["django>2.2,<3.3", "mongoengine>=0.14"],
     packages=find_packages(exclude=('doc', 'docs',)),
     include_package_data=True,
     classifiers=[

@@ -17,7 +17,6 @@ from django.contrib.admin.options import (
     TO_FIELD_VAR, IS_POPUP_VAR,
     get_ul_class, csrf_protect_m,
 )
-import six
 from django.utils.html import escape
 from django.core.exceptions import PermissionDenied
 try:
@@ -173,7 +172,7 @@ class DocumentAdmin(BaseDocumentAdmin):
 
 # XXX: add inline init somewhere
     def _get_inline_instances(self):
-        for f in six.itervalues(self.model._fields):
+        for f in self.model._fields.values():
             if not (isinstance(f, ListField) and isinstance(getattr(f, 'field', None), EmbeddedDocumentField)) and not isinstance(f, EmbeddedDocumentField):
                 continue
             # Should only reach here if there is an embedded document...
