@@ -9,10 +9,10 @@ jobs:
     strategy:
       matrix:
         python:
-          - 3.7
-          - 3.8
+          # - 3.7
+          # - 3.8
           - 3.9
-          - "pypy3"
+          # - "pypy3"
         django:
           #- "Django>=2.2,<2.3"
           #- "Django>=3.0,<3.2"
