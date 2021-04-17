@@ -1,0 +1,18 @@
+# vim: set ft=dosini:
+[flake8]
+ignore =
+    E501,
+    E123,
+    E221,
+    E231,
+    E241,
+    E272,
+    E731,
+    N806,
+    C901
+exclude =
+    .git,
+    __pycache__,
+    dist,
+    node_modules
+max-complexity = 10

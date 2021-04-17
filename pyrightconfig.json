@@ -1,0 +1,14 @@
+{
+  "include": [
+    "django_mongoengine"
+  ],
+  "exclude": [
+    "**/__pycache__"
+  ],
+  "ignore": [
+    "src/fornex/*/migrations/*"
+  ],
+  "pythonVersion": "3.9",
+  "pythonPlatform": "Linux",
+  "reportGeneralTypeIssues": "information"
+}
