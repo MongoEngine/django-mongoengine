@@ -1,0 +1,41 @@
+# Docs:
+#  - https://docs.github.com/en/actions/guides/about-service-containers
+#  - https://github.com/actions/example-services/blob/main/.github/workflows/mongodb-service.yml
+name: CI
+on: [push]
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - 3.7
+          - 3.8
+          - 3.9
+          - "pypy3"
+        django:
+          - "Django>=2.2,<2.3"
+          - "Django>=3.0,<3.2"
+          - "Django>=3.2,<3.3"
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DJANGO: ${{ matrix.django }}
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Set up env
+        run: |
+          python -m pip install -q poetry
+          poetry install -q
+          poetry run pip install -q "${{ matrix.django }}"
+      - name: Run tests
+        run: |
+          poetry run python -m pytest

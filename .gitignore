@@ -1,4 +1,3 @@
-.*
 !.gitignore
 *~
 *.py[co]
@@ -13,6 +12,7 @@ env/
 Pipfile.lock
 .settings
 .project
+.coverage
 .pydevproject
 tests/bugfix.py
 *.egg-info
