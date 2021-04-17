@@ -2,11 +2,7 @@
 Django-MongoEngine
 ==================
 
-|build| |lifecycle| |gitter|
-
-.. |build| image:: https://travis-ci.org/MongoEngine/django-mongoengine.svg?branch=master
-   :alt: build status
-   :target: https://travis-ci.org/MongoEngine/django-mongoengine
+|lifecycle| |gitter|
 
 .. |lifecycle| image:: https://img.shields.io/osslifecycle/MongoEngine/django-mongoengine
    :alt: OSS Lifecycle
