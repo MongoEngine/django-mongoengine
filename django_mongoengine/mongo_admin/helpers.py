@@ -65,14 +65,21 @@ class AdminReadonlyField(DjangoAdminReadonlyField):
         self.is_checkbox = False
         self.is_readonly = True
 
+    def get_empty_value_diplay(self):
+        if hasattr(self.model_admin, 'get_empty_value_diplay'):
+            return self.model_admin.get_empty_value_diplay()
+        else:
+            # Django < 1.9
+            from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
+            return EMPTY_CHANGELIST_VALUE
+
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
-        from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
         field, obj, model_admin = self.field['field'], self.form.instance, self.model_admin
         try:
             f, attr, value = lookup_field(field, obj, model_admin)
         except (AttributeError, ValueError, ObjectDoesNotExist):
-            result_repr = EMPTY_CHANGELIST_VALUE
+            result_repr = self.get_empty_value_diplay()
         else:
             if f is None:
                 boolean = getattr(attr, "boolean", False)
@@ -84,7 +91,7 @@ class AdminReadonlyField(DjangoAdminReadonlyField):
                         result_repr = mark_safe(result_repr)
             else:
                 if value is None:
-                    result_repr = EMPTY_CHANGELIST_VALUE
+                    result_repr = self.get_empty_value_diplay()
                 #HERE WE NEED TO CHANGE THIS TEST
                 # elif isinstance(f.rel, ManyToManyRel):
                 #     result_repr = ", ".join(map(unicode, value.all()))
