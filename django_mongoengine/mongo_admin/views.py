@@ -2,7 +2,7 @@ import operator
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.contrib.admin.views.main import (
-    ChangeList, ORDER_VAR, ALL_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR,
+    ChangeList, ORDER_VAR, ALL_VAR, SEARCH_VAR, IS_POPUP_VAR,
     TO_FIELD_VAR)
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.core.paginator import InvalidPage
@@ -124,7 +124,7 @@ class DocumentChangeList(ChangeList):
 
     def _lookup_param_1_3(self):
         lookup_params = self.params.copy() # a dictionary of the query string
-        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR,
+        for i in (ALL_VAR, ORDER_VAR, SEARCH_VAR,
                   IS_POPUP_VAR, TO_FIELD_VAR):
             if i in lookup_params:
                 del lookup_params[i]
