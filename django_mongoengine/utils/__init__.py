@@ -12,10 +12,10 @@ except ImportError:
 
 try:
     # python3 and new django versions
-    from django.utils.encoding import force_text
+    from django.utils.encoding import force_str
 except ImportError:
     # some very old django versions
-    from django.utils.encoding import force_unicode as force_text
+    from django.utils.encoding import force_unicode as force_str
 
 try:
     from django.db.models.utils import resolve_callables
