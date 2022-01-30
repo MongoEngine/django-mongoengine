@@ -10,7 +10,7 @@ from mongoengine import fields
 from mongoengine.queryset import OperationError
 from mongoengine.connection import DEFAULT_CONNECTION_NAME
 
-from .utils import datetime_now, force_text
+from .utils import datetime_now, force_str
 
 
 MONGOENGINE_SESSION_DB_ALIAS = getattr(
@@ -59,14 +59,14 @@ class SessionStore(SessionBase):
             s = MongoSession.objects(session_key=self.session_key,
                                      expire_date__gt=datetime_now)[0]
             if MONGOENGINE_SESSION_DATA_ENCODE:
-                return self.decode(force_text(s.session_data))
+                return self.decode(force_str(s.session_data))
             else:
                 return s.session_data
         except (IndexError, SuspiciousOperation) as e:
             if isinstance(e, SuspiciousOperation):
                 logger = logging.getLogger('django.security.%s' %
                         e.__class__.__name__)
-                logger.warning(force_text(e))
+                logger.warning(force_str(e))
             self._session_key = None
             return {}
 
