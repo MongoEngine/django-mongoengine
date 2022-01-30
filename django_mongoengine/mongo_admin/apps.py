@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 from django.core import checks
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 def check_admin_app(**kwargs):
     from .sites import system_check_errors
