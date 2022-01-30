@@ -3,7 +3,7 @@ import warnings
 
 from django.core.exceptions import FieldDoesNotExist
 from django.utils.text import capfirst
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 from django.db.models.options import Options
 
 try:
@@ -39,7 +39,7 @@ class PkWrapper(object):
         Returns a string value of this field from the passed obj.
         This is used by the serialization framework.
         """
-        return smart_text(obj.pk)
+        return smart_str(obj.pk)
 
     def get_internal_type(self):
         return "CharField"
