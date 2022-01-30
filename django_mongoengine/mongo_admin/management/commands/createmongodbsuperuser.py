@@ -10,7 +10,7 @@ from django_mongoengine.mongo_auth.models import MongoUser
 from django_mongoengine.sessions import DEFAULT_CONNECTION_NAME
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 get_default_username = lambda: "admin"
 
