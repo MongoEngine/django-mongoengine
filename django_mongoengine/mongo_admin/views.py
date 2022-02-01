@@ -2,11 +2,9 @@ import operator
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.contrib.admin.views.main import (
-    ChangeList, ORDER_VAR, ALL_VAR, SEARCH_VAR, IS_POPUP_VAR,
-    TO_FIELD_VAR)
+    ChangeList, ORDER_VAR)
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.core.paginator import InvalidPage
-from django.utils.encoding import smart_str
 
 from mongoengine import Q
 from functools import reduce
