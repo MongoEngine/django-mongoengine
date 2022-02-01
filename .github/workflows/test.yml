@@ -2,7 +2,7 @@
 #  - https://docs.github.com/en/actions/guides/about-service-containers
 #  - https://github.com/actions/example-services/blob/main/.github/workflows/mongodb-service.yml
 name: CI
-on: [push]
+on: [push, pull_request]
 jobs:
   Test:
     runs-on: ubuntu-latest
