@@ -129,24 +129,21 @@ class DocumentChangeList(ChangeList):
         # First, we collect all the declared list filters.
         qs = self.root_query_set.clone()
 
-        try:
-            filter_values = self.get_filters(request)
-            if len(filter_values) == 4: # for Django 2
-                (self.filter_specs, self.has_filters, remaining_lookup_params,
-                    use_distinct) = filter_values
-            else: # for Django >2
-                (self.filter_specs, self.has_filters, remaining_lookup_params,
-                    use_distinct, has_active_filters) = filter_values
+        filter_values = self.get_filters(request)
+        if len(filter_values) == 4: # for Django 2
+            (self.filter_specs, self.has_filters, remaining_lookup_params,
+                use_distinct) = filter_values
+        else: # for Django >2
+            (self.filter_specs, self.has_filters, remaining_lookup_params,
+                use_distinct, has_active_filters) = filter_values
 
 
-            # Then, we let every list filter modify the queryset to its liking.
-            for filter_spec in self.filter_specs:
-                new_qs = filter_spec.queryset(request, qs)
-                if new_qs is not None:
-                    qs = new_qs
-        except ValueError:
-            # Django < 1.4.
-            raise Exception("Django versions < 1.4 are not supported.")
+        # Then, we let every list filter modify the queryset to its liking.
+        for filter_spec in self.filter_specs:
+            new_qs = filter_spec.queryset(request, qs)
+            if new_qs is not None:
+                qs = new_qs
+
 
         try:
             # Finally, we apply the remaining lookup parameters from the query

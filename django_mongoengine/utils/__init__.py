@@ -10,12 +10,7 @@ except ImportError:
     from datetime import datetime
     datetime_now = datetime.now
 
-try:
-    # python3 and new django versions
-    from django.utils.encoding import force_str
-except ImportError:
-    # some very old django versions
-    from django.utils.encoding import force_unicode as force_str
+from django.utils.encoding import force_str
 
 try:
     from django.db.models.utils import resolve_callables
