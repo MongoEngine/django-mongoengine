@@ -2,11 +2,9 @@ import operator
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.contrib.admin.views.main import (
-    ChangeList, ORDER_VAR, ALL_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR,
-    TO_FIELD_VAR)
+    ChangeList, ORDER_VAR)
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.core.paginator import InvalidPage
-from django.utils.encoding import smart_str
 
 from mongoengine import Q
 from functools import reduce
@@ -122,38 +120,6 @@ class DocumentChangeList(ChangeList):
             ordering.append('pk')
         return ordering
 
-    def _lookup_param_1_3(self):
-        lookup_params = self.params.copy() # a dictionary of the query string
-        for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR,
-                  IS_POPUP_VAR, TO_FIELD_VAR):
-            if i in lookup_params:
-                del lookup_params[i]
-        for key, value in lookup_params.items():
-            if not isinstance(key, str):
-                # 'key' will be used as a keyword argument later, so Python
-                # requires it to be a string.
-                del lookup_params[key]
-                lookup_params[smart_str(key)] = value
-
-            # if key ends with __in, split parameter into separate values
-            if key.endswith('__in'):
-                value = value.split(',')
-                lookup_params[key] = value
-
-            # if key ends with __isnull, special case '' and false
-            if key.endswith('__isnull'):
-                if value.lower() in ('', 'false'):
-                    value = False
-                else:
-                    value = True
-                lookup_params[key] = value
-
-            if not self.model_admin.lookup_allowed(key, value):
-                raise SuspiciousOperation(
-                    "Filtering by %s not allowed" % key
-                )
-        return lookup_params
-
     def get_queryset(self, request=None):
         # root_query_set has been changed to root_queryset
         try:
@@ -163,18 +129,21 @@ class DocumentChangeList(ChangeList):
         # First, we collect all the declared list filters.
         qs = self.root_query_set.clone()
 
-        try:
+        filter_values = self.get_filters(request)
+        if len(filter_values) == 4: # for Django 2
             (self.filter_specs, self.has_filters, remaining_lookup_params,
-             use_distinct) = self.get_filters(request)
+                use_distinct) = filter_values
+        else: # for Django >2
+            (self.filter_specs, self.has_filters, remaining_lookup_params,
+                use_distinct, has_active_filters) = filter_values
 
-            # Then, we let every list filter modify the queryset to its liking.
-            for filter_spec in self.filter_specs:
-                new_qs = filter_spec.queryset(request, qs)
-                if new_qs is not None:
-                    qs = new_qs
-        except ValueError:
-            # Django < 1.4.
-            remaining_lookup_params = self._lookup_param_1_3()
+
+        # Then, we let every list filter modify the queryset to its liking.
+        for filter_spec in self.filter_specs:
+            new_qs = filter_spec.queryset(request, qs)
+            if new_qs is not None:
+                qs = new_qs
+
 
         try:
             # Finally, we apply the remaining lookup parameters from the query

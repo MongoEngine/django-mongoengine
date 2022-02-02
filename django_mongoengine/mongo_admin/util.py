@@ -1,11 +1,11 @@
-from django.utils.encoding import smart_text, smart_str
+from django.utils.encoding import smart_str
 from django.forms.utils import pretty_name
 from django.core.exceptions import FieldDoesNotExist
 from django.utils import formats
 
 from mongoengine import fields
 
-from django_mongoengine.utils import force_text
+from django_mongoengine.utils import force_str
 
 
 class RelationWrapper(object):
@@ -24,7 +24,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
         label = field.name.replace('_', ' ')
     except FieldDoesNotExist:
         if name == "__unicode__":
-            label = force_text(model._meta.verbose_name)
+            label = force_str(model._meta.verbose_name)
         elif name == "__str__":
             label = smart_str(model._meta.verbose_name)
         else:
@@ -74,7 +74,7 @@ def display_for_field(value, field):
     elif isinstance(field, fields.FloatField):
         return formats.number_format(value)
     else:
-        return smart_text(value)
+        return smart_str(value)
 
 
 def help_text_for_field(name, model):
@@ -82,4 +82,4 @@ def help_text_for_field(name, model):
         help_text = model._meta.get_field_by_name(name)[0].help_text
     except FieldDoesNotExist:
         help_text = ""
-    return smart_text(help_text, strings_only=True)
+    return smart_str(help_text, strings_only=True)

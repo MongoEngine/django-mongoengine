@@ -8,12 +8,12 @@ from django.contrib.admin import helpers
 from django.contrib.admin.utils import get_deleted_objects, model_ngettext
 from django.db import router
 from django.shortcuts import render_to_response
-from django.utils.translation import ugettext_lazy, ugettext as _
+from django.utils.translation import gettext_lazy, gettext as _
 from django.db import models
 
 from django.contrib.admin.actions import delete_selected as django_delete_selected
 
-from django_mongoengine.utils import force_text
+from django_mongoengine.utils import force_str
 
 
 def delete_selected(modeladmin, request, queryset):
@@ -53,13 +53,13 @@ def _delete_selected(modeladmin, request, queryset):
         n = len(queryset)
         if n:
             for obj in queryset:
-                obj_display = force_text(obj)
+                obj_display = force_str(obj)
                 modeladmin.log_deletion(request, obj, obj_display)
                 # call the objects delete method to ensure signals are
                 # processed.
                 obj.delete()
             # This is what you get if you have to monkey patch every object in a changelist
-            # No queryset object, I can tell ya. So we get a new one and delete that. 
+            # No queryset object, I can tell ya. So we get a new one and delete that.
             #pk_list = [o.pk for o in queryset]
             #klass = queryset[0].__class__
             #qs = klass.objects.filter(pk__in=pk_list)
@@ -71,9 +71,9 @@ def _delete_selected(modeladmin, request, queryset):
         return None
 
     if len(queryset) == 1:
-        objects_name = force_text(opts.verbose_name)
+        objects_name = force_str(opts.verbose_name)
     else:
-        objects_name = force_text(opts.verbose_name_plural)
+        objects_name = force_str(opts.verbose_name_plural)
 
     if perms_needed or protected:
         title = _("Cannot delete %(name)s") % {"name": objects_name}
@@ -92,7 +92,7 @@ def _delete_selected(modeladmin, request, queryset):
         "app_label": app_label,
         'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
     }
-    
+
     # Display the confirmation page
     return render_to_response(modeladmin.delete_selected_confirmation_template or [
         "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.object_name.lower()),
@@ -100,4 +100,4 @@ def _delete_selected(modeladmin, request, queryset):
         "admin/delete_selected_confirmation.html"
     ], context, context_instance=template.RequestContext(request))
 
-delete_selected.short_description = ugettext_lazy("Delete selected %(verbose_name_plural)s")
+delete_selected.short_description = gettext_lazy("Delete selected %(verbose_name_plural)s")

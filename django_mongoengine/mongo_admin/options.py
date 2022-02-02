@@ -26,13 +26,13 @@ except ImportError:
 from django.http import Http404
 from django.template.response import TemplateResponse
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.forms.utils import pretty_name
 from django.forms.models import modelform_defines_fields
 from django.conf import settings
 from django.apps import apps
 
-from django_mongoengine.utils import force_text
+from django_mongoengine.utils import force_str
 from django_mongoengine.fields import (ListField, EmbeddedDocumentField,
                                        ReferenceField, StringField)
 
@@ -301,7 +301,7 @@ class DocumentAdmin(BaseDocumentAdmin):
 
             if obj is None:
                 raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-                    'name': force_text(opts.verbose_name), 'key': escape(object_id)})
+                    'name': force_str(opts.verbose_name), 'key': escape(object_id)})
 
         ModelForm = self.get_form(request, obj)
         if request.method == 'POST':
@@ -348,7 +348,7 @@ class DocumentAdmin(BaseDocumentAdmin):
 
         context = dict(
             self.admin_site.each_context(request),
-            title=(_('Add %s') if add else _('Change %s')) % force_text(opts.verbose_name),
+            title=(_('Add %s') if add else _('Change %s')) % force_str(opts.verbose_name),
             adminform=adminForm,
             object_id=object_id,
             original=obj,
@@ -391,7 +391,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         if obj is None:
             raise Http404(
                 _('%(name)s object with primary key %(key)r does not exist.') %
-                {'name': force_text(opts.verbose_name), 'key': escape(object_id)}
+                {'name': force_str(opts.verbose_name), 'key': escape(object_id)}
             )
 
         # Populate deleted_objects, a data structure of all related objects that
@@ -402,7 +402,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
-            obj_display = force_text(obj)
+            obj_display = force_str(obj)
             attr = str(to_field) if to_field else opts.pk.attname
             obj_id = obj.serializable_value(attr)
             self.log_deletion(request, obj, obj_display)
@@ -410,7 +410,7 @@ class DocumentAdmin(BaseDocumentAdmin):
 
             return self.response_delete(request, obj_display, obj_id)
 
-        object_name = force_text(opts.verbose_name)
+        object_name = force_str(opts.verbose_name)
 
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": object_name}
@@ -445,7 +445,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         obj = self.get_object(request, unquote(object_id))
         if obj is None:
             raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-                'name': force_text(model._meta.verbose_name),
+                'name': force_str(model._meta.verbose_name),
                 'key': escape(object_id),
             })
 
@@ -462,9 +462,9 @@ class DocumentAdmin(BaseDocumentAdmin):
 
         context = dict(
             self.admin_site.each_context(request),
-            title=_('Change history: %s') % force_text(obj),
+            title=_('Change history: %s') % force_str(obj),
             action_list=action_list,
-            module_name=capfirst(force_text(opts.verbose_name_plural)),
+            module_name=capfirst(force_str(opts.verbose_name_plural)),
             object=obj,
             opts=opts,
             preserved_filters=self.get_preserved_filters(request),
