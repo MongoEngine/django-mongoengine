@@ -22,6 +22,20 @@ _field_defaults = (
 class DjangoField(object):
     get_choices = Field.__dict__["get_choices"]
 
+    def _get_flatchoices(self):
+        """Flattened version of choices tuple."""
+        if self.choices is None:
+            return []
+        flat = []
+        for choice, value in self.choices:
+            if isinstance(value, (list, tuple)):
+                flat.extend(value)
+            else:
+                flat.append((choice, value))
+        return flat
+
+    flatchoices = property(_get_flatchoices)
+
     def __init__(self, *args, **kwargs):
         for k, v in _field_defaults:
             kwargs.setdefault(k, v)
