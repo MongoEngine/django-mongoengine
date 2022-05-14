@@ -1,16 +1,17 @@
 from django.http import HttpResponse
 from django.views.generic import View
+from tumblelog import forms
+from tumblelog.models import BlogPost, Image, Music, Post, Quote, Video
 
 from django_mongoengine.forms.fields import DictField
 from django_mongoengine.views import (
-    CreateView, UpdateView,
-    DeleteView, ListView,
+    CreateView,
+    DeleteView,
     DetailView,
     EmbeddedDetailView,
+    ListView,
+    UpdateView,
 )
-
-from tumblelog.models import Post, BlogPost, Video, Image, Quote, Music
-from tumblelog import forms
 
 
 class PostIndexView(ListView):
@@ -50,11 +51,7 @@ class AddPostView(CreateView):
                 'Album': '',
                 'Genre': '',
                 'Label': '',
-                'Release dates': {
-                    'UK': '',
-                    'US': '',
-                    'FR': ''
-                }
+                'Release dates': {'UK': '', 'US': '', 'FR': ''},
             }
             music_parameters = DictField(initial=schema, flags=['FORCE_SCHEMA'])
             form.fields['music_parameters'] = music_parameters
@@ -75,6 +72,7 @@ class UpdatePostView(UpdateView):
 
     def get_form_class(self):
         from django_mongoengine.forms.documents import documentform_factory
+
         return documentform_factory(self.object.__class__, fields=self.fields)
 
 

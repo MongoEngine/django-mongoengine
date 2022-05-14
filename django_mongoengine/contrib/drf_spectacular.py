@@ -1,10 +1,10 @@
+from django.db import models
 from drf_spectacular import openapi
 from drf_spectacular.openapi import OpenApiTypes, build_basic_type
-
-from django.db import models
-from django_mongoengine.forms.document_options import PkWrapper
 from mongoengine.fields import BaseField
 from rest_framework import serializers
+
+from django_mongoengine.forms.document_options import PkWrapper
 
 SUPPORTED_FIELDS = (PkWrapper, BaseField)
 

@@ -1,5 +1,4 @@
 from django.test import SimpleTestCase, TransactionTestCase
-
 from mongoengine import connect
 from mongoengine.connection import get_db
 
@@ -10,10 +9,12 @@ class MongoTestCase(SimpleTestCase):
     """
     TestCase class that clear the collection between the tests
     """
+
     assertQuerysetEqual = TransactionTestCase.__dict__['assertQuerysetEqual']
 
     def __init__(self, methodName='runtest'):
         from django.conf import settings
+
         connect(settings.MONGODB_DATABASES['default']['name'])
         self.db = get_db()
         super(MongoTestCase, self).__init__(methodName)

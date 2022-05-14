@@ -6,11 +6,12 @@ import re
 import sys
 from optparse import make_option
 
-from django_mongoengine.mongo_auth.models import MongoUser
-from django_mongoengine.sessions import DEFAULT_CONNECTION_NAME
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.translation import gettext as _
+
+from django_mongoengine.mongo_auth.models import MongoUser
+from django_mongoengine.sessions import DEFAULT_CONNECTION_NAME
 
 get_default_username = lambda: "admin"
 
@@ -18,8 +19,10 @@ RE_VALID_USERNAME = re.compile('[\w.@+-]+$')
 
 EMAIL_RE = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
-    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"' # quoted-string
-    r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
+    r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"'  # quoted-string
+    r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$',
+    re.IGNORECASE,
+)  # domain
 
 
 def is_valid_email(value):
@@ -32,23 +35,35 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--username', dest='username', default=None,
-            help='Specifies the username for the superuser.'
+            '--username',
+            dest='username',
+            default=None,
+            help='Specifies the username for the superuser.',
         )
         parser.add_argument(
-            '--email', dest='email', default=None,
-            help='Specifies the email address for the superuser.'
+            '--email',
+            dest='email',
+            default=None,
+            help='Specifies the email address for the superuser.',
         )
         parser.add_argument(
-            '--noinput', action='store_false', dest='interactive', default=True,
-            help=('Tells Django to NOT prompt the user for input of any kind. '
-                  'You must use --username and --email with --noinput, and '
-                  'superusers created with --noinput will not be able to log '
-                  'in until they\'re given a valid password.')
+            '--noinput',
+            action='store_false',
+            dest='interactive',
+            default=True,
+            help=(
+                'Tells Django to NOT prompt the user for input of any kind. '
+                'You must use --username and --email with --noinput, and '
+                'superusers created with --noinput will not be able to log '
+                'in until they\'re given a valid password.'
+            ),
         )
         parser.add_argument(
-            '--database', action='store', dest='database',
-            default=DEFAULT_CONNECTION_NAME, help='Specifies the database to use. Default is "default".'
+            '--database',
+            action='store',
+            dest='database',
+            default=DEFAULT_CONNECTION_NAME,
+            help='Specifies the database to use. Default is "default".',
         )
 
     def handle(self, *args, **options):
@@ -91,7 +106,9 @@ class Command(BaseCommand):
                     if default_username and username == '':
                         username = default_username
                     if not RE_VALID_USERNAME.match(username):
-                        sys.stderr.write("Error: That username is invalid. Use only letters, digits and underscores.\n")
+                        sys.stderr.write(
+                            "Error: That username is invalid. Use only letters, digits and underscores.\n"
+                        )
                         username = None
                         continue
                     try:
@@ -137,4 +154,4 @@ class Command(BaseCommand):
 
         MongoUser.objects.create_superuser(username, email, password)
         if verbosity >= 1:
-          self.stdout.write("Superuser created successfully.\n")
+            self.stdout.write("Superuser created successfully.\n")

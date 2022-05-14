@@ -1,13 +1,13 @@
-from django.utils.text import capfirst
-from django.core.validators import RegexValidator
-from django.core.exceptions import ImproperlyConfigured
 from django import forms
+from django.core.exceptions import ImproperlyConfigured
+from django.core.validators import RegexValidator
 from django.db.models import Field
 from django.utils.functional import cached_property
-
+from django.utils.text import capfirst
 from mongoengine import fields
 
 from django_mongoengine.forms import fields as formfields
+
 from .internal import INTERNAL_DJANGO_FIELDS_MAP
 
 _field_defaults = (
@@ -40,7 +40,9 @@ class DjangoField(object):
         for k, v in _field_defaults:
             kwargs.setdefault(k, v)
         if "required" in kwargs:
-            raise ImproperlyConfigured("`required` option is not supported. Use Django-style `blank` instead.")
+            raise ImproperlyConfigured(
+                "`required` option is not supported. Use Django-style `blank` instead."
+            )
         kwargs["required"] = not kwargs["blank"]
         if hasattr(self, "auto_created"):
             kwargs.pop("auto_created")
@@ -63,9 +65,11 @@ class DjangoField(object):
         Returns a django.forms.Field instance for this database Field.
         """
 
-        defaults = {'required': self.required,
-                    'label': capfirst(self.verbose_name),
-                    'help_text': self.help_text}
+        defaults = {
+            'required': self.required,
+            'label': capfirst(self.verbose_name),
+            'help_text': self.help_text,
+        }
         if self.default:
             if callable(self.default):
                 defaults['initial'] = self.default
@@ -74,8 +78,7 @@ class DjangoField(object):
                 defaults['initial'] = self.default
         if self.choices:
             # Fields with choices get special treatment.
-            include_blank = (self.blank or
-                             not (self.default or 'initial' in kwargs))
+            include_blank = self.blank or not (self.default or 'initial' in kwargs)
             defaults['choices'] = self.get_choices(include_blank=include_blank)
             defaults['coerce'] = self.to_python
             if self.null:
@@ -88,9 +91,18 @@ class DjangoField(object):
             # max_value) don't apply for choice fields, so be sure to only pass
             # the values that TypedChoiceField will understand.
             for k in list(kwargs):
-                if k not in ('coerce', 'empty_value', 'choices', 'required',
-                             'widget', 'label', 'initial', 'help_text',
-                             'error_messages', 'show_hidden_initial'):
+                if k not in (
+                    'coerce',
+                    'empty_value',
+                    'choices',
+                    'required',
+                    'widget',
+                    'label',
+                    'initial',
+                    'help_text',
+                    'error_messages',
+                    'show_hidden_initial',
+                ):
                     del kwargs[k]
         defaults.update(kwargs)
         if form_class is None:
@@ -130,7 +142,6 @@ class DjangoField(object):
 
 
 class StringField(DjangoField):
-
     def formfield(self, form_class=forms.CharField, choices_form_class=None, **kwargs):
 
         defaults = {}
@@ -149,7 +160,6 @@ class StringField(DjangoField):
 
 
 class EmailField(StringField):
-
     def __init__(self, *args, **kwargs):
         # max_length=254 to be compliant with RFCs 3696 and 5321
         kwargs['max_length'] = kwargs.get('max_length', 254)
@@ -164,7 +174,6 @@ class EmailField(StringField):
 
 
 class URLField(StringField):
-
     def formfield(self, **kwargs):
         defaults = {
             'form_class': forms.URLField,
@@ -174,18 +183,16 @@ class URLField(StringField):
 
 
 class MinMaxMixin(object):
-
     def formfield(self, **kwargs):
         defaults = {
-            'min_value':  self.min_value,
-            'max_value':  self.max_value,
+            'min_value': self.min_value,
+            'max_value': self.max_value,
         }
         defaults.update(kwargs)
         return super(MinMaxMixin, self).formfield(**defaults)
 
 
 class IntField(MinMaxMixin, DjangoField):
-
     def formfield(self, **kwargs):
         defaults = {
             'form_class': forms.IntegerField,
@@ -195,7 +202,6 @@ class IntField(MinMaxMixin, DjangoField):
 
 
 class FloatField(MinMaxMixin, DjangoField):
-
     def formfield(self, **kwargs):
         defaults = {
             'form_class': forms.FloatField,
@@ -205,7 +211,6 @@ class FloatField(MinMaxMixin, DjangoField):
 
 
 class DecimalField(MinMaxMixin, DjangoField):
-
     def formfield(self, **kwargs):
         defaults = {
             'max_digits': self.max_digits,
@@ -215,10 +220,11 @@ class DecimalField(MinMaxMixin, DjangoField):
         defaults.update(kwargs)
         return super(DecimalField, self).formfield(**defaults)
 
+
 # TODO: test boolean choices; test choices
 
-class BooleanField(DjangoField):
 
+class BooleanField(DjangoField):
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
 
@@ -237,7 +243,6 @@ class BooleanField(DjangoField):
 
 
 class DateTimeField(DjangoField):
-
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.DateTimeField}
         defaults.update(kwargs)
@@ -245,11 +250,10 @@ class DateTimeField(DjangoField):
 
 
 class ReferenceField(DjangoField):
-
     def formfield(self, **kwargs):
         defaults = {
-          'form_class': formfields.ReferenceField,
-          'queryset': self.document_type.objects,
+            'form_class': formfields.ReferenceField,
+            'queryset': self.document_type.objects,
         }
         defaults.update(kwargs)
         return super(ReferenceField, self).formfield(**defaults)
@@ -277,8 +281,6 @@ class ListField(DjangoField):
 
 
 class FileField(DjangoField):
-
-
     def __init__(self, *args, **kwargs):
 
         kwargs['max_length'] = kwargs.get('max_length', 100)
@@ -298,7 +300,6 @@ class FileField(DjangoField):
 
 
 class ImageField(FileField):
-
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ImageField}
         defaults.update(kwargs)
@@ -306,13 +307,13 @@ class ImageField(FileField):
 
 
 class DictField(DjangoField):
-
     def formfield(self, **kwargs):
-        #remove Mongo reserved words
+        # remove Mongo reserved words
         validators = [
             RegexValidator(
                 regex='^[^$_]',
-                message=u'Ensure the keys do not begin with : ["$","_"].', code='invalid_start'
+                message=u'Ensure the keys do not begin with : ["$","_"].',
+                code='invalid_start',
             )
         ]
         defaults = {
@@ -323,9 +324,9 @@ class DictField(DjangoField):
 
 
 class EmbeddedDocumentField(DjangoField):
-
     def formfield(self, **kwargs):
         from django_mongoengine.forms.documents import documentform_factory
+
         defaults = {
             'label': self.label,
             'help_text': self.help_text,

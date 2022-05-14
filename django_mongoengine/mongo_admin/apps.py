@@ -2,8 +2,10 @@ from django.apps import AppConfig
 from django.core import checks
 from django.utils.translation import gettext_lazy as _
 
+
 def check_admin_app(**kwargs):
     from .sites import system_check_errors
+
     return system_check_errors
 
 
@@ -18,7 +20,6 @@ class SimpleMongoAdminConfig(AppConfig):
 
 
 class MongoAdminConfig(SimpleMongoAdminConfig):
-
     def ready(self):
         super(MongoAdminConfig, self).ready()
         self.module.autodiscover()

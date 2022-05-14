@@ -1,6 +1,6 @@
 # Django settings for tumblelog project.
-import sys
 import os
+import sys
 
 PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.insert(0, os.path.realpath(os.path.join(PROJECT_ROOT, '../../../')))
@@ -15,14 +15,10 @@ ADMINS = (
 MANAGERS = ADMINS
 
 # MongoDB settings
-MONGODB_DATABASES = {
-    'default': {'name': 'django_mongoengine'}
-}
+MONGODB_DATABASES = {'default': {'name': 'django_mongoengine'}}
 
 
-DATABASES = {
-    'default': {'ENGINE': 'django.db.backends.dummy'}
-}
+DATABASES = {'default': {'ENGINE': 'django.db.backends.dummy'}}
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -127,26 +123,24 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-
     'django_mongoengine',
     'django_mongoengine.mongo_auth',
     'django_mongoengine.mongo_admin',
-
     'bootstrap3',
-
-    'tumblelog'
+    'tumblelog',
 )
 
 AUTH_USER_MODEL = 'mongo_auth.MongoUser'
 
-AUTHENTICATION_BACKENDS = (
-    'django_mongoengine.mongo_auth.backends.MongoEngineBackend',
-)
+AUTHENTICATION_BACKENDS = ('django_mongoengine.mongo_auth.backends.MongoEngineBackend',)
 
 SESSION_ENGINE = 'django_mongoengine.sessions'
 
 
-INTERNAL_IPS = ('127.0.0.1', '10.0.2.2',)
+INTERNAL_IPS = (
+    '127.0.0.1',
+    '10.0.2.2',
+)
 
 
 # A sample logging configuration. The only tangible logging
@@ -157,16 +151,12 @@ INTERNAL_IPS = ('127.0.0.1', '10.0.2.2',)
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
+    'filters': {'require_debug_false': {'()': 'django.utils.log.RequireDebugFalse'}},
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'django.utils.log.AdminEmailHandler',
         }
     },
     'loggers': {
@@ -175,5 +165,5 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-    }
+    },
 }

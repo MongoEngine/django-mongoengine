@@ -1,9 +1,7 @@
 from django.db.models.query import QuerySet as DjangoQuerySet
-
-from mongoengine.errors import NotUniqueError
-from mongoengine import queryset as qs
-
 from django.db.models.utils import resolve_callables
+from mongoengine import queryset as qs
+from mongoengine.errors import NotUniqueError
 
 
 class QueryWrapper(object):
@@ -104,7 +102,6 @@ class BaseQuerySet(object):
             setattr(obj, k, v)
         obj.save()
         return obj, False
-
 
     _extract_model_params = DjangoQuerySet.__dict__["_extract_model_params"]
 

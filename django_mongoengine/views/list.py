@@ -1,8 +1,8 @@
 from mongoengine.queryset import QuerySet
 
 from django_mongoengine.paginator import Paginator
-from django_mongoengine.utils.wrappers import WrapDocument, copy_class
 from django_mongoengine.utils.monkey import get_patched_django_module
+from django_mongoengine.utils.wrappers import WrapDocument, copy_class
 
 __all__ = [
     "MultipleObjectMixin",

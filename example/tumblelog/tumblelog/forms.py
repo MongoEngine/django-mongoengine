@@ -1,10 +1,9 @@
-from django_mongoengine import forms
-
 from tumblelog import models
+
+from django_mongoengine import forms
 
 
 class CommentForm(forms.EmbeddedDocumentForm):
-
     class Meta:
         document = models.Comment
         embedded_field = 'comments'

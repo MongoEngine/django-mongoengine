@@ -1,11 +1,8 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.views.generic.base import View
-from django.views.generic.base import TemplateResponseMixin
 from django.views.generic import detail as djmod
+from django.views.generic.base import TemplateResponseMixin, View
 
-from django_mongoengine.utils.wrappers import (
-    WrapDocument, copy_class,
-)
+from django_mongoengine.utils.wrappers import WrapDocument, copy_class
 
 
 class SingleObjectMixin(djmod.SingleObjectMixin, metaclass=WrapDocument):
@@ -60,11 +57,9 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             elif hasattr(self, 'model') and self.model is not None:
                 opts = self.model._meta
             if opts:
-                names.append("%s/%s%s.html" % (
-                    opts.app_label,
-                    opts.model_name,
-                    self.template_name_suffix
-                ))
+                names.append(
+                    "%s/%s%s.html" % (opts.app_label, opts.model_name, self.template_name_suffix)
+                )
 
             # If we still haven't managed to find any template names, we should
             # re-raise the ImproperlyConfigured to alert the user.

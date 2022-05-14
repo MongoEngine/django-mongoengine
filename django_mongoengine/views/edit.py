@@ -1,16 +1,17 @@
 from django.core.exceptions import ImproperlyConfigured
 
-from django_mongoengine.utils.wrappers import WrapDocument, copy_class
-from django_mongoengine.utils.monkey import get_patched_django_module
 from django_mongoengine.forms.documents import documentform_factory
+from django_mongoengine.utils.monkey import get_patched_django_module
+from django_mongoengine.utils.wrappers import WrapDocument, copy_class
 
 from .detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
 
 djmod = get_patched_django_module(
     "django.views.generic.edit",
     model_forms=get_patched_django_module(
-        "django.forms.models", modelform_factory=documentform_factory,
-    )
+        "django.forms.models",
+        modelform_factory=documentform_factory,
+    ),
 )
 
 try:
@@ -25,7 +26,6 @@ class WrapDocumentForm(WrapDocument, FormMixin):
 
 
 class DocumentFormFixin(SingleObjectMixin):
-
     def get_success_url(self):
         """
         Returns the supplied URL.
@@ -38,7 +38,8 @@ class DocumentFormFixin(SingleObjectMixin):
             except AttributeError:
                 raise ImproperlyConfigured(
                     "No URL to redirect to.  Either provide a url or define"
-                    " a get_absolute_url method on the Model.")
+                    " a get_absolute_url method on the Model."
+                )
         return url
 
 
@@ -49,7 +50,7 @@ class CreateView(
     djmod.BaseCreateView,
     metaclass=WrapDocumentForm,
 ):
-    __doc__  = djmod.CreateView.__doc__
+    __doc__ = djmod.CreateView.__doc__
 
 
 @copy_class(djmod.UpdateView)
@@ -59,7 +60,7 @@ class UpdateView(
     djmod.BaseUpdateView,
     metaclass=WrapDocumentForm,
 ):
-    __doc__  = djmod.UpdateView.__doc__
+    __doc__ = djmod.UpdateView.__doc__
 
 
 @copy_class(djmod.DeleteView)
@@ -69,4 +70,4 @@ class DeleteView(
     djmod.BaseDeleteView,
     metaclass=WrapDocumentForm,
 ):
-    __doc__  = djmod.DeleteView.__doc__
+    __doc__ = djmod.DeleteView.__doc__

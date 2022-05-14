@@ -2,22 +2,21 @@ import sys
 import warnings
 
 from django.core.exceptions import FieldDoesNotExist
-from django.utils.text import capfirst
-from django.utils.encoding import smart_str
 from django.db.models.options import Options
+from django.utils.encoding import smart_str
+from django.utils.text import capfirst
 
 try:
     from django.db.models.options import get_verbose_name as camel_case_to_spaces
 except ImportError:
     from django.utils.text import camel_case_to_spaces, format_lazy
 
-
 from mongoengine.fields import ReferenceField
 
 
 class PkWrapper(object):
-    """Used to wrap the Primary Key so it can mimic Django's expectations
-    """
+    """Used to wrap the Primary Key so it can mimic Django's expectations"""
+
     editable = False
     remote_field = None
 
@@ -50,6 +49,7 @@ class DocumentMetaWrapper(object):
     Used to store mongoengine's _meta dict to make the document admin
     as compatible as possible to django's meta class on models.
     """
+
     _pk = None
     pk_name = None
     app_label = None
@@ -118,7 +118,9 @@ class DocumentMetaWrapper(object):
         """
         warnings.warn(
             "Options.module_name has been deprecated in favor of model_name",
-            PendingDeprecationWarning, stacklevel=2)
+            PendingDeprecationWarning,
+            stacklevel=2,
+        )
         return self.model_name
 
     def get_app_label(self):
@@ -210,8 +212,7 @@ class DocumentMetaWrapper(object):
                 self._init_field_cache()
                 return self._field_cache[name]
         except KeyError:
-            raise FieldDoesNotExist('%s has no field named %r'
-                                    % (self.object_name, name))
+            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, name))
 
     def _init_field_cache(self):
         if self._field_cache is None:

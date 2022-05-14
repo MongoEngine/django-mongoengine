@@ -1,21 +1,22 @@
-from django.utils.encoding import smart_str
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
+from bson.objectid import ObjectId
 from django.conf import settings
+from django.contrib import auth
 from django.contrib.auth.models import (
     AbstractBaseUser,
-    _user_has_perm, _user_get_permissions, _user_has_module_perms,
+    _user_get_permissions,
+    _user_has_module_perms,
+    _user_has_perm,
 )
-from django.db import models
 from django.contrib.contenttypes.models import ContentTypeManager
-from django.contrib import auth
-
-from bson.objectid import ObjectId
+from django.db import models
+from django.utils import timezone
+from django.utils.encoding import smart_str
+from django.utils.translation import gettext_lazy as _
 from mongoengine import ImproperlyConfigured
 
-from django_mongoengine import document
-from django_mongoengine import fields
+from django_mongoengine import document, fields
 from django_mongoengine.queryset import QuerySetManager
+
 from .managers import MongoUserManager
 
 
@@ -53,6 +54,7 @@ except ImportError:
 
     def make_password(raw_password):
         from random import random
+
         algo = 'sha1'
         salt = get_hexdigest(algo, str(random()), str(random()))[:5]
         hash = get_hexdigest(algo, salt, raw_password)
@@ -75,8 +77,9 @@ class BaseUser(object):
 class ContentType(document.Document):
     name = fields.StringField(max_length=100)
     app_label = fields.StringField(max_length=100)
-    model = fields.StringField(max_length=100, verbose_name=_('python model class name'),
-                        unique_with='app_label')
+    model = fields.StringField(
+        max_length=100, verbose_name=_('python model class name'), unique_with='app_label'
+    )
     objects = ContentTypeManager()
 
     class Meta:
@@ -92,6 +95,7 @@ class ContentType(document.Document):
     def model_class(self):
         "Returns the Python model class for this type of content."
         from django.db import models
+
         return models.get_model(self.app_label, self.model)
 
     def get_object_for_this_type(self, **kwargs):
@@ -114,8 +118,7 @@ class SiteProfileNotAvailable(Exception):
 class PermissionManager(QuerySetManager):
     def get_by_natural_key(self, codename, app_label, model):
         return self.get(
-            codename=codename,
-            content_type=ContentType.objects.get_by_natural_key(app_label, model)
+            codename=codename, content_type=ContentType.objects.get_by_natural_key(app_label, model)
         )
 
 
@@ -141,11 +144,12 @@ class Permission(document.Document):
     Three basic permissions -- add, change and delete -- are automatically
     created for each Django model.
     """
+
     name = fields.StringField(max_length=50, verbose_name=_('username'))
     content_type = fields.ReferenceField(ContentType)
     codename = fields.StringField(max_length=100, verbose_name=_('codename'))
-        # FIXME: don't access field of the other class
-        # unique_with=['content_type__app_label', 'content_type__model'])
+    # FIXME: don't access field of the other class
+    # unique_with=['content_type__app_label', 'content_type__model'])
 
     objects = PermissionManager()
 
@@ -164,6 +168,7 @@ class Permission(document.Document):
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
+
     natural_key.dependencies = ['contenttypes.contenttype']
 
 
@@ -183,6 +188,7 @@ class Group(document.Document):
     members-only portion of your site, or sending them members-only
     e-mail messages.
     """
+
     name = fields.StringField(max_length=80, unique=True, verbose_name=_('name'))
     permissions = fields.ListField(fields.ReferenceField(Permission, verbose_name=_('permissions')))
 
@@ -198,61 +204,67 @@ class AbstractUser(BaseUser, document.Document):
     """A User document that aims to mirror most of the API specified by Django
     at http://docs.djangoproject.com/en/dev/topics/auth/#users
     """
+
     username = fields.StringField(
-        max_length=150, verbose_name=_('username'),
+        max_length=150,
+        verbose_name=_('username'),
         help_text=_("Required. 150 characters or fewer. Letters, numbers and @/./+/-/_ characters"),
     )
 
     first_name = fields.StringField(
-        max_length=30, blank=True, verbose_name=_('first name'),
+        max_length=30,
+        blank=True,
+        verbose_name=_('first name'),
     )
 
-    last_name = fields.StringField(
-        max_length=30, blank=True, verbose_name=_('last name'))
+    last_name = fields.StringField(max_length=30, blank=True, verbose_name=_('last name'))
     email = fields.EmailField(verbose_name=_('e-mail address'), blank=True)
     password = fields.StringField(
         max_length=128,
         verbose_name=_('password'),
-        help_text=_("Use '[algo]$[iterations]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."))
+        help_text=_(
+            "Use '[algo]$[iterations]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
+        ),
+    )
     is_staff = fields.BooleanField(
         default=False,
         verbose_name=_('staff status'),
-        help_text=_("Designates whether the user can log into this admin site."))
+        help_text=_("Designates whether the user can log into this admin site."),
+    )
     is_active = fields.BooleanField(
         default=True,
         verbose_name=_('active'),
-        help_text=_("Designates whether this user should be treated as active. Unselect this instead of deleting accounts."))
+        help_text=_(
+            "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
+        ),
+    )
     is_superuser = fields.BooleanField(
         default=False,
         verbose_name=_('superuser status'),
-        help_text=_("Designates that this user has all permissions without explicitly assigning them."))
-    last_login = fields.DateTimeField(
-        default=timezone.now,
-        verbose_name=_('last login'))
-    date_joined = fields.DateTimeField(
-        default=timezone.now,
-        verbose_name=_('date joined'))
+        help_text=_(
+            "Designates that this user has all permissions without explicitly assigning them."
+        ),
+    )
+    last_login = fields.DateTimeField(default=timezone.now, verbose_name=_('last login'))
+    date_joined = fields.DateTimeField(default=timezone.now, verbose_name=_('date joined'))
 
     user_permissions = fields.ListField(
-        fields.ReferenceField(Permission), verbose_name=_('user permissions'),
-        blank=True, help_text=_('Permissions for the user.'))
+        fields.ReferenceField(Permission),
+        verbose_name=_('user permissions'),
+        blank=True,
+        help_text=_('Permissions for the user.'),
+    )
 
     USERNAME_FIELD = getattr(settings, 'MONGOENGINE_USERNAME_FIELDS', 'username')
     REQUIRED_FIELDS = getattr(settings, 'MONGOENGINE_USER_REQUIRED_FIELDS', ['email'])
 
-    meta = {
-        'abstract': True,
-        'indexes': [
-            {'fields': ['username'], 'unique': True, 'sparse': True}
-        ]
-    }
+    meta = {'abstract': True, 'indexes': [{'fields': ['username'], 'unique': True, 'sparse': True}]}
 
     def __unicode__(self):
         return self.username
 
     def get_full_name(self):
-        """Returns the users first and last names, separated by a space.
-        """
+        """Returns the users first and last names, separated by a space."""
         full_name = u'%s %s' % (self.first_name or '', self.last_name or '')
         return full_name.strip()
 
@@ -276,8 +288,8 @@ class AbstractUser(BaseUser, document.Document):
     @classmethod
     def _create_user(cls, username, password, email=None, create_superuser=False):
         """Create (and save) a new user with the given username, password and
-                email address.
-                """
+        email address.
+        """
         now = timezone.now()
 
         # Normalize the address by lowercasing the domain part of the email
@@ -336,7 +348,7 @@ class AbstractUser(BaseUser, document.Document):
 
         # Otherwise we need to check the backends.
         return _user_has_perm(self, perm, obj)
-    
+
     def has_perms(self, perm_list, obj=None):
         """
         Returns True if the user has each of the specified permissions. If
@@ -362,6 +374,7 @@ class AbstractUser(BaseUser, document.Document):
     def email_user(self, subject, message, from_email=None):
         "Sends an e-mail to this User."
         from django.core.mail import send_mail
+
         send_mail(subject, message, from_email, [self.email])
 
     def get_profile(self):
@@ -371,22 +384,29 @@ class AbstractUser(BaseUser, document.Document):
         """
         if not hasattr(self, '_profile_cache'):
             if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
-                raise SiteProfileNotAvailable('You need to set AUTH_PROFILE_MO'
-                                              'DULE in your project settings')
+                raise SiteProfileNotAvailable(
+                    'You need to set AUTH_PROFILE_MO' 'DULE in your project settings'
+                )
             try:
                 app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
             except ValueError:
-                raise SiteProfileNotAvailable('app_label and model_name should'
-                        ' be separated by a dot in the AUTH_PROFILE_MODULE set'
-                        'ting')
+                raise SiteProfileNotAvailable(
+                    'app_label and model_name should'
+                    ' be separated by a dot in the AUTH_PROFILE_MODULE set'
+                    'ting'
+                )
 
             try:
                 model = models.get_model(app_label, model_name)
                 if model is None:
-                    raise SiteProfileNotAvailable('Unable to load the profile '
+                    raise SiteProfileNotAvailable(
+                        'Unable to load the profile '
                         'model, check AUTH_PROFILE_MODULE in your project sett'
-                        'ings')
-                self._profile_cache = model._default_manager.using(self._state.db).get(user__id__exact=self.id)
+                        'ings'
+                    )
+                self._profile_cache = model._default_manager.using(self._state.db).get(
+                    user__id__exact=self.id
+                )
                 self._profile_cache.user = self
             except (ImportError, ImproperlyConfigured):
                 raise SiteProfileNotAvailable
@@ -398,7 +418,7 @@ class User(AbstractUser):
 
 
 class MongoUser(BaseUser, models.Model):
-    """"
+    """ "
     Dummy user model for Django.
 
     MongoUser is used to replace Django's UserManager with MongoUserManager.

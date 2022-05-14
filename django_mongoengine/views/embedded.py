@@ -8,6 +8,7 @@ class EmbeddedFormMixin(djmod.FormMixin):
     """
     A mixin that provides a way to show and handle a documentform in a request.
     """
+
     embedded_form_class = None
     embedded_context_name = 'embedded_form'
 
@@ -19,7 +20,8 @@ class EmbeddedFormMixin(djmod.FormMixin):
             return self.embedded_form_class
         else:
             raise ImproperlyConfigured(
-                    "No embedded form class provided. An embedded form class must be provided.")
+                "No embedded form class provided. An embedded form class must be provided."
+            )
 
     def get_form(self, form_class=None):
         """
@@ -60,7 +62,8 @@ class EmbeddedFormMixin(djmod.FormMixin):
             except AttributeError:
                 raise ImproperlyConfigured(
                     "No URL to redirect to.  Either provide a url or define"
-                    " a get_absolute_url method on the document.")
+                    " a get_absolute_url method on the document."
+                )
         return url
 
     def form_valid(self, form):
@@ -85,6 +88,7 @@ class ProcessEmbeddedFormMixin(object):
     A mixin that processes an embedded form on POST.
     Does not implement any GET handling.
     """
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form_class = self.get_form_class()
@@ -101,6 +105,7 @@ class BaseEmbeddedFormMixin(EmbeddedFormMixin, ProcessEmbeddedFormMixin):
     A Mixin that handles an embedded form on POST and
     adds the form into the template context.
     """
+
 
 class EmbeddedDetailView(
     BaseEmbeddedFormMixin,

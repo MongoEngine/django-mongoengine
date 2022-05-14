@@ -3,10 +3,9 @@
 from __future__ import absolute_import, division, print_function
 
 from bson import ObjectId
-
 from django.urls import reverse
-from django_mongoengine import Document
-from django_mongoengine import fields
+
+from django_mongoengine import Document, fields
 
 
 class Artist(Document):
@@ -14,15 +13,15 @@ class Artist(Document):
     name = fields.StringField(max_length=100)
 
     class Meta:
-        ordering = ['name'],
-        verbose_name = 'professional artist',
+        ordering = (['name'],)
+        verbose_name = ('professional artist',)
         verbose_name_plural = 'professional artists'
 
     def __unicode__(self):
         return self.name or ''
 
     def get_absolute_url(self):
-        return reverse('artist_detail', args=(self.id, ))
+        return reverse('artist_detail', args=(self.id,))
 
 
 class Author(Document):

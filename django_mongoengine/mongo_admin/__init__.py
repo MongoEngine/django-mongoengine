@@ -1,8 +1,8 @@
 from django.utils.module_loading import autodiscover_modules
 
+from .decorators import register
 from .options import DocumentAdmin
 from .sites import site
-from .decorators import register
 
 __all__ = ['DocumentAdmin', 'site', 'register']
 

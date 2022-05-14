@@ -11,7 +11,7 @@ def register(*models, **kwargs):
     admin site will be used.
     """
     from .options import DocumentAdmin
-    from .sites import site, AdminSite
+    from .sites import AdminSite, site
 
     def _model_admin_wrapper(admin_class):
         admin_site = kwargs.pop('site', site)
@@ -25,4 +25,5 @@ def register(*models, **kwargs):
         admin_site.register(models, admin_class=admin_class)
 
         return admin_class
+
     return _model_admin_wrapper

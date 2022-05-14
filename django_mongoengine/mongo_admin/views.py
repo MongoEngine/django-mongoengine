@@ -1,13 +1,11 @@
 import operator
-
-from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
-from django.contrib.admin.views.main import (
-    ChangeList, ORDER_VAR)
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.core.paginator import InvalidPage
-
-from mongoengine import Q
 from functools import reduce
+
+from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.views.main import ORDER_VAR, ChangeList
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
+from django.core.paginator import InvalidPage
+from mongoengine import Q
 
 
 class DocumentChangeList(ChangeList):
@@ -27,8 +25,7 @@ class DocumentChangeList(ChangeList):
         except:
             self.root_query_set = self.root_queryset
 
-        paginator = self.model_admin.get_paginator(request, self.query_set,
-                                                   self.list_per_page)
+        paginator = self.model_admin.get_paginator(request, self.query_set, self.list_per_page)
         # Get the number of objects, with admin filters applied.
         result_count = paginator.count
 
@@ -49,7 +46,7 @@ class DocumentChangeList(ChangeList):
             result_list = self.query_set.clone()
         else:
             try:
-                result_list = paginator.page(self.page_num+1).object_list
+                result_list = paginator.page(self.page_num + 1).object_list
             except InvalidPage:
                 raise IncorrectLookupParameters
 
@@ -85,8 +82,7 @@ class DocumentChangeList(ChangeList):
             return super(DocumentChangeList, self).get_ordering()
 
         params = self.params
-        ordering = list(self.model_admin.get_ordering(request)
-                        or self._get_default_ordering())
+        ordering = list(self.model_admin.get_ordering(request) or self._get_default_ordering())
         if ORDER_VAR in params:
             # Clear ordering and used params
             ordering = []
@@ -97,10 +93,10 @@ class DocumentChangeList(ChangeList):
                     field_name = self.list_display[int(idx)]
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
-                        continue # No 'admin_order_field', skip it
+                        continue  # No 'admin_order_field', skip it
                     ordering.append(pfx + order_field)
                 except (IndexError, ValueError):
-                    continue # Invalid ordering specified, skip it.
+                    continue  # Invalid ordering specified, skip it.
 
         # Add the given query's ordering fields, if any.
         try:
@@ -130,20 +126,27 @@ class DocumentChangeList(ChangeList):
         qs = self.root_query_set.clone()
 
         filter_values = self.get_filters(request)
-        if len(filter_values) == 4: # for Django 2
-            (self.filter_specs, self.has_filters, remaining_lookup_params,
-                use_distinct) = filter_values
-        else: # for Django >2
-            (self.filter_specs, self.has_filters, remaining_lookup_params,
-                use_distinct, has_active_filters) = filter_values
-
+        if len(filter_values) == 4:  # for Django 2
+            (
+                self.filter_specs,
+                self.has_filters,
+                remaining_lookup_params,
+                use_distinct,
+            ) = filter_values
+        else:  # for Django >2
+            (
+                self.filter_specs,
+                self.has_filters,
+                remaining_lookup_params,
+                use_distinct,
+                has_active_filters,
+            ) = filter_values
 
         # Then, we let every list filter modify the queryset to its liking.
         for filter_spec in self.filter_specs:
             new_qs = filter_spec.queryset(request, qs)
             if new_qs is not None:
                 qs = new_qs
-
 
         try:
             # Finally, we apply the remaining lookup parameters from the query
@@ -174,16 +177,16 @@ class DocumentChangeList(ChangeList):
             elif field_name.startswith('='):
                 return "%s__iexact" % field_name[1:]
             # No __search for mongoengine
-            #elif field_name.startswith('@'):
+            # elif field_name.startswith('@'):
             #    return "%s__search" % field_name[1:]
             else:
                 return "%s__icontains" % field_name
 
         if self.search_fields and self.query:
-            orm_lookups = [construct_search(str(search_field))
-                           for search_field in self.search_fields]
+            orm_lookups = [
+                construct_search(str(search_field)) for search_field in self.search_fields
+            ]
             for bit in self.query.split():
-                or_queries = [Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
+                or_queries = [Q(**{orm_lookup: bit}) for orm_lookup in orm_lookups]
                 qs = qs.filter(reduce(operator.or_, or_queries))
         return qs

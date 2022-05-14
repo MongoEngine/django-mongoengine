@@ -7,5 +7,3 @@ def resolve_callables(mapping):
     # after we drop support for django below 3.2, this can be removed
     for k, v in mapping.items():
         yield k, v() if callable(v) else v
-
-

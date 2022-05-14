@@ -1,7 +1,7 @@
 import re
 from collections import OrderedDict
 
-from django.forms.widgets import TextInput, HiddenInput, MultiWidget, Media
+from django.forms.widgets import HiddenInput, Media, MultiWidget, TextInput
 from django.utils.safestring import mark_safe
 
 # The list of JavaScript files to insert to render any Dictionary widget
@@ -15,9 +15,17 @@ class Dictionary(MultiWidget):
     A widget representing a dictionary field
     """
 
-    def __init__(self, schema=None, no_schema=1, max_depth=None,
-                 flags=None, sub_attrs=None, attrs=None, verbose_dict=None,
-                 verbose_field=None):
+    def __init__(
+        self,
+        schema=None,
+        no_schema=1,
+        max_depth=None,
+        flags=None,
+        sub_attrs=None,
+        attrs=None,
+        verbose_dict=None,
+        verbose_field=None,
+    ):
         """
         :param schema: A dictionary representing the future schema of
                        the Dictionary widget. It is responsible for the
@@ -48,7 +56,7 @@ class Dictionary(MultiWidget):
         self.verbose_field = verbose_field or ADD_FIELD_VERBOSE
         self.verbose_dict = verbose_dict or ADD_DICT_VERBOSE
         self.no_schema = no_schema
-        self.max_depth = (max_depth if max_depth and max_depth >= 0 else None)
+        self.max_depth = max_depth if max_depth and max_depth >= 0 else None
         self.flags = flags or []
         self.sub_attrs = sub_attrs or {}
 
@@ -63,12 +71,21 @@ class Dictionary(MultiWidget):
         if isinstance(schema, dict) and self.no_schema > 0:
             for key in schema:
                 if isinstance(schema[key], dict):
-                    widget_object.append(self.subdict(key_value=key, schema=schema[key],
-                                         max_depth=max_depth, sub_attrs=self.sub_attrs,
-                                         attrs=attrs, verbose_field=self.verbose_field,
-                                         verbose_dict=self.verbose_dict))
+                    widget_object.append(
+                        self.subdict(
+                            key_value=key,
+                            schema=schema[key],
+                            max_depth=max_depth,
+                            sub_attrs=self.sub_attrs,
+                            attrs=attrs,
+                            verbose_field=self.verbose_field,
+                            verbose_dict=self.verbose_dict,
+                        )
+                    )
                 else:
-                    widget_object.append(self.pair(key_value=key, sub_attrs=self.sub_attrs, attrs=attrs))
+                    widget_object.append(
+                        self.pair(key_value=key, sub_attrs=self.sub_attrs, attrs=attrs)
+                    )
         else:
             widget_object.append(self.pair(sub_attrs=self.sub_attrs, sattrs=attrs))
 
@@ -104,11 +121,8 @@ class Dictionary(MultiWidget):
                 widget_value = None
             suffix = widget.suffix
             if id_:
-                final_attrs = dict(final_attrs, id='%s_%s_%s' %
-                                   (id_, i, suffix))
-            output.append(widget.render('%s_%s_%s' % (name, i, suffix),
-                                        widget_value,
-                                        final_attrs))
+                final_attrs = dict(final_attrs, id='%s_%s_%s' % (id_, i, suffix))
+            output.append(widget.render('%s_%s_%s' % (name, i, suffix), widget_value, final_attrs))
         return mark_safe(self.format_output(name, output))
 
     def value_from_datadict(self, data, files, name):
@@ -132,52 +146,63 @@ class Dictionary(MultiWidget):
             else:
                 match = re.match(name + '_(\d+)_%ssubdict_0' % prefix, data_key)
                 if match is not None:
-                        self.widgets.append(
-                            self.subdict(sub_attrs=self.sub_attrs,
-                                         no_schema=0,
-                                         max_depth=self.max_depth,
-                                         flags=self.flags,
-                                         attrs=self.attrs)
+                    self.widgets.append(
+                        self.subdict(
+                            sub_attrs=self.sub_attrs,
+                            no_schema=0,
+                            max_depth=self.max_depth,
+                            flags=self.flags,
+                            attrs=self.attrs,
                         )
-                        html_indexes.append(match.group(1))
+                    )
+                    html_indexes.append(match.group(1))
 
-        return [widget.value_from_datadict(
-                    data, files,
-                    '%s_%s_%s' % (name, html_indexes[i], widget.suffix))
-                    for i, widget in enumerate(self.widgets)]
+        return [
+            widget.value_from_datadict(
+                data, files, '%s_%s_%s' % (name, html_indexes[i], widget.suffix)
+            )
+            for i, widget in enumerate(self.widgets)
+        ]
 
     def format_output(self, name, rendered_widgets):
         class_depth = ''
         if self.max_depth is not None:
             class_depth = 'depth_%s' % self.max_depth
 
-        params = {'id': "id_%s" % self.id_for_label(name),
-         'class_depth': class_depth,
-         'widgets': ''.join(rendered_widgets),
-         'add_id': 'add_id_%s' % self.id_for_label(name),
-         'add_sub_id': 'add_sub_id_%s' % self.id_for_label(name),
-         'add_field': ADD_FIELD_VERBOSE,
-         'add_dict': ADD_DICT_VERBOSE
+        params = {
+            'id': "id_%s" % self.id_for_label(name),
+            'class_depth': class_depth,
+            'widgets': ''.join(rendered_widgets),
+            'add_id': 'add_id_%s' % self.id_for_label(name),
+            'add_sub_id': 'add_sub_id_%s' % self.id_for_label(name),
+            'add_field': ADD_FIELD_VERBOSE,
+            'add_dict': ADD_DICT_VERBOSE,
         }
 
         if 'FORCE_SCHEMA' not in self.flags:
-            actions = """
+            actions = (
+                """
 <span id="%(add_id)s" class="add_pair_dictionary">%(add_field)s</span>
 <span id="%(add_sub_id)s" class="add_sub_dictionary">
     %(add_dict)s
 </span>
-""" % params
+"""
+                % params
+            )
         else:
             actions = ''
 
         params['actions'] = actions
 
-        return """
+        return (
+            """
 <ul id="%(id)s" class="dictionary %(class_depth)s">
   %(widgets)s
 </ul>
 %(actions)s
-""" % params
+"""
+            % params
+        )
 
     def update_widgets(self, keys, erase=False):
         # import pdb
@@ -185,15 +210,22 @@ class Dictionary(MultiWidget):
         if erase:
             self.widgets = []
         for k in keys:
-            if (isinstance(k[1], dict)):
+            if isinstance(k[1], dict):
                 self.widgets.append(
-                    self.subdict(key_value=k[0], schema=k[1], no_schema=2,
-                                 max_depth=self.max_depth, flags=self.flags,
-                                 sub_attrs=self.sub_attrs, attrs=self.attrs))
+                    self.subdict(
+                        key_value=k[0],
+                        schema=k[1],
+                        no_schema=2,
+                        max_depth=self.max_depth,
+                        flags=self.flags,
+                        sub_attrs=self.sub_attrs,
+                        attrs=self.attrs,
+                    )
+                )
             else:
-                self.widgets.append(self.pair(sub_attrs=self.sub_attrs,
-                                              key_value=k[1],
-                                              attrs=self.attrs))
+                self.widgets.append(
+                    self.pair(sub_attrs=self.sub_attrs, key_value=k[1], attrs=self.attrs)
+                )
 
     def _get_media(self):
         """
@@ -207,14 +239,12 @@ class Dictionary(MultiWidget):
         for w in self.widgets:
             media = media + w.media
         return media
+
     media = property(_get_media)
 
     def dict_sort(self, d):
         if isinstance(d, dict):
-            return OrderedDict([
-                (k, self.dict_sort(v))
-                for k, v in sorted(d.items())
-            ])
+            return OrderedDict([(k, self.dict_sort(v)) for k, v in sorted(d.items())])
         else:
             return d
 
@@ -224,7 +254,7 @@ class Pair(MultiWidget):
     A widget representing a key-value pair in a dictionary
     """
 
-    #default for a pair
+    # default for a pair
     key_type = TextInput
     value_type = TextInput
     suffix = 'pair'
@@ -234,7 +264,10 @@ class Pair(MultiWidget):
         if self.value_type in [TextInput, HiddenInput]:
             if sub_attrs:
                 try:
-                    widgets = [self.key_type(attrs=sub_attrs['key']), self.value_type(attrs=sub_attrs['value'])]
+                    widgets = [
+                        self.key_type(attrs=sub_attrs['key']),
+                        self.value_type(attrs=sub_attrs['value']),
+                    ]
                 except KeyError:
                     raise KeyError("improper synthax for sub_attrs parameter")
             else:
@@ -242,17 +275,20 @@ class Pair(MultiWidget):
         elif self.value_type == Dictionary:
             if sub_attrs:
                 try:
-                    widgets = [self.key_type(attrs=sub_attrs['key']), self.value_type(attrs=sub_attrs['value'], **kwargs)]
+                    widgets = [
+                        self.key_type(attrs=sub_attrs['key']),
+                        self.value_type(attrs=sub_attrs['value'], **kwargs),
+                    ]
                 except KeyError:
                     raise KeyError("improper synthax for sub_attrs parameter")
             else:
                 widgets = [self.key_type(), self.value_type(**kwargs)]
         self.sub_attrs = sub_attrs
-        #raise error here ?
+        # raise error here ?
         self.key_value = key_value if key_value is not None else ''
         super(Pair, self).__init__(widgets, attrs)
 
-    #this method should be overwritten by subclasses
+    # this method should be overwritten by subclasses
     def decompress(self, value):
         if value is not None:
             return list(value)
@@ -279,16 +315,24 @@ class Pair(MultiWidget):
         return mark_safe(self.format_output(output, name))
 
     def value_from_datadict(self, data, files, name):
-        return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
+        return [
+            widget.value_from_datadict(data, files, name + '_%s' % i)
+            for i, widget in enumerate(self.widgets)
+        ]
 
     def format_output(self, rendered_widgets, name):
-        return '<li>' + ' : '.join(rendered_widgets) + '<span class="del_pair" id="del_%s"> - Delete</span></li>\n' % name
+        return (
+            '<li>'
+            + ' : '.join(rendered_widgets)
+            + '<span class="del_pair" id="del_%s"> - Delete</span></li>\n' % name
+        )
 
 
 class SubDictionary(Pair):
     """
     A widget representing a key-value pair in a dictionary, where value is a dictionary
     """
+
     key_type = TextInput
     value_type = Dictionary
     suffix = 'subdict'
@@ -296,8 +340,7 @@ class SubDictionary(Pair):
     def __init__(self, sub_attrs, schema=None, **kwargs):
         if schema is None:
             schema = {'key': 'value'}
-        super(SubDictionary, self).__init__(schema=schema,
-                                            sub_attrs=sub_attrs, **kwargs)
+        super(SubDictionary, self).__init__(schema=schema, sub_attrs=sub_attrs, **kwargs)
 
     def decompress(self, value):
         if value is not None:
@@ -306,13 +349,13 @@ class SubDictionary(Pair):
             return ['', {}]
 
     def format_output(self, rendered_widgets, name):
-        params = {
-            "widgets": ' : '.join(rendered_widgets),
-            "del_id": "del_%s" % name
-        }
-        return """
+        params = {"widgets": ' : '.join(rendered_widgets), "del_id": "del_%s" % name}
+        return (
+            """
 <li> %(widgets)s <span class="del_dict" id="%(del_id)s"> - Delete</span>
-</li>""" % params
+</li>"""
+            % params
+        )
 
 
 class StaticPair(Pair):
@@ -337,11 +380,14 @@ class StaticPair(Pair):
         params = {
             "html_class": self.sub_attrs.get('key', {}).get('class', ''),
             "key": self.key_value,
-            "widgets": ''.join(rendered_widgets)
+            "widgets": ''.join(rendered_widgets),
         }
-        return """
+        return (
+            """
 <li><span class="static_key %(html_class)s">%(key)s</span> :  %(widgets)s
-</li>""" % params
+</li>"""
+            % params
+        )
 
 
 class StaticSubDictionary(SubDictionary):
@@ -363,16 +409,21 @@ class StaticSubDictionary(SubDictionary):
         params = {
             "html_class": self.sub_attrs.get('key', {}).get('class', ''),
             "key": self.key_value,
-            "widgets": ''.join(rendered_widgets)
+            "widgets": ''.join(rendered_widgets),
         }
-        return """
+        return (
+            """
 <li><span class="static_key %(html_class)s">%(key)s</span> :  %(widgets)s</li>
-""" % params
+"""
+            % params
+        )
+
 
 class EmbeddedFieldWidget(MultiWidget):
     """
     A widget that render each field found in the supplied form.
     """
+
     def __init__(self, fields, attrs=None):
         self.fields = fields
         super(EmbeddedFieldWidget, self).__init__([f.widget for f in self.fields.values()], attrs)
@@ -390,7 +441,10 @@ class EmbeddedFieldWidget(MultiWidget):
         Format the label for each field
         """
         return '<label for="id_formfield_%s" %s>%s:</label>' % (
-            counter, field.required and 'class="required"', field.label)
+            counter,
+            field.required and 'class="required"',
+            field.label,
+        )
 
     def format_help_text(self, field, counter):
         """
@@ -408,8 +462,7 @@ class EmbeddedFieldWidget(MultiWidget):
         for i, field in enumerate(self.fields):
             label = self.format_label(self.fields[field], i)
             help_text = self.format_help_text(self.fields[field], i)
-            ret.append('<li>%s %s %s</li>' % (
-                label, help_text, rendered_widgets[i]))
+            ret.append('<li>%s %s %s</li>' % (label, help_text, rendered_widgets[i]))
 
         ret.append('</ul>')
         return u''.join(ret)

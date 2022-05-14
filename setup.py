@@ -14,10 +14,10 @@ Links
   <https://github.com/MongoEngine/django-mongoengine>`_
 
 """
-from setuptools import setup, find_packages
-import sys
 import os
+import sys
 
+from setuptools import find_packages, setup
 
 __version__ = '0.4.6'
 __description__ = 'Django support for MongoDB via MongoEngine'
@@ -42,7 +42,12 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=["django>2.2,<3.3", "mongoengine>=0.14"],
-    packages=find_packages(exclude=('doc', 'docs',)),
+    packages=find_packages(
+        exclude=(
+            'doc',
+            'docs',
+        )
+    ),
     include_package_data=True,
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -53,6 +58,6 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Framework :: Django'
-    ]
+        'Framework :: Django',
+    ],
 )

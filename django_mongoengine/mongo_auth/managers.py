@@ -2,14 +2,14 @@ from importlib import import_module
 
 from django.conf import settings
 from django.contrib.auth.models import UserManager
-from django.db.models import CharField, BooleanField, DateTimeField, DateField
+from django.db.models import BooleanField, CharField, DateField, DateTimeField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from mongoengine.errors import DoesNotExist
 
-
 MONGOENGINE_USER_DOCUMENT = getattr(
-    settings, 'MONGOENGINE_USER_DOCUMENT', 'django_mongoengine.mongo_auth.models.User')
+    settings, 'MONGOENGINE_USER_DOCUMENT', 'django_mongoengine.mongo_auth.models.User'
+)
 
 
 def get_user_document():
@@ -23,7 +23,7 @@ def get_user_document():
     name = MONGOENGINE_USER_DOCUMENT
     dot = name.rindex('.')
     module = import_module(name[:dot])
-    return getattr(module, name[dot + 1:])
+    return getattr(module, name[dot + 1 :])
 
 
 class MongoUserManager(UserManager):
@@ -82,7 +82,6 @@ class MongoUserManager(UserManager):
 
         date_joined = DateTimeField(_('date_joined'), auto_now_add=True)
         date_joined.contribute_to_class(self.dj_model, 'date_joined')
-
 
     def get(self, *args, **kwargs):
         try:

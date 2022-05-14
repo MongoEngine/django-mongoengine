@@ -3,24 +3,25 @@ try:
 except ImportError:
     from django.core.urlresolvers import reverse
 
-from django_mongoengine import Document, EmbeddedDocument
-from django_mongoengine import fields
-
 import datetime
+
+from django_mongoengine import Document, EmbeddedDocument, fields
 
 
 class Comment(EmbeddedDocument):
     created_at = fields.DateTimeField(
-        default=datetime.datetime.now, editable=False,
+        default=datetime.datetime.now,
+        editable=False,
     )
     author = fields.StringField(verbose_name="Name", max_length=255)
-    email  = fields.EmailField(verbose_name="Email", blank=True)
+    email = fields.EmailField(verbose_name="Email", blank=True)
     body = fields.StringField(verbose_name="Comment")
 
 
 class Post(Document):
     created_at = fields.DateTimeField(
-        default=datetime.datetime.now, editable=False,
+        default=datetime.datetime.now,
+        editable=False,
     )
     title = fields.StringField(max_length=255)
     slug = fields.StringField(max_length=255, primary_key=True)
@@ -43,7 +44,7 @@ class Post(Document):
     meta = {
         'indexes': ['-created_at', 'slug'],
         'ordering': ['-created_at'],
-        'allow_inheritance': True
+        'allow_inheritance': True,
     }
 
 

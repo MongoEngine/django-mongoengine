@@ -1,8 +1,7 @@
-from django.utils.encoding import smart_str
-from django.forms.utils import pretty_name
 from django.core.exceptions import FieldDoesNotExist
+from django.forms.utils import pretty_name
 from django.utils import formats
-
+from django.utils.encoding import smart_str
 from mongoengine import fields
 
 
@@ -11,6 +10,7 @@ class RelationWrapper(object):
     Wraps a document referenced from a ReferenceField with an Interface similiar to
     django's ForeignKeyField.rel
     """
+
     def __init__(self, document):
         self.to = document
 

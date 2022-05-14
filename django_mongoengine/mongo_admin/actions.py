@@ -3,14 +3,13 @@ Built-in, globally-available admin actions.
 """
 
 from django import template
-from django.core.exceptions import PermissionDenied
 from django.contrib.admin import helpers
+from django.contrib.admin.actions import delete_selected as django_delete_selected
 from django.contrib.admin.utils import get_deleted_objects, model_ngettext
+from django.core.exceptions import PermissionDenied
+from django.db import models
 from django.shortcuts import render_to_response
 from django.utils.translation import gettext_lazy as _
-from django.db import models
-
-from django.contrib.admin.actions import delete_selected as django_delete_selected
 
 from django_mongoengine.utils import force_str
 
@@ -20,6 +19,7 @@ def delete_selected(modeladmin, request, queryset):
         return django_delete_selected(modeladmin, request, queryset)
     else:
         return _delete_selected(modeladmin, request, queryset)
+
 
 def _delete_selected(modeladmin, request, queryset):
     """
@@ -42,7 +42,8 @@ def _delete_selected(modeladmin, request, queryset):
     # will also be deleted.
     # TODO: Permissions would be so cool...
     deletable_objects, perms_needed, protected = get_deleted_objects(
-        queryset, request, modeladmin.admin_site)
+        queryset, request, modeladmin.admin_site
+    )
 
     # The user has already confirmed the deletion.
     # Do the deletion and return a None to display the change list view again.
@@ -59,13 +60,15 @@ def _delete_selected(modeladmin, request, queryset):
                 obj.delete()
             # This is what you get if you have to monkey patch every object in a changelist
             # No queryset object, I can tell ya. So we get a new one and delete that.
-            #pk_list = [o.pk for o in queryset]
-            #klass = queryset[0].__class__
-            #qs = klass.objects.filter(pk__in=pk_list)
-            #qs.delete()
-            modeladmin.message_user(request, _("Successfully deleted %(count)d %(items)s.") % {
-                "count": n, "items": model_ngettext(modeladmin.opts, n)
-            })
+            # pk_list = [o.pk for o in queryset]
+            # klass = queryset[0].__class__
+            # qs = klass.objects.filter(pk__in=pk_list)
+            # qs.delete()
+            modeladmin.message_user(
+                request,
+                _("Successfully deleted %(count)d %(items)s.")
+                % {"count": n, "items": model_ngettext(modeladmin.opts, n)},
+            )
         # Return None to display the change list page again.
         return None
 
@@ -93,10 +96,16 @@ def _delete_selected(modeladmin, request, queryset):
     }
 
     # Display the confirmation page
-    return render_to_response(modeladmin.delete_selected_confirmation_template or [
-        "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.object_name.lower()),
-        "admin/%s/delete_selected_confirmation.html" % app_label,
-        "admin/delete_selected_confirmation.html"
-    ], context, context_instance=template.RequestContext(request))
+    return render_to_response(
+        modeladmin.delete_selected_confirmation_template
+        or [
+            "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/delete_selected_confirmation.html" % app_label,
+            "admin/delete_selected_confirmation.html",
+        ],
+        context,
+        context_instance=template.RequestContext(request),
+    )
+
 
 delete_selected.short_description = _("Delete selected %(verbose_name_plural)s")
