@@ -6,17 +6,28 @@ authors = ["Ross Lawley <ross.lawley@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4"
-django = "~3"
+django = ">=3.1,<5"
 mongoengine = ">=0.14"
 
 [tool.poetry.dev-dependencies]
 sphinx = "*"
-pytest = "^6"
-flake8 = "^3"
-pdbpp = "^0.10.2"
-pytest-django = "^4.2.0"
-pytest-cov = "^2.11.1"
-pytest-sugar = "^0.9.4"
+pytest = "*"
+flake8 = "*"
+pdbpp = "*"
+pytest-django = "*"
+pytest-cov = "*"
+pytest-sugar = "*"
+
+[tool.black]
+line-length = 100
+skip-string-normalization = true
+
+[tool.isort]
+line_length = 100
+known_first_party = ["django_mongoengine"]
+multi_line_output = 3
+skip_gitignore = true
+include_trailing_comma = true
 
 [build-system]
 requires = ["poetry>=0.12"]

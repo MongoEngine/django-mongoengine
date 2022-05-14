@@ -1,48 +1,46 @@
-from functools import partial
-
-try:
-    from functools import partialmethod
-except ImportError:
-    from django.utils.functional import curry as partialmethod
+from functools import partial, partialmethod
 
 from django import forms
-from django.forms.formsets import all_valid
-from django.urls import reverse
+from django.apps import apps
+from django.conf import settings
+from django.contrib.admin import helpers, widgets
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
-from django.contrib.admin import widgets, helpers
-from django.contrib.admin.utils import (
-    unquote, flatten_fieldsets, get_deleted_objects,
-)
 from django.contrib.admin.options import (
-    TO_FIELD_VAR, IS_POPUP_VAR,
-    get_ul_class, csrf_protect_m,
+    IS_POPUP_VAR,
+    TO_FIELD_VAR,
+    csrf_protect_m,
+    get_ul_class,
 )
-from django.utils.html import escape
+from django.contrib.admin.utils import flatten_fieldsets, get_deleted_objects, unquote
 from django.core.exceptions import PermissionDenied
-try:
-    from django.db.models.related import RelatedObject
-except ImportError:
-    from django.db.models.fields.related import ForeignObjectRel as RelatedObject # noqa
+from django.forms.formsets import all_valid
+from django.forms.models import modelform_defines_fields
+from django.forms.utils import pretty_name
 from django.http import Http404
 from django.template.response import TemplateResponse
+from django.urls import reverse
+from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
-from django.forms.utils import pretty_name
-from django.forms.models import modelform_defines_fields
-from django.conf import settings
-from django.apps import apps
+from django.utils.encoding import force_str
 
-from django_mongoengine.utils import force_str
-from django_mongoengine.fields import (ListField, EmbeddedDocumentField,
-                                       ReferenceField, StringField)
-
+from django_mongoengine.fields import (
+    EmbeddedDocumentField,
+    ListField,
+    ReferenceField,
+    StringField,
+)
+from django_mongoengine.forms.documents import (
+    BaseInlineDocumentFormSet,
+    DocumentForm,
+    documentform_factory,
+    documentformset_factory,
+    inlineformset_factory,
+)
 from django_mongoengine.mongo_admin.util import RelationWrapper
 from django_mongoengine.paginator import Paginator
-from django_mongoengine.utils.wrappers import copy_class
 from django_mongoengine.utils.monkey import get_patched_django_module
-from django_mongoengine.forms.documents import (
-    DocumentForm, documentform_factory, documentformset_factory,
-    inlineformset_factory, BaseInlineDocumentFormSet)
+from django_mongoengine.utils.wrappers import copy_class
 
 
 def get_content_type_for_model(obj):
@@ -304,6 +302,8 @@ class DocumentAdmin(BaseDocumentAdmin):
                     'name': force_str(opts.verbose_name), 'key': escape(object_id)})
 
         ModelForm = self.get_form(request, obj)
+        form_validated = False
+
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
             if form.is_valid():
@@ -440,6 +440,7 @@ class DocumentAdmin(BaseDocumentAdmin):
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
+
         # First check if the user can see this history.
         model = self.model
         obj = self.get_object(request, unquote(object_id))

@@ -2,6 +2,8 @@ import logging
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
 from django.core.exceptions import SuspiciousOperation
+from django.utils import timezone
+from django.utils.encoding import force_str
 
 from bson import json_util
 
@@ -9,8 +11,6 @@ from mongoengine.document import Document
 from mongoengine import fields
 from mongoengine.queryset import OperationError
 from mongoengine.connection import DEFAULT_CONNECTION_NAME
-
-from .utils import datetime_now, force_str
 
 
 MONGOENGINE_SESSION_DB_ALIAS = getattr(
@@ -57,7 +57,7 @@ class SessionStore(SessionBase):
     def load(self):
         try:
             s = MongoSession.objects(session_key=self.session_key,
-                                     expire_date__gt=datetime_now)[0]
+                                     expire_date__gt=timezone.now)[0]
             if MONGOENGINE_SESSION_DATA_ENCODE:
                 return self.decode(force_str(s.session_data))
             else:

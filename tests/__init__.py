@@ -19,7 +19,7 @@ class MongoTestCase(SimpleTestCase):
         super(MongoTestCase, self).__init__(methodName)
 
     def dropCollections(self):
-        for collection in self.db.collection_names():
+        for collection in self.db.list_collection_names():
             if collection.startswith('system.'):
                 continue
             self.db.drop_collection(collection)

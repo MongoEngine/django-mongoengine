@@ -1,8 +1,4 @@
-#!/usr/bin/env python
-# coding=utf-8
-from __future__ import absolute_import, division, print_function
-
-from django.conf.urls import url
+from django.urls import re_path as url
 from django.views.decorators.cache import cache_page
 
 from django.views.generic import TemplateView

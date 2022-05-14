@@ -1,5 +1,3 @@
-from functools import partial
-
 from django.forms.forms import DeclarativeFieldsMetaclass
 from django.forms.models import ALL_FIELDS
 from django.core.exceptions import FieldError, ImproperlyConfigured
@@ -139,7 +137,7 @@ class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
                     opts.localized_fields, opts.labels,
                     opts.help_texts, opts.error_messages,
                     opts.field_classes,
-                ) 
+                )
             else:
                 fields = model_forms.fields_for_model(
                     opts.model, opts.fields, opts.exclude,

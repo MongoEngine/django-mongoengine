@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# coding=utf-8
-from __future__ import absolute_import, division, print_function
-
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.forms.models import modelform_factory
@@ -10,6 +6,8 @@ from tests import MongoTestCase
 from django_mongoengine.forms.documents import documentform_factory
 from django_mongoengine.forms.fields import DictField
 from django_mongoengine.forms import widgets
+
+from .models import MongoDoc, DjangoModel
 
 
 class DictFieldTest(MongoTestCase):
@@ -265,7 +263,6 @@ class DictFieldTest(MongoTestCase):
 class FormFactoryTest(MongoTestCase):
 
     def test_documentform_factory(self):
-        from .models import MongoDoc, DjangoModel
         m_form = documentform_factory(MongoDoc, fields="__all__")()
         d_form = modelform_factory(DjangoModel, fields="__all__")()
         self.assertEqual(d_form.as_p(), m_form.as_p())

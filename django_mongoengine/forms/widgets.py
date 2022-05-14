@@ -1,9 +1,8 @@
 import re
+from collections import OrderedDict
 
 from django.forms.widgets import TextInput, HiddenInput, MultiWidget, Media
 from django.utils.safestring import mark_safe
-
-from django_mongoengine.utils import OrderedDict
 
 # The list of JavaScript files to insert to render any Dictionary widget
 MEDIAS = ('jquery-1.8.0.min.js', 'dict.js', 'helper.js')
