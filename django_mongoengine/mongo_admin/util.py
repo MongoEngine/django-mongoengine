@@ -5,8 +5,6 @@ from django.utils import formats
 
 from mongoengine import fields
 
-from django_mongoengine.utils import force_str
-
 
 class RelationWrapper(object):
     """

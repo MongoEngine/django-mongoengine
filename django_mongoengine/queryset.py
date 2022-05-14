@@ -3,7 +3,7 @@ from django.db.models.query import QuerySet as DjangoQuerySet
 from mongoengine.errors import NotUniqueError
 from mongoengine import queryset as qs
 
-from .utils import resolve_callables
+from django.db.models.utils import resolve_callables
 
 
 class QueryWrapper(object):

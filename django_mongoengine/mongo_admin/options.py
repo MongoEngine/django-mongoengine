@@ -22,8 +22,8 @@ from django.urls import reverse
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
+from django.utils.encoding import force_str
 
-from django_mongoengine.utils import force_str
 from django_mongoengine.fields import (
     EmbeddedDocumentField,
     ListField,
