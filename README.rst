@@ -23,7 +23,7 @@ It's python3 only and i have not tried it yet, but looks promising.
 
 
 Working / Django 2.0-3.0
----------------------
+------------------------
 
 * [ok] sessions
 * [ok] models/fields, fields needs testing
