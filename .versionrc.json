@@ -1,0 +1,11 @@
+{
+  "host": "github.com",
+  "owner": "MongoEngine",
+  "repository": "django-mongoengine",
+  "bumpFiles": [
+    {
+      "filename": "VERSION",
+      "type": "plain-text"
+    }
+  ]
+}

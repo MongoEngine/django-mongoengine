@@ -1,25 +1,12 @@
-"""
-Django-MongoEngine
-------------------
-
-Django support for MongoDB using MongoEngine.
-
-This is work-in-progress. Some things working, some don't. Fix what you need and make
-pull-request.
-
-Links
-`````
-
-* `development version
-  <https://github.com/MongoEngine/django-mongoengine>`_
-
-"""
 import os
 import sys
+from pathlib import Path
 
 from setuptools import find_packages, setup
 
-__version__ = '0.4.6'
+_directory = Path(__file__).parent
+
+__version__ = (_directory / "VERSION").read_text().strip()
 __description__ = 'Django support for MongoDB via MongoEngine'
 __license__ = 'BSD'
 __author__ = 'Ross Lawley'
@@ -38,7 +25,8 @@ setup(
     author=__author__,
     author_email=__email__,
     description=__description__,
-    long_description=__doc__,
+    long_description=(_directory / "README.rst").read_text().strip(),
+    long_description_content_type="text/x-rst",
     zip_safe=False,
     platforms='any',
     install_requires=["Django>3.1,<4.1", "mongoengine>=0.14"],
