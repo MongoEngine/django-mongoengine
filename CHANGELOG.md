@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5...v0.5.0) (2022-05-14)
+
+
+### Features
+
+* Clean up deprecated code for django-4 ([c82cbc6](https://github.com/MongoEngine/django-mongoengine/commit/c82cbc641a78c59e46b5b0e7be0e2867260e17c0)), closes [#156](https://github.com/MongoEngine/django-mongoengine/issues/156)
+* Drop django 2.2, add django 4.0 ([6c3d068](https://github.com/MongoEngine/django-mongoengine/commit/6c3d068b305a8f0ba88597ddeb97281a31f204fe))
+
+
+### Bug Fixes
+
+* Fix 'StringField' object has no attribute 'flatchoices' ([#161](https://github.com/MongoEngine/django-mongoengine/issues/161)) ([db3860d](https://github.com/MongoEngine/django-mongoengine/commit/db3860d39fa29819fde71953e905f117f680a3be))
+* Fix invalid import EMPTY_CHANGELIST_VALUE in django >= 3 ([e8a75e8](https://github.com/MongoEngine/django-mongoengine/commit/e8a75e8e5860545ecfbadaf1b1285495022bd7cb))
+* **deps:** Move pytests dependency int dev-dependencies ([f7e37a7](https://github.com/MongoEngine/django-mongoengine/commit/f7e37a75e6612a4243ccc9abdb22f2dc72f53d9e))
+
 ### [0.4.6](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5...v0.4.6) (2021-04-11)
 
 
