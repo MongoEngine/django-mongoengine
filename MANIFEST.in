@@ -2,9 +2,12 @@ include MANIFEST.in
 include README.rst
 include LICENSE
 include AUTHORS
+include VERSION
 recursive-include django_mongoengine *.html *.css *.js *.png *.gif *.woff *.ttf *.svg *.eot
 recursive-include docs *
 recursive-exclude docs *.pyc
 recursive-exclude docs *.pyo
 prune docs/_build
 prune docs/_themes/.git
+prune tests/
+prune example/
