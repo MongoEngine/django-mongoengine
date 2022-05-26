@@ -14,6 +14,8 @@ _field_defaults = (
     ("blank", False),
     ("null", False),
     ("help_text", ""),
+    ("editable", True),
+    ("auto_created", False),
 )
 
 
@@ -46,11 +48,12 @@ class DjangoField:
             kwargs.pop("auto_created")
         self._verbose_name = kwargs.pop("verbose_name", None)
 
-        super(DjangoField, self).__init__(*args, **kwargs)
+        # Parent init will update self.__dict__ with unused kwargs.
+        super().__init__(*args, **kwargs)
+
         self.remote_field = None
         self.is_relation = self.remote_field is not None
-        self.editable = kwargs.pop("editable", True)
-        self.auto_created = kwargs.pop("auto_created", False)
+
 
     def _get_verbose_name(self):
         return self._verbose_name or self.db_field.replace('_', ' ')
