@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.1](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.0...v0.5.1) (2022-05-26)
+
+
+### Bug Fixes
+
+* Add placeholders for get_path_to_parent/get_path_from_parent ([3653d21](https://github.com/MongoEngine/django-mongoengine/commit/3653d21b979d351b3dd411dbcd74d55e331fbddf))
+* Use django-patched ObjectIdField for auto created primary keys. ([5fde4a6](https://github.com/MongoEngine/django-mongoengine/commit/5fde4a6e17d11cab1e53d32a00b15b3ac55ef209))
+
 ## [0.5.0](https://github.com/MongoEngine/django-mongoengine/compare/v0.4.5...v0.5.0) (2022-05-14)
 
 
