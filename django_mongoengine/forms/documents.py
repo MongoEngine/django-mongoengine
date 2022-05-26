@@ -275,9 +275,9 @@ class EmbeddedDocumentForm(BaseDocumentForm, metaclass=DocumentFormMetaclass):
 
         def save(*args, **kwargs):
             instance = construct_instance(self, self.instance, self.fields, self._meta.exclude)
-            l = getattr(self.parent_document, self._meta.embedded_field)
-            l.append(instance)
-            setattr(self.parent_document, self._meta.embedded_field, l)
+            f = getattr(self.parent_document, self._meta.embedded_field)
+            f.append(instance)
+            setattr(self.parent_document, self._meta.embedded_field, f)
             self.parent_document.save(*args, **kwargs)
 
         if commit:
