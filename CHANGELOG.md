@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.2](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.1...v0.5.2) (2022-05-26)
+
+
+### Bug Fixes
+
+* Fix create without id ([41bc837](https://github.com/MongoEngine/django-mongoengine/commit/41bc837916fca5f8226b4c1b0491db8766477f1f))
+
 ### [0.5.1](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.0...v0.5.1) (2022-05-26)
 
 
