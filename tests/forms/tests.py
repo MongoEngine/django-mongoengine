@@ -262,6 +262,10 @@ class DictFieldTest(MongoTestCase):
 
 class FormFactoryTest(MongoTestCase):
     def test_documentform_factory(self):
-        m_form = documentform_factory(MongoDoc, fields="__all__")()
-        d_form = modelform_factory(DjangoModel, fields="__all__")()
-        self.assertEqual(d_form.as_p(), m_form.as_p())
+        mongo_form = documentform_factory(MongoDoc, fields="__all__")()
+        django_form = modelform_factory(DjangoModel, fields="__all__")()
+        mongo_keys = mongo_form.fields.keys()
+        django_keys = django_form.fields.keys()
+
+        assert mongo_keys == django_keys
+        assert django_form.as_p() == mongo_form.as_p()

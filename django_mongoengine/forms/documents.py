@@ -130,31 +130,18 @@ class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
                 # fields from the model"
                 opts.fields = None
 
-            if hasattr(opts, 'field_classes'):
-                fields = model_forms.fields_for_model(
-                    opts.model,
-                    opts.fields,
-                    opts.exclude,
-                    opts.widgets,
-                    formfield_callback,
-                    opts.localized_fields,
-                    opts.labels,
-                    opts.help_texts,
-                    opts.error_messages,
-                    opts.field_classes,
-                )
-            else:
-                fields = model_forms.fields_for_model(
-                    opts.model,
-                    opts.fields,
-                    opts.exclude,
-                    opts.widgets,
-                    formfield_callback,
-                    opts.localized_fields,
-                    opts.labels,
-                    opts.help_texts,
-                    opts.error_messages,
-                )
+            fields = model_forms.fields_for_model(
+                opts.model,
+                opts.fields,
+                opts.exclude,
+                opts.widgets,
+                formfield_callback,
+                opts.localized_fields,
+                opts.labels,
+                opts.help_texts,
+                opts.error_messages,
+                getattr(opts, "field_classes", None),
+            )
 
             # make sure opts.fields doesn't specify an invalid field
             none_model_fields = [k for k, v in fields.items() if not v]
@@ -275,9 +262,9 @@ class EmbeddedDocumentForm(BaseDocumentForm, metaclass=DocumentFormMetaclass):
 
         def save(*args, **kwargs):
             instance = construct_instance(self, self.instance, self.fields, self._meta.exclude)
-            l = getattr(self.parent_document, self._meta.embedded_field)
-            l.append(instance)
-            setattr(self.parent_document, self._meta.embedded_field, l)
+            f = getattr(self.parent_document, self._meta.embedded_field)
+            f.append(instance)
+            setattr(self.parent_document, self._meta.embedded_field, f)
             self.parent_document.save(*args, **kwargs)
 
         if commit:

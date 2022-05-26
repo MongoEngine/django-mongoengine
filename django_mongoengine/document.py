@@ -1,12 +1,20 @@
-from bson import ObjectId
+from functools import partial
+
+from bson.objectid import ObjectId
 from django.db.models import Model
 from django.db.models.base import ModelState
 from mongoengine import document as me
 from mongoengine.base import metaclasses as mtc
 from mongoengine.errors import FieldDoesNotExist
 
+from .fields import ObjectIdField
 from .forms.document_options import DocumentMetaWrapper
 from .queryset import QuerySetManager
+
+# TopLevelDocumentMetaclass is using ObjectIdField to create default pk field,
+# if one's not set explicitly.
+# We need to know it's not editable and auto_created.
+mtc.ObjectIdField = partial(ObjectIdField, editable=False, auto_created=True)
 
 
 def django_meta(meta, *top_bases):

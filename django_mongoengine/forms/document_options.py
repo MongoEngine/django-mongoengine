@@ -44,7 +44,7 @@ class PkWrapper(object):
         return "CharField"
 
 
-class DocumentMetaWrapper(object):
+class DocumentMetaWrapper:
     """
     Used to store mongoengine's _meta dict to make the document admin
     as compatible as possible to django's meta class on models.
@@ -53,6 +53,7 @@ class DocumentMetaWrapper(object):
     _pk = None
     pk_name = None
     app_label = None
+    object_name = None
     model_name = None
     verbose_name = None
     has_auto_field = False
@@ -90,6 +91,8 @@ class DocumentMetaWrapper(object):
         self.model = document
         self.concrete_model = document
         self.concrete_fields = document._fields.values()
+        self.object_name = document.__name__
+        self.model_name = self.object_name.lower()
         self.fields = self.concrete_fields
         try:
             self.apps = self.default_apps
@@ -100,8 +103,6 @@ class DocumentMetaWrapper(object):
         except AttributeError:
             self.object_name = self.document.__class__.__name__
 
-        self.model_name = self.object_name.lower()
-        self.app_label = self.get_app_label()
         self.verbose_name = self.get_verbose_name()
 
         # EmbeddedDocuments don't have an id field.
@@ -112,18 +113,15 @@ class DocumentMetaWrapper(object):
             pass
 
     @property
-    def module_name(self):
-        """
-        This property has been deprecated in favor of `model_name`.
-        """
-        warnings.warn(
-            "Options.module_name has been deprecated in favor of model_name",
-            PendingDeprecationWarning,
-            stacklevel=2,
-        )
-        return self.model_name
+    def label(self):
+        return "%s.%s" % (self.app_label, self.model_name)
 
-    def get_app_label(self):
+    @property
+    def label_lower(self):
+        return "%s.%s" % (self.app_label, self.model_name)
+
+    @property
+    def app_label(self) -> str:
         if 'app_label' in self._meta:
             return self._meta['app_label']
         else:
