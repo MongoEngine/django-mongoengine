@@ -4,8 +4,10 @@ from django_mongoengine import Document, fields
 
 
 class MongoDoc(Document):
-    intfield = fields.IntField()
+    year = fields.IntField()
+    file = fields.FileField(upload_to="test")
 
 
 class DjangoModel(models.Model):
-    intfield = models.IntegerField()
+    year = models.IntegerField()
+    file = models.FileField(upload_to="test")
