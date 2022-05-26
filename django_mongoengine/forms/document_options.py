@@ -127,6 +127,14 @@ class DocumentMetaWrapper:
             model_module = sys.modules[self.document.__module__]
             return model_module.__name__.split('.')[-2]
 
+    def get_path_to_parent(self, parent):
+        # This is just placeholders.
+        # If you depend on this, port it from django.
+        return []
+
+    def get_path_from_parent(self, parent):
+        return []
+
     def get_verbose_name(self):
         """
         Returns the verbose name of the document.
