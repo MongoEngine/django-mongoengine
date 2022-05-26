@@ -35,9 +35,6 @@ def patch_mongoengine_field(field_name):
     for k in ["__eq__", "__lt__", "__hash__", "attname", "get_internal_type"]:
         if k not in field.__dict__:
             setattr(field, k, djangoflavor.DjangoField.__dict__[k])
-    # set auto_created False for check in django db model when delete
-    if field_name == "ObjectIdField":
-        setattr(field, "auto_created", False)
 
 
 init_module()
