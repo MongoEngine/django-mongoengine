@@ -53,3 +53,7 @@ class Page(Document):
     id = fields.StringField(primary_key=True, default=ObjectId)
     content = fields.StringField()
     template = fields.StringField(max_length=300)
+
+
+class City(Document):
+    name = fields.StringField(max_length=100)

@@ -1,4 +1,8 @@
-from .views.models import Artist
+from .views.models import Artist, City
+
+
+def test_create():
+    City.objects.create(name="Dnipro")
 
 
 def test_get_or_create():
