@@ -218,7 +218,7 @@ class DocumentMetaWrapper:
         for f in self.document._fields.values():
             if isinstance(f, ReferenceField):
                 document = f.document_type
-                self._field_cache[document._meta.module_name] = (f, document, False, False)
+                self._field_cache[document._meta.model_name] = (f, document, False, False)
             else:
                 self._field_cache[f.name] = (f, None, True, False)
 
