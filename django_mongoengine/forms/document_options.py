@@ -1,5 +1,4 @@
 import sys
-import warnings
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.options import Options
