@@ -14,7 +14,7 @@ from .queryset import QuerySetManager
 # TopLevelDocumentMetaclass is using ObjectIdField to create default pk field,
 # if one's not set explicitly.
 # We need to know it's not editable and auto_created.
-mtc.ObjectIdField = partial(ObjectIdField, editable=False, auto_created=True)
+#mtc.ObjectIdField = partial(ObjectIdField, editable=False, auto_created=True)
 
 
 def django_meta(meta, *top_bases):
