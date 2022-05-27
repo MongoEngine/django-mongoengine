@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.4](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.3...v0.5.4) (2022-05-27)
+
+
+### Bug Fixes
+
+* Fix package metadata ([a2496b4](https://github.com/MongoEngine/django-mongoengine/commit/a2496b4854d67f843f1aae5e9ae0c36bf67a3c74))
+
 ### [0.5.3](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.2...v0.5.3) (2022-05-27)
 
 
