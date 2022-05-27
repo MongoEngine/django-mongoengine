@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.3](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.2...v0.5.3) (2022-05-27)
+
+
+### Bug Fixes
+
+* Properly set attributes for auto created field ([3b9c039](https://github.com/MongoEngine/django-mongoengine/commit/3b9c039791991be2b01693c9c561fbcd82ad7564))
+
 ### [0.5.2](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.1...v0.5.2) (2022-05-26)
 
 
