@@ -14,15 +14,12 @@ Django-MongoEngine
 
 THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
-Right now we're targeting to get things working on Django 2.0 and 3.0;
+Right now we're targeting to get things working on Django 3.0 and 4.0;
 
-WARNING:
---------
-Maybe there is better option for mongo support, take a look at https://nesdis.github.io/djongo/;
-It's python3 only and i have not tried it yet, but looks promising.
+WARNING: This project is not in good state, and is likely to break with django updates,
+as it uses monkey-patching heavily. It's better to use raw mongoengine.
 
-
-Working / Django 2.0-3.0
+Working / Django 3.0-4.0
 ------------------------
 
 * [ok] sessions
