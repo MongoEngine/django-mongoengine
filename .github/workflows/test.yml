@@ -20,7 +20,6 @@ jobs:
           - "pypy3.8"
           - "pypy3.9"
         django:
-          - "Django>=3.0,<3.2"
           - "Django>=3.2,<3.3"
           - "Django>=4.0,<4.1"
         exclude:
