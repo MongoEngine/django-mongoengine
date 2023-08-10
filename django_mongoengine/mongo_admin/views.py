@@ -46,7 +46,7 @@ class DocumentChangeList(ChangeList):
             result_list = self.query_set.clone()
         else:
             try:
-                result_list = paginator.page(self.page_num + 1).object_list
+                result_list = paginator.page(self.page_num).object_list
             except InvalidPage:
                 raise IncorrectLookupParameters
 
