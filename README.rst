@@ -14,12 +14,12 @@ Django-MongoEngine
 
 THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
-Right now we're targeting to get things working on Django 3.0 and 4.0;
+Right now we're targeting to get things working on Django 4.2;
 
 WARNING: This project is not in good state, and is likely to break with django updates.
 It's better to use raw mongoengine.
 
-Working / Django 3.0-4.0
+Working / Django 3.2-4.2
 ------------------------
 
 * [ok] sessions
