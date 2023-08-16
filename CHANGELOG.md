@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.6-beta.0](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.5...v0.5.6-beta.0) (2023-08-16)
+
+
+### Features
+
+* Update test matrix; drop python 3.7 ([1bca66a](https://github.com/MongoEngine/django-mongoengine/commit/1bca66ad9238420790077c025424ff6c42cb61cb))
+
+
+### Bug Fixes
+
+* Fix queryset comparison for django 4.2 ([da5f2b5](https://github.com/MongoEngine/django-mongoengine/commit/da5f2b5aab6a850a8217284bf6d24235db847edc))
+
 ### [0.5.5](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.4...v0.5.5) (2023-08-10)
 
 
