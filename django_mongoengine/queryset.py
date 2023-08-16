@@ -4,7 +4,7 @@ from mongoengine import queryset as qs
 from mongoengine.errors import NotUniqueError
 
 
-class QueryWrapper(object):
+class QueryWrapper:
     # XXX: copy funcs from django; now it's just wrapper
     select_related = False
     order_by = []
@@ -14,7 +14,7 @@ class QueryWrapper(object):
         self.order_by = ordering or []
 
 
-class BaseQuerySet(object):
+class BaseQuerySet:
     """
     A base queryset with django-required attributes
     """

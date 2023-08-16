@@ -21,13 +21,13 @@ class AdminSite(sites.AdminSite):
             model_or_iterable._meta = DocumentMetaWrapper(model_or_iterable)
             model_or_iterable = [model_or_iterable]
 
-        super(AdminSite, self).register(model_or_iterable, admin_class, **options)
+        super().register(model_or_iterable, admin_class, **options)
 
     def unregister(self, model_or_iterable):
         if isinstance(model_or_iterable, TopLevelDocumentMetaclass):
             model_or_iterable = [model_or_iterable]
 
-        super(AdminSite, self).unregister(model_or_iterable)
+        super().unregister(model_or_iterable)
 
 
 # This global object represents the default admin site, for the common case.

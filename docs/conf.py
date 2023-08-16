@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -38,8 +37,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Django-MongoEngine'
-copyright = u'2011-2013, MongoEngine'
+project = 'Django-MongoEngine'
+copyright = '2011-2013, MongoEngine'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -180,8 +179,8 @@ latex_documents = [
     (
         'index',
         'django-mongoengine.tex',
-        u'Django-MongoEngine Documentation',
-        u'Ross Lawley',
+        'Django-MongoEngine Documentation',
+        'Ross Lawley',
         'manual',
     ),
 ]
@@ -215,5 +214,5 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'django-mongoengine', u'Django-MongoEngine Documentation', ['Ross Lawley'], 1)
+    ('index', 'django-mongoengine', 'Django-MongoEngine Documentation', ['Ross Lawley'], 1)
 ]

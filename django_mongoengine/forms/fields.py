@@ -19,10 +19,10 @@ class DictField(forms.Field):
     """
 
     error_messages = {
-        'length': _(u'Ensure the keys length is less than or equal to %s.'),
-        'invalid_key': _(u'Ensure the keys are not : %s.'),
-        'illegal': _(u'Ensure the keys does not contain any illegal character : %s.'),
-        'depth': _(u'Ensure the dictionary depth is less than or equal to %s.'),
+        'length': _('Ensure the keys length is less than or equal to %s.'),
+        'invalid_key': _('Ensure the keys are not : %s.'),
+        'illegal': _('Ensure the keys does not contain any illegal character : %s.'),
+        'depth': _('Ensure the dictionary depth is less than or equal to %s.'),
     }
 
     # Mongo reserved keywords
@@ -55,7 +55,7 @@ class DictField(forms.Field):
                 max_depth=max_depth, flags=flags, schema=schema, sub_attrs=sub_attrs
             )
 
-        super(DictField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def prepare_value(self, value):
         return value
@@ -107,7 +107,7 @@ class EmbeddedDocumentField(forms.MultiValueField):
         kwargs['widget'] = EmbeddedFieldWidget(self.form.fields)
         kwargs['initial'] = [f.initial for f in self.form.fields.values()]
         kwargs['require_all_fields'] = False
-        super(EmbeddedDocumentField, self).__init__(
+        super().__init__(
             fields=tuple([f for f in self.form.fields.values()]), *args, **kwargs
         )
 
@@ -120,14 +120,14 @@ class EmbeddedDocumentField(forms.MultiValueField):
     def compress(self, data_list):
         data = {}
         if data_list:
-            data = dict((f.name, data_list[i]) for i, f in enumerate(self.form))
+            data = {f.name: data_list[i] for i, f in enumerate(self.form)}
             f = self.form.__class__(data)
             f.is_valid()
             return f.cleaned_data
         return data
 
     def clean(self, value):
-        return self.to_python(super(EmbeddedDocumentField, self).clean(value))
+        return self.to_python(super().clean(value))
 
     def to_python(self, value):
         obj = self.form._meta.model()

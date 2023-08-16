@@ -5,7 +5,7 @@ from django.utils.encoding import smart_str
 from mongoengine import fields
 
 
-class RelationWrapper(object):
+class RelationWrapper:
     """
     Wraps a document referenced from a ReferenceField with an Interface similiar to
     django's ForeignKeyField.rel

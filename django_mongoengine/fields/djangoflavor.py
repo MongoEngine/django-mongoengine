@@ -159,21 +159,21 @@ class StringField(DjangoField):
             defaults['regex'] = self.regex
 
         defaults.update(kwargs)
-        return super(StringField, self).formfield(form_class, choices_form_class, **defaults)
+        return super().formfield(form_class, choices_form_class, **defaults)
 
 
 class EmailField(StringField):
     def __init__(self, *args, **kwargs):
         # max_length=254 to be compliant with RFCs 3696 and 5321
         kwargs['max_length'] = kwargs.get('max_length', 254)
-        super(EmailField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         defaults = {
             'form_class': forms.EmailField,
         }
         defaults.update(kwargs)
-        return super(EmailField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class URLField(StringField):
@@ -182,17 +182,17 @@ class URLField(StringField):
             'form_class': forms.URLField,
         }
         defaults.update(kwargs)
-        return super(URLField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
-class MinMaxMixin(object):
+class MinMaxMixin:
     def formfield(self, **kwargs):
         defaults = {
             'min_value': self.min_value,
             'max_value': self.max_value,
         }
         defaults.update(kwargs)
-        return super(MinMaxMixin, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class IntField(MinMaxMixin, DjangoField):
@@ -201,7 +201,7 @@ class IntField(MinMaxMixin, DjangoField):
             'form_class': forms.IntegerField,
         }
         defaults.update(kwargs)
-        return super(IntField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class FloatField(MinMaxMixin, DjangoField):
@@ -210,7 +210,7 @@ class FloatField(MinMaxMixin, DjangoField):
             'form_class': forms.FloatField,
         }
         defaults.update(kwargs)
-        return super(FloatField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class DecimalField(MinMaxMixin, DjangoField):
@@ -221,7 +221,7 @@ class DecimalField(MinMaxMixin, DjangoField):
             'form_class': forms.DecimalField,
         }
         defaults.update(kwargs)
-        return super(DecimalField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 # TODO: test boolean choices; test choices
@@ -231,7 +231,7 @@ class BooleanField(DjangoField):
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
 
-        super(BooleanField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         # Unlike most fields, BooleanField figures out include_blank from
@@ -242,14 +242,14 @@ class BooleanField(DjangoField):
         else:
             defaults = {'form_class': forms.BooleanField}
         defaults.update(kwargs)
-        return super(BooleanField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class DateTimeField(DjangoField):
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.DateTimeField}
         defaults.update(kwargs)
-        return super(DateTimeField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class ReferenceField(DjangoField):
@@ -259,7 +259,7 @@ class ReferenceField(DjangoField):
             'queryset': self.document_type.objects,
         }
         defaults.update(kwargs)
-        return super(ReferenceField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 # TODO: test field.field.choices?
@@ -280,14 +280,14 @@ class ListField(DjangoField):
             defaults = {}
 
         defaults.update(kwargs)
-        return super(ListField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class FileField(DjangoField):
     def __init__(self, *args, **kwargs):
 
         kwargs['max_length'] = kwargs.get('max_length', 100)
-        super(FileField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FileField, 'max_length': self.max_length}
@@ -299,14 +299,14 @@ class FileField(DjangoField):
         if 'initial' in kwargs:
             defaults['required'] = False
         defaults.update(kwargs)
-        return super(FileField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class ImageField(FileField):
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ImageField}
         defaults.update(kwargs)
-        return super(ImageField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class DictField(DjangoField):
@@ -315,7 +315,7 @@ class DictField(DjangoField):
         validators = [
             RegexValidator(
                 regex='^[^$_]',
-                message=u'Ensure the keys do not begin with : ["$","_"].',
+                message='Ensure the keys do not begin with : ["$","_"].',
                 code='invalid_start',
             )
         ]
@@ -323,7 +323,7 @@ class DictField(DjangoField):
             'validators': validators,
             'form_class': formfields.DictField,
         }
-        return super(DictField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class EmbeddedDocumentField(DjangoField):

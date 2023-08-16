@@ -46,7 +46,7 @@ class EmbeddedFormMixin(djmod.FormMixin):
         """
         Returns the keyword arguments for instantiating the form.
         """
-        kwargs = super(EmbeddedFormMixin, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({'instance': self.get_embedded_object()})
         if not 'initial' in kwargs:
             kwargs['initial'] = {}
@@ -68,10 +68,10 @@ class EmbeddedFormMixin(djmod.FormMixin):
 
     def form_valid(self, form):
         self.embedded_object = form.save()
-        return super(EmbeddedFormMixin, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        context = super(EmbeddedFormMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         self.object = getattr(self, 'object', self.get_object())
         if 'form' in kwargs:
@@ -83,7 +83,7 @@ class EmbeddedFormMixin(djmod.FormMixin):
         return context
 
 
-class ProcessEmbeddedFormMixin(object):
+class ProcessEmbeddedFormMixin:
     """
     A mixin that processes an embedded form on POST.
     Does not implement any GET handling.
@@ -97,7 +97,7 @@ class ProcessEmbeddedFormMixin(object):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
-        super(ProcessEmbeddedFormMixin, self).post(request, *args, **kwargs)
+        super().post(request, *args, **kwargs)
 
 
 class BaseEmbeddedFormMixin(EmbeddedFormMixin, ProcessEmbeddedFormMixin):

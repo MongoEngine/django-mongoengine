@@ -10,7 +10,7 @@ class WrapDocument(type):
                 attrs['model'] = document
             except AttributeError:
                 attrs['model'] = property(lambda self: self.document)
-        return super(WrapDocument, cls).__new__(cls, name, bases, attrs)
+        return super().__new__(cls, name, bases, attrs)
 
 
 def copy_class(source):

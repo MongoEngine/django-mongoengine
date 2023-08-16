@@ -10,7 +10,7 @@ from mongoengine import Q
 
 class DocumentChangeList(ChangeList):
     def __init__(self, *args, **kwargs):
-        super(DocumentChangeList, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.pk_attname = self.lookup_opts.pk_name
 
     def get_results(self, request):
@@ -48,7 +48,7 @@ class DocumentChangeList(ChangeList):
 
     def _get_default_ordering(self):
         try:
-            ordering = super(DocumentChangeList, self)._get_default_ordering()
+            ordering = super()._get_default_ordering()
         except AttributeError:
             ordering = []
             if self.model_admin.ordering:
@@ -68,7 +68,7 @@ class DocumentChangeList(ChangeList):
         """
         if queryset is None:
             # with Django < 1.4 get_ordering works without fixes for mongoengine
-            return super(DocumentChangeList, self).get_ordering()
+            return super().get_ordering()
 
         params = self.params
         ordering = list(self.model_admin.get_ordering(request) or self._get_default_ordering())
@@ -99,7 +99,7 @@ class DocumentChangeList(ChangeList):
         # ordering fields so we can guarantee a deterministic order across all
         # database backends.
         pk_name = self.lookup_opts.pk.name
-        if not (set(ordering) & set(['pk', '-pk', pk_name, '-' + pk_name])):
+        if not (set(ordering) & {'pk', '-pk', pk_name, '-' + pk_name}):
             # The two sets do not intersect, meaning the pk isn't present. So
             # we add it.
             ordering.append('pk')

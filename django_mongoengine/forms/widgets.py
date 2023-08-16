@@ -89,7 +89,7 @@ class Dictionary(MultiWidget):
         else:
             widget_object.append(self.pair(sub_attrs=self.sub_attrs, sattrs=attrs))
 
-        super(Dictionary, self).__init__(widget_object, attrs)
+        super().__init__(widget_object, attrs)
 
     def decompress(self, value):
         if value and isinstance(value, dict):
@@ -139,12 +139,12 @@ class Dictionary(MultiWidget):
         html_indexes = []
         prefix = 'st' if self.flags is not None and 'FORCE_SCHEMA' in self.flags else ''
         for data_key in data_keys:
-            match = re.match(name + '_(\d+)_%spair_0' % prefix, data_key)
+            match = re.match(name + r'_(\d+)_%spair_0' % prefix, data_key)
             if match is not None:
                 self.widgets.append(self.pair(sub_attrs=self.sub_attrs, attrs=self.attrs))
                 html_indexes.append(match.group(1))
             else:
-                match = re.match(name + '_(\d+)_%ssubdict_0' % prefix, data_key)
+                match = re.match(name + r'_(\d+)_%ssubdict_0' % prefix, data_key)
                 if match is not None:
                     self.widgets.append(
                         self.subdict(
@@ -286,7 +286,7 @@ class Pair(MultiWidget):
         self.sub_attrs = sub_attrs
         # raise error here ?
         self.key_value = key_value if key_value is not None else ''
-        super(Pair, self).__init__(widgets, attrs)
+        super().__init__(widgets, attrs)
 
     # this method should be overwritten by subclasses
     def decompress(self, value):
@@ -340,7 +340,7 @@ class SubDictionary(Pair):
     def __init__(self, sub_attrs, schema=None, **kwargs):
         if schema is None:
             schema = {'key': 'value'}
-        super(SubDictionary, self).__init__(schema=schema, sub_attrs=sub_attrs, **kwargs)
+        super().__init__(schema=schema, sub_attrs=sub_attrs, **kwargs)
 
     def decompress(self, value):
         if value is not None:
@@ -372,7 +372,7 @@ class StaticPair(Pair):
     #     super(StaticPair, self).__init__(key_value=key_value, attrs=attrs)
 
     def decompress(self, value):
-        value = super(StaticPair, self).decompress(value)
+        value = super().decompress(value)
         self.key_value = value[0]
         return value
 
@@ -401,7 +401,7 @@ class StaticSubDictionary(SubDictionary):
     suffix = 'stsubdict'
 
     def decompress(self, value):
-        value = super(StaticSubDictionary, self).decompress(value)
+        value = super().decompress(value)
         self.key_value = value[0]
         return value
 
@@ -426,7 +426,7 @@ class EmbeddedFieldWidget(MultiWidget):
 
     def __init__(self, fields, attrs=None):
         self.fields = fields
-        super(EmbeddedFieldWidget, self).__init__([f.widget for f in self.fields.values()], attrs)
+        super().__init__([f.widget for f in self.fields.values()], attrs)
 
     def decompress(self, value):
         """
@@ -465,4 +465,4 @@ class EmbeddedFieldWidget(MultiWidget):
             ret.append('<li>%s %s %s</li>' % (label, help_text, rendered_widgets[i]))
 
         ret.append('</ul>')
-        return u''.join(ret)
+        return ''.join(ret)

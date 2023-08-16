@@ -61,7 +61,7 @@ except ImportError:
         return '%s$%s$%s' % (algo, salt, hash)
 
 
-class BaseUser(object):
+class BaseUser:
 
     is_anonymous = AbstractBaseUser.__dict__['is_anonymous']
     is_authenticated = AbstractBaseUser.__dict__['is_authenticated']
@@ -160,7 +160,7 @@ class Permission(document.Document):
         # ordering = ('content_type__app_label', 'content_type__model', 'codename')
 
     def __unicode__(self):
-        return u"%s | %s | %s" % (
+        return "%s | %s | %s" % (
             self.content_type.app_label,
             self.content_type,
             self.name,
@@ -265,7 +265,7 @@ class AbstractUser(BaseUser, document.Document):
 
     def get_full_name(self):
         """Returns the users first and last names, separated by a space."""
-        full_name = u'%s %s' % (self.first_name or '', self.last_name or '')
+        full_name = '%s %s' % (self.first_name or '', self.last_name or '')
         return full_name.strip()
 
     def set_password(self, raw_password):

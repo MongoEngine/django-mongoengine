@@ -13,7 +13,7 @@ except ImportError:
 from mongoengine.fields import ReferenceField
 
 
-class PkWrapper(object):
+class PkWrapper:
     """Used to wrap the Primary Key so it can mimic Django's expectations"""
 
     editable = False
@@ -25,12 +25,12 @@ class PkWrapper(object):
     def __getattr__(self, attr):
         if attr in dir(self.obj):
             return getattr(self.obj, attr)
-        raise AttributeError("{} has no {}".format(self, attr))
+        raise AttributeError(f"{self} has no {attr}")
 
     def __setattr__(self, attr, value):
         if attr != 'obj' and hasattr(self.obj, attr):
             setattr(self.obj, attr, value)
-        super(PkWrapper, self).__setattr__(attr, value)
+        super().__setattr__(attr, value)
 
     def value_to_string(self, obj):
         """
@@ -248,7 +248,7 @@ class DocumentMetaWrapper:
         if not hasattr(self, name):
             self._meta[name] = value
         else:
-            super(DocumentMetaWrapper, self).__setattr__(name, value)
+            super().__setattr__(name, value)
 
     def __getitem__(self, key):
         return self._meta[key]

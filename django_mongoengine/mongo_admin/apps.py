@@ -21,5 +21,5 @@ class SimpleMongoAdminConfig(AppConfig):
 
 class MongoAdminConfig(SimpleMongoAdminConfig):
     def ready(self):
-        super(MongoAdminConfig, self).ready()
+        super().ready()
         self.module.autodiscover()

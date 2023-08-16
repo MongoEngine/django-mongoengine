@@ -95,7 +95,7 @@ class SessionStore(SessionBase):
         MongoSession.objects(session_key=session_key).delete()
 
 
-class BSONSerializer(object):
+class BSONSerializer:
     """
     Serializer that can handle BSON types (eg ObjectId).
     """

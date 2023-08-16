@@ -55,7 +55,7 @@ class MongoUserManager(UserManager):
     """
 
     def contribute_to_class(self, model, name):
-        super(MongoUserManager, self).contribute_to_class(model, name)
+        super().contribute_to_class(model, name)
         self.dj_model = self.model
         self.model = get_user_document()
 

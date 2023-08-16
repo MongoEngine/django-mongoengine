@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
-from __future__ import absolute_import, division, print_function
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -59,7 +57,7 @@ class AuthorList(views.ListView):
 
 class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        super(CustomPaginator, self).__init__(
+        super().__init__(
             queryset, page_size, orphans=2, allow_empty_first_page=allow_empty_first_page
         )
 
@@ -68,7 +66,7 @@ class AuthorListCustomPaginator(AuthorList):
     paginate_by = 5
 
     def get_paginator(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        return super(AuthorListCustomPaginator, self).get_paginator(
+        return super().get_paginator(
             queryset, page_size, orphans=2, allow_empty_first_page=allow_empty_first_page
         )
 
