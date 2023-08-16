@@ -14,18 +14,7 @@ class DocumentChangeList(ChangeList):
         self.pk_attname = self.lookup_opts.pk_name
 
     def get_results(self, request):
-        # query_set has been changed to queryset
-        try:
-            self.query_set
-        except:
-            self.query_set = self.queryset
-        # root_query_set has been changed to root_queryset
-        try:
-            self.root_query_set
-        except:
-            self.root_query_set = self.root_queryset
-
-        paginator = self.model_admin.get_paginator(request, self.query_set, self.list_per_page)
+        paginator = self.model_admin.get_paginator(request, self.queryset, self.list_per_page)
         # Get the number of objects, with admin filters applied.
         result_count = paginator.count
 
@@ -33,17 +22,17 @@ class DocumentChangeList(ChangeList):
         # Perform a slight optimization: Check to see whether any filters were
         # given. If not, use paginator.hits to calculate the number of objects,
         # because we've already done paginator.hits and the value is cached.
-        if len(self.query_set._query) == 1:
+        if len(self.queryset._query) == 1:
             full_result_count = result_count
         else:
-            full_result_count = self.root_query_set.count()
+            full_result_count = self.root_queryset.count()
 
         can_show_all = result_count <= self.list_max_show_all
         multi_page = result_count > self.list_per_page
 
         # Get the list of objects to display on this page.
         if (self.show_all and can_show_all) or not multi_page:
-            result_list = self.query_set.clone()
+            result_list = self.queryset.clone()
         else:
             try:
                 result_list = paginator.page(self.page_num).object_list
@@ -117,30 +106,16 @@ class DocumentChangeList(ChangeList):
         return ordering
 
     def get_queryset(self, request=None):
-        # root_query_set has been changed to root_queryset
-        try:
-            self.root_query_set
-        except:
-            self.root_query_set = self.root_queryset
         # First, we collect all the declared list filters.
-        qs = self.root_query_set.clone()
+        qs = self.root_queryset.clone()
 
-        filter_values = self.get_filters(request)
-        if len(filter_values) == 4:  # for Django 2
-            (
-                self.filter_specs,
-                self.has_filters,
-                remaining_lookup_params,
-                use_distinct,
-            ) = filter_values
-        else:  # for Django >2
-            (
-                self.filter_specs,
-                self.has_filters,
-                remaining_lookup_params,
-                use_distinct,
-                has_active_filters,
-            ) = filter_values
+        (
+            self.filter_specs,
+            self.has_filters,
+            remaining_lookup_params,
+            use_distinct,
+            has_active_filters,
+        ) = self.get_filters(request)
 
         # Then, we let every list filter modify the queryset to its liking.
         for filter_spec in self.filter_specs:
