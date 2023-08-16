@@ -2,8 +2,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.contrib.auth.models import UserManager
-from django.db.models import BooleanField, CharField, DateField, DateTimeField
-from django.utils import timezone
+from django.db.models import BooleanField, CharField, DateTimeField
 from django.utils.translation import gettext_lazy as _
 from mongoengine.errors import DoesNotExist
 

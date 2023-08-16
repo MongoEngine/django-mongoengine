@@ -381,7 +381,7 @@ def validate_base(cls, model):
                     "is neither an instance of ForeignKey nor does "
                     "have choices set." % (cls.__name__, field)
                 )
-            if not val in (HORIZONTAL, VERTICAL):
+            if val not in (HORIZONTAL, VERTICAL):
                 raise ImproperlyConfigured(
                     "'%s.radio_fields['%s']' "
                     "is neither admin.HORIZONTAL nor admin.VERTICAL." % (cls.__name__, field)

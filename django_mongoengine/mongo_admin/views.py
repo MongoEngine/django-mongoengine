@@ -89,7 +89,8 @@ class DocumentChangeList(ChangeList):
 
         # Add the given query's ordering fields, if any.
         try:
-            sign = lambda t: t[1] > 0 and '+' or '-'
+            def sign(t):
+                return t[1] > 0 and '+' or '-'
             qs_ordering = [sign(t) + t[0] for t in queryset._ordering]
             ordering.extend(qs_ordering)
         except:
