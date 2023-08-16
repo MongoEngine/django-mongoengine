@@ -1,11 +1,17 @@
-from functools import partial, partialmethod
+import operator
+from functools import partial, partialmethod, reduce
 
 from django import forms
 from django.apps import apps
 from django.conf import settings
 from django.contrib.admin import helpers, widgets
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
-from django.contrib.admin.options import IS_POPUP_VAR, TO_FIELD_VAR, csrf_protect_m, get_ul_class
+from django.contrib.admin.options import (
+    IS_POPUP_VAR,
+    TO_FIELD_VAR,
+    csrf_protect_m,
+    get_ul_class,
+)
 from django.contrib.admin.utils import flatten_fieldsets, get_deleted_objects, unquote
 from django.core.exceptions import PermissionDenied
 from django.forms.formsets import all_valid
@@ -18,8 +24,14 @@ from django.utils.encoding import force_str
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
+from mongoengine import Q
 
-from django_mongoengine.fields import EmbeddedDocumentField, ListField, ReferenceField, StringField
+from django_mongoengine.fields import (
+    EmbeddedDocumentField,
+    ListField,
+    ReferenceField,
+    StringField,
+)
 from django_mongoengine.forms.documents import (
     BaseInlineDocumentFormSet,
     DocumentForm,
@@ -233,6 +245,36 @@ class DocumentAdmin(BaseDocumentAdmin):
             fields=self.list_editable,
             **defaults
         )
+
+    def get_search_results(self, request, queryset, search_term):
+        """
+        Return a tuple containing a queryset to implement the search
+        and a boolean indicating if the results may contain duplicates.
+        """
+
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            # No __search for mongoengine
+            # elif field_name.startswith('@'):
+            #    return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
+        search_fields = self.get_search_fields(request)
+
+        if search_fields and search_term:
+            orm_lookups = [
+                construct_search(str(search_field)) for search_field in search_fields
+            ]
+            for bit in search_term.split():
+                or_queries = [Q(**{orm_lookup: bit}) for orm_lookup in orm_lookups]
+                queryset = queryset.filter(reduce(operator.or_, or_queries))
+
+        return queryset, False
+
 
     def get_changelist(self, request, **kwargs):
         """
