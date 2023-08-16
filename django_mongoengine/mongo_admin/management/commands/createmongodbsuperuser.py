@@ -4,7 +4,6 @@ Management utility to create superusers.
 import getpass
 import re
 import sys
-from optparse import make_option
 
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
@@ -13,7 +12,8 @@ from django.utils.translation import gettext as _
 from django_mongoengine.mongo_auth.models import MongoUser
 from django_mongoengine.sessions import DEFAULT_CONNECTION_NAME
 
-get_default_username = lambda: "admin"
+def get_default_username():
+    return "admin"
 
 RE_VALID_USERNAME = re.compile(r'[\w.@+-]+$')
 

@@ -450,7 +450,7 @@ class EmbeddedFieldWidget(MultiWidget):
         """
         Format the help text for the bound field
         """
-        if field.help_text != None:
+        if field.help_text is not None:
             return '(<em>%s</em>)' % field.help_text
         return ''
 

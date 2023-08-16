@@ -48,7 +48,7 @@ class EmbeddedFormMixin(djmod.FormMixin):
         """
         kwargs = super().get_form_kwargs()
         kwargs.update({'instance': self.get_embedded_object()})
-        if not 'initial' in kwargs:
+        if 'initial' not in kwargs:
             kwargs['initial'] = {}
         return kwargs
 
