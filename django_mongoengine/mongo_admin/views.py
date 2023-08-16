@@ -1,11 +1,7 @@
-import operator
-from functools import reduce
-
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.main import ORDER_VAR, ChangeList
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.core.paginator import InvalidPage
-from mongoengine import Q
 
 
 class DocumentChangeList(ChangeList):
@@ -114,7 +110,7 @@ class DocumentChangeList(ChangeList):
             self.filter_specs,
             self.has_filters,
             remaining_lookup_params,
-            use_distinct,
+            search_may_have_duplicates,
             has_active_filters,
         ) = self.get_filters(request)
 
@@ -146,23 +142,11 @@ class DocumentChangeList(ChangeList):
         ordering = self.get_ordering(request, qs)
         qs = qs.order_by(*ordering)
 
-        # Apply keyword searches.
-        def construct_search(field_name):
-            if field_name.startswith('^'):
-                return "%s__istartswith" % field_name[1:]
-            elif field_name.startswith('='):
-                return "%s__iexact" % field_name[1:]
-            # No __search for mongoengine
-            # elif field_name.startswith('@'):
-            #    return "%s__search" % field_name[1:]
-            else:
-                return "%s__icontains" % field_name
+        # Apply search results
+        qs, search_may_have_duplicates = self.model_admin.get_search_results(
+            request,
+            qs,
+            self.query,
+        )
 
-        if self.search_fields and self.query:
-            orm_lookups = [
-                construct_search(str(search_field)) for search_field in self.search_fields
-            ]
-            for bit in self.query.split():
-                or_queries = [Q(**{orm_lookup: bit}) for orm_lookup in orm_lookups]
-                qs = qs.filter(reduce(operator.or_, or_queries))
         return qs
