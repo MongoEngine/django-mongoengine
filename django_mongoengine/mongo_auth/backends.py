@@ -1,7 +1,7 @@
 from django.contrib.auth import backends as django_backends
 
 
-class MongoEngineBackend(object):
+class MongoEngineBackend:
     """Authenticate using MongoEngine and mongoengine.django.auth.User."""
 
     supports_object_permissions = False

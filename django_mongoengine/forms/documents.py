@@ -64,9 +64,9 @@ def save_instance(
         # see BaseDocumentForm._post_clean for an explanation
         if hasattr(form, '_delete_before_save'):
             fields = instance._fields
-            new_fields = dict(
-                [(n, f) for n, f in fields.items() if n not in form._delete_before_save]
-            )
+            new_fields = {
+                n: f for n, f in fields.items() if n not in form._delete_before_save
+            }
             if hasattr(instance, '_changed_fields'):
                 for field in form._delete_before_save:
                     instance._changed_fields.remove(field)
@@ -81,7 +81,7 @@ def save_instance(
 
 class DocumentFormOptions(model_forms.ModelFormOptions):
     def __init__(self, options=None):
-        super(DocumentFormOptions, self).__init__(options)
+        super().__init__(options)
         self.model = getattr(options, 'document', None) or getattr(options, 'model', None)
         if self.model is not None:
             options.model = self.model
@@ -92,7 +92,7 @@ class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
     def __new__(mcs, name, bases, attrs):
         formfield_callback = attrs.pop('formfield_callback', None)
 
-        new_class = super(DocumentFormMetaclass, mcs).__new__(mcs, name, bases, attrs)
+        new_class = super().__new__(mcs, name, bases, attrs)
 
         if bases == (BaseDocumentForm,):
             return new_class
@@ -246,7 +246,7 @@ def documentform_factory(
 
 class EmbeddedDocumentForm(BaseDocumentForm, metaclass=DocumentFormMetaclass):
     def __init__(self, parent_document, *args, **kwargs):
-        super(EmbeddedDocumentForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.parent_document = parent_document
         if self._meta.embedded_field is None:
             raise FieldError("%s.Meta must have defined embedded_field" % self.__class__.__name__)
@@ -347,14 +347,14 @@ class BaseInlineDocumentFormSet(BaseDocumentFormSet):
         self.instance = instance
         self.save_as_new = save_as_new
 
-        super(BaseInlineDocumentFormSet, self).__init__(
+        super().__init__(
             data, files, prefix=prefix, queryset=queryset, **kwargs
         )
 
     def initial_form_count(self):
         if self.save_as_new:
             return 0
-        return super(BaseInlineDocumentFormSet, self).initial_form_count()
+        return super().initial_form_count()
 
     # @classmethod
     def get_default_prefix(cls):
@@ -363,7 +363,7 @@ class BaseInlineDocumentFormSet(BaseDocumentFormSet):
     get_default_prefix = classmethod(get_default_prefix)
 
     def add_fields(self, form, index):
-        super(BaseInlineDocumentFormSet, self).add_fields(form, index)
+        super().add_fields(form, index)
 
         # Add the generated field to form._meta.fields if it's defined to make
         # sure validation isn't skipped on that field.
@@ -374,7 +374,7 @@ class BaseInlineDocumentFormSet(BaseDocumentFormSet):
 
     def get_unique_error_message(self, unique_check):
         unique_check = [field for field in unique_check if field != self.fk.name]
-        return super(BaseInlineDocumentFormSet, self).get_unique_error_message(unique_check)
+        return super().get_unique_error_message(unique_check)
 
 
 def inlineformset_factory(
@@ -423,7 +423,7 @@ class EmbeddedDocumentFormSet(BaseInlineDocumentFormSet):
         **kwargs
     ):
         self.parent_document = parent_document
-        super(EmbeddedDocumentFormSet, self).__init__(
+        super().__init__(
             data, files, instance, save_as_new, prefix, queryset, **kwargs
         )
 

@@ -37,7 +37,7 @@ def django_meta(meta, *top_bases):
     return type.__new__(metaclass, 'temporary_meta', (), {})
 
 
-class DjangoFlavor(object):
+class DjangoFlavor:
     objects = QuerySetManager()
     _default_manager = QuerySetManager()
     _get_pk_val = Model.__dict__["_get_pk_val"]
@@ -45,7 +45,7 @@ class DjangoFlavor(object):
     def __init__(self, *args, **kwargs):
         self._state = ModelState()
         self._state.db = self._meta.get("db_alias", me.DEFAULT_CONNECTION_NAME)
-        super(DjangoFlavor, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _get_unique_checks(self, exclude=None):
         # XXX: source: django/db/models/base.py

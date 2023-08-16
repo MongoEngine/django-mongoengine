@@ -35,7 +35,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         * ``<app_label>/<model_name><template_name_suffix>.html``
         """
         try:
-            names = super(SingleObjectTemplateResponseMixin, self).get_template_names()
+            names = super().get_template_names()
         except ImproperlyConfigured:
             # If template_name isn't specified, it's not a problem --
             # we just start with an empty list.

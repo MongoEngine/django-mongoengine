@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# coding=utf-8
-from __future__ import absolute_import, division, print_function
-
 import datetime
 
 from tests import MongoTestCase
@@ -18,7 +14,7 @@ class TestCase(MongoTestCase):
 
         Artist(id="1", name="Rene Magritte").save()
 
-        Author(id="1", name=u"Roberto Bolaño", slug="roberto-bolano").save()
+        Author(id="1", name="Roberto Bolaño", slug="roberto-bolano").save()
         scott = Author(id="2", name="Scott Rosenberg", slug="scott-rosenberg").save()
 
         Book(

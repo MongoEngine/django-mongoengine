@@ -157,7 +157,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         self.model = model
         self.opts = model._meta
         self.admin_site = admin_site
-        super(DocumentAdmin, self).__init__(model, admin_site)
+        super().__init__(model, admin_site)
         self.log = (
             not settings.DATABASES.get('default', {})
             .get('ENGINE', 'django.db.backends.dummy')
@@ -249,7 +249,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         """
         if not self.log:
             return
-        super(DocumentAdmin, self).log_addition(request, object, message)
+        super().log_addition(request, object, message)
 
     def log_change(self, request, object, message):
         """
@@ -258,7 +258,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         """
         if not self.log:
             return
-        super(DocumentAdmin, self).log_change(request, object, message)
+        super().log_change(request, object, message)
 
     def log_deletion(self, request, object, object_repr):
         """
@@ -268,7 +268,7 @@ class DocumentAdmin(BaseDocumentAdmin):
         """
         if not self.log:
             return
-        super(DocumentAdmin, self).log_deletion(request, object, object_repr)
+        super().log_deletion(request, object, object_repr)
 
     @property
     def media(self):
@@ -524,7 +524,7 @@ class InlineDocumentAdmin(BaseDocumentAdmin):
         self.parent_document = parent_document
         self.opts = self.model._meta
 
-        super(InlineDocumentAdmin, self).__init__()
+        super().__init__()
 
         if self.verbose_name is None:
             self.verbose_name = self.model._meta.verbose_name
@@ -594,7 +594,7 @@ class EmbeddedDocumentAdmin(InlineDocumentAdmin):
                 self.model._meta.verbose_name_plural,
             )
 
-        super(EmbeddedDocumentAdmin, self).__init__(parent_document, admin_site)
+        super().__init__(parent_document, admin_site)
 
     def queryset(self, request):
         if isinstance(self.field, ListField):  # list field

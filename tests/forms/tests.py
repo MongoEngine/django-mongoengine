@@ -68,8 +68,8 @@ class DictFieldTest(MongoTestCase):
             ],
         }
         invalid_message = {
-            '[[key1,value1],[$key2,value2]]': u'Ensure the keys do not begin with : ["$","_"].',
-            '[[key1,value1],[_key2,value2]]': u'Ensure the keys do not begin with : ["$","_"].',
+            '[[key1,value1],[$key2,value2]]': 'Ensure the keys do not begin with : ["$","_"].',
+            '[[key1,value1],[_key2,value2]]': 'Ensure the keys do not begin with : ["$","_"].',
             '[[key1,value1],[k.ey2,value2]]': self.field.error_messages['illegal']
             % self.field.illegal_characters,
             '[[keykeykeykeykeykeykeykeykeykeykey,value1],[key2,value2]]': self.field.error_messages[
@@ -105,14 +105,14 @@ class DictFieldTest(MongoTestCase):
         # contains the POST data dicts
         data_inputs = {
             'data1': {
-                u'widget_name_0_subdict_0': [u'a'],
-                u'widget_name_0_subdict_1_0_subdict_0': [u'b'],
-                u'widget_name_0_subdict_1_0_subdict_1_0_pair_0': [u'f'],
-                u'widget_name_0_subdict_1_0_subdict_1_0_pair_1': [u'g'],
+                'widget_name_0_subdict_0': ['a'],
+                'widget_name_0_subdict_1_0_subdict_0': ['b'],
+                'widget_name_0_subdict_1_0_subdict_1_0_pair_0': ['f'],
+                'widget_name_0_subdict_1_0_subdict_1_0_pair_1': ['g'],
             }
         }
         # contains the data dicts
-        data_dicts = {'data1': {u'a': {u'b': {u'f': u'g'}}}}
+        data_dicts = {'data1': {'a': {'b': {'f': 'g'}}}}
         # contains structures of output
         output_structures = {
             'data1': {
@@ -212,7 +212,7 @@ class DictFieldTest(MongoTestCase):
         validate = [
             RegexValidator(
                 regex='^[^$_]',
-                message=u'Ensure the keys do not begin with : ["$","_"].',
+                message='Ensure the keys do not begin with : ["$","_"].',
                 code='invalid_start',
             )
         ]

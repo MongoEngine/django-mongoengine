@@ -17,7 +17,7 @@ class MongoTestCase(SimpleTestCase):
 
         connect(settings.MONGODB_DATABASES['default']['name'])
         self.db = get_db()
-        super(MongoTestCase, self).__init__(methodName)
+        super().__init__(methodName)
 
     def dropCollections(self):
         for collection in self.db.list_collection_names():
