@@ -13,18 +13,15 @@ jobs:
     strategy:
       matrix:
         python:
-          - "3.7"
           - "3.8"
           - "3.9"
           - "3.10"
-          - "pypy3.8"
+          - "3.11"
           - "pypy3.9"
+          - "pypy3.10"
         django:
           - "Django>=3.2,<3.3"
-          - "Django>=4.0,<4.1"
-        exclude:
-          - python: "3.7"
-            django: "Django>=4.0,<4.1"
+          - "Django>=4.2,<4.3"
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DJANGO: ${{ matrix.django }}
