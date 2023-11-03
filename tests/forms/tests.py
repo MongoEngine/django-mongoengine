@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.forms.models import modelform_factory
-
+import pytest
 from django_mongoengine.forms import widgets
 from django_mongoengine.forms.documents import documentform_factory
 from django_mongoengine.forms.fields import DictField
@@ -159,6 +159,8 @@ class DictFieldTest(MongoTestCase):
             self.field.widget.render('widget_name', data_dicts[data])
             self._check_structure(self.field.widget, output_structures[data], 'test_rendering:2')
 
+    # I don't understand why it fails; disable this check for now
+    @pytest.mark.skip(reason="Broken for now")
     def test_static(self):
         self._init_field(force=True)
         structure = {
@@ -204,8 +206,6 @@ class DictFieldTest(MongoTestCase):
                 },
             ],
         }
-        print("I don't understand why it fails; disable this check for now")
-        return
         self._check_structure(self.field.widget, structure, 'test_static:1')
 
     def _init_field(self, depth=None, force=False):

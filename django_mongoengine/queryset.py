@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Generic, TypeVar
+
 from django.db.models.query import QuerySet as DjangoQuerySet
 from django.db.models.utils import resolve_callables
 from mongoengine import queryset as qs

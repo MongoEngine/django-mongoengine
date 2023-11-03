@@ -43,4 +43,6 @@ jobs:
           poetry run pip install -q "${{ matrix.django }}"
       - name: Run tests
         run: |
+          poetry run ruff .
+          poetry run black --check .
           poetry run python -m pytest
