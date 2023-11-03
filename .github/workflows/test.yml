@@ -32,15 +32,24 @@ jobs:
           - 27017:27017
     steps:
       - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
+          cache: 'poetry'
+      - name: Cache virtualenv
+        uses: actions/cache@v3
+        with:
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('poetry.lock') }}
+          path: .venv
       - name: Set up env
         run: |
-          python -m pip install -U -q poetry pip
           poetry install -q
           poetry run pip install -q "${{ matrix.django }}"
       - name: Run tests
         run: |
+          poetry run ruff .
+          poetry run black --check .
           poetry run python -m pytest

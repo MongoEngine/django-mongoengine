@@ -8,23 +8,31 @@ authors = ["Ross Lawley <ross.lawley@gmail.com>"]
 python = ">=3.8"
 django = ">=3.2,<5"
 mongoengine = ">=0.14"
+typing-extensions = "^4.8.0"
 
-[tool.poetry.dev-dependencies]
-sphinx = "*"
-pytest = "*"
+[tool.poetry.group.dev.dependencies]
 flake8 = "*"
 pdbpp = "*"
-pytest-django = "*"
+pytest = "*"
 pytest-cov = "*"
+pytest-django = "*"
 pytest-sugar = "*"
+ruff = "^0.1.3"
+sphinx = "*"
+black = "^23.10.1"
 
 [tool.black]
 line-length = 100
 skip-string-normalization = true
 
-[tool.isort]
-line_length = 100
-known_first_party = ["django_mongoengine"]
-multi_line_output = 3
-skip_gitignore = true
-include_trailing_comma = true
+[tool.ruff]
+line-length = 100
+select = [
+    "E",
+    "F",
+    "FA",
+    "T20",
+    "TCH",
+    "C4",
+]
+ignore = ["E501"]
