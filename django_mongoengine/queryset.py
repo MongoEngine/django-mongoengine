@@ -4,10 +4,14 @@ from django.db.models.utils import resolve_callables
 from mongoengine import queryset as qs
 from mongoengine.errors import NotUniqueError
 
+from .utils.monkey import patch_typing_support
+
 if TYPE_CHECKING:
     from .document import Document
 
-_M = TypeVar("_M", bound=Document)
+_M = TypeVar("_M", bound="Document")
+
+patch_typing_support()
 
 
 class QueryWrapper:
@@ -122,6 +126,7 @@ class QuerySetNoCache(BaseQuerySet[_M], qs.QuerySetNoCache[_M]):
 
 class QuerySetManager(Generic[_M], qs.QuerySetManager):
     default = QuerySet
+    if TYPE_CHECKING:
 
-    def __get__(self, instance: object, cls: type[_M]) -> QuerySet[_M]:
-        return QuerySet(cls, cls._get_collection())
+        def __get__(self, instance: object, cls: type[_M]) -> QuerySet[_M]:
+            ...

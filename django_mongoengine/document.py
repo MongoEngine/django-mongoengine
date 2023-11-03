@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from functools import partial
+from typing import TYPE_CHECKING
 
 from bson.objectid import ObjectId
 from django.db.models import Model
@@ -10,6 +11,8 @@ from mongoengine import DoesNotExist
 from mongoengine import document as me
 from mongoengine.base import metaclasses as mtc
 from mongoengine.errors import FieldDoesNotExist
+from mongoengine.fields import StringField
+from typing_extensions import Self
 
 from .fields import ObjectIdField
 from .forms.document_options import DocumentMetaWrapper
@@ -42,8 +45,11 @@ def django_meta(meta, *top_bases):
 
 
 class DjangoFlavor:
-    _default_manager = QuerySetManager()
+    id: StringField
+    objects = QuerySetManager[Self]()
+    _default_manager = QuerySetManager[Self]()
     _get_pk_val = Model.__dict__["_get_pk_val"]
+    _meta: DocumentMetaWrapper
     DoesNotExist: type[DoesNotExist]
 
     def __init__(self, *args, **kwargs):
@@ -100,3 +106,18 @@ class DynamicEmbeddedDocument(
     django_meta(mtc.DocumentMetaclass, DjangoFlavor, me.DynamicEmbeddedDocument)
 ):
     swap_base = True
+
+
+if TYPE_CHECKING:
+
+    class Document(DjangoFlavor, me.Document):
+        ...
+
+    class DynamicDocument(DjangoFlavor, me.DynamicDocument):
+        ...
+
+    class EmbeddedDocument(DjangoFlavor, me.EmbeddedDocument):
+        _instance: Document
+
+    class DynamicEmbeddedDocument(DjangoFlavor, me.DynamicEmbeddedDocument):
+        ...

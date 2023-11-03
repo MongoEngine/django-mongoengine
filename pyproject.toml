@@ -8,6 +8,7 @@ authors = ["Ross Lawley <ross.lawley@gmail.com>"]
 python = ">=3.8"
 django = ">=3.2,<5"
 mongoengine = ">=0.14"
+typing-extensions = "^4.8.0"
 
 [tool.poetry.dev-dependencies]
 sphinx = "*"
