@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.6](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.6-beta.0...v0.5.6) (2023-11-03)
+
+
+### Bug Fixes
+
+* **typing:** Add static types for dynamic classes ([5c843e6](https://github.com/MongoEngine/django-mongoengine/commit/5c843e60f6cd26ebc232dac66b56c626a5808e73))
+
 ### [0.5.6-beta.0](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.5...v0.5.6-beta.0) (2023-08-16)
 
 
