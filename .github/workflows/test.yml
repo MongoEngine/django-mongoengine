@@ -40,7 +40,7 @@ jobs:
       - name: Cache virtualenv
         uses: actions/cache@v3
         with:
-          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('poetry.lock') }}-${{ matrix.django }}
+          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('poetry.lock') }}
           path: .venv
       - name: Set up env
         run: |
