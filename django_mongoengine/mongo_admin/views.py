@@ -91,7 +91,7 @@ class DocumentChangeList(ChangeList):
 
             qs_ordering = [sign(t) + t[0] for t in queryset._ordering]
             ordering.extend(qs_ordering)
-        except:
+        except:  # noqa: E722
             pass
 
         # Ensure that the primary key is systematically present in the list of

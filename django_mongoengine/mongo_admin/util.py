@@ -21,9 +21,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
         field = model._meta.get_field_by_name(name)[0]
         label = field.name.replace('_', ' ')
     except FieldDoesNotExist:
-        if name == "__unicode__":
-            label = force_str(model._meta.verbose_name)
-        elif name == "__str__":
+        if name == "__str__":
             label = smart_str(model._meta.verbose_name)
         else:
             if callable(name):

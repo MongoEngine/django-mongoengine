@@ -73,7 +73,6 @@ class Command(BaseCommand):
         email = options.get('email', None)
         interactive = options.get('interactive')
         verbosity = int(options.get('verbosity', 1))
-        database = options.get('database')
 
         # Do quick and dirty validation if --noinput
         if not interactive:
