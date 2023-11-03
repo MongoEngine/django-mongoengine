@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING, Any
 
 from bson.objectid import ObjectId
 from django.db.models import Model
@@ -43,10 +42,7 @@ def django_meta(meta, *top_bases):
 
 
 class DjangoFlavor:
-    id: Any
-    objects: Any = QuerySetManager()
-    _meta: DocumentMetaWrapper
-    _default_manager: Any = QuerySetManager()
+    _default_manager = QuerySetManager()
     _get_pk_val = Model.__dict__["_get_pk_val"]
     DoesNotExist: type[DoesNotExist]
 
@@ -104,18 +100,3 @@ class DynamicEmbeddedDocument(
     django_meta(mtc.DocumentMetaclass, DjangoFlavor, me.DynamicEmbeddedDocument)
 ):
     swap_base = True
-
-
-if TYPE_CHECKING:
-
-    class Document(DjangoFlavor, me.Document):
-        ...
-
-    class DynamicDocument(DjangoFlavor, me.DynamicDocument):
-        ...
-
-    class EmbeddedDocument(DjangoFlavor, me.EmbeddedDocument):
-        ...
-
-    class DynamicEmbeddedDocument(DjangoFlavor, me.DynamicEmbeddedDocument):
-        ...

@@ -1,7 +1,13 @@
+from typing import TYPE_CHECKING, Generic, TypeVar
 from django.db.models.query import QuerySet as DjangoQuerySet
 from django.db.models.utils import resolve_callables
 from mongoengine import queryset as qs
 from mongoengine.errors import NotUniqueError
+
+if TYPE_CHECKING:
+    from .document import Document
+
+_M = TypeVar("_M", bound=Document)
 
 
 class QueryWrapper:
@@ -14,13 +20,13 @@ class QueryWrapper:
         self.order_by = ordering or []
 
 
-class BaseQuerySet:
+class BaseQuerySet(Generic[_M]):
     """
     A base queryset with django-required attributes
     """
 
     @property
-    def model(self):
+    def model(self) -> type[_M]:
         return self._document
 
     @property
@@ -46,7 +52,7 @@ class BaseQuerySet:
     def earliest(self, field_name):
         return self.order_by(field_name).first()
 
-    def exists(self):
+    def exists(self) -> bool:
         return bool(self)
 
     def _clone(self):
@@ -106,13 +112,16 @@ class BaseQuerySet:
     _extract_model_params = DjangoQuerySet.__dict__["_extract_model_params"]
 
 
-class QuerySet(BaseQuerySet, qs.QuerySet):
+class QuerySet(BaseQuerySet[_M], qs.QuerySet[_M]):
     pass
 
 
-class QuerySetNoCache(BaseQuerySet, qs.QuerySetNoCache):
+class QuerySetNoCache(BaseQuerySet[_M], qs.QuerySetNoCache[_M]):
     pass
 
 
-class QuerySetManager(qs.QuerySetManager):
+class QuerySetManager(Generic[_M], qs.QuerySetManager):
     default = QuerySet
+
+    def __get__(self, instance: object, cls: type[_M]) -> QuerySet[_M]:
+        return QuerySet(cls, cls._get_collection())
