@@ -107,9 +107,7 @@ class EmbeddedDocumentField(forms.MultiValueField):
         kwargs['widget'] = EmbeddedFieldWidget(self.form.fields)
         kwargs['initial'] = [f.initial for f in self.form.fields.values()]
         kwargs['require_all_fields'] = False
-        super().__init__(
-            fields=tuple([f for f in self.form.fields.values()]), *args, **kwargs
-        )
+        super().__init__(fields=tuple([f for f in self.form.fields.values()]), *args, **kwargs)
 
     def bound_data(self, data, initial):
         return data

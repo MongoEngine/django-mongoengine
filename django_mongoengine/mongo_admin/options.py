@@ -266,15 +266,12 @@ class DocumentAdmin(BaseDocumentAdmin):
         search_fields = self.get_search_fields(request)
 
         if search_fields and search_term:
-            orm_lookups = [
-                construct_search(str(search_field)) for search_field in search_fields
-            ]
+            orm_lookups = [construct_search(str(search_field)) for search_field in search_fields]
             for bit in search_term.split():
                 or_queries = [Q(**{orm_lookup: bit}) for orm_lookup in orm_lookups]
                 queryset = queryset.filter(reduce(operator.or_, or_queries))
 
         return queryset, False
-
 
     def get_changelist(self, request, **kwargs):
         """
@@ -318,7 +315,6 @@ class DocumentAdmin(BaseDocumentAdmin):
 
     @csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-
         to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
         if to_field and not self.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)

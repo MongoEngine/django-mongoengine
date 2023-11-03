@@ -12,8 +12,10 @@ from django.utils.translation import gettext as _
 from django_mongoengine.mongo_auth.models import MongoUser
 from django_mongoengine.sessions import DEFAULT_CONNECTION_NAME
 
+
 def get_default_username():
     return "admin"
+
 
 RE_VALID_USERNAME = re.compile(r'[\w.@+-]+$')
 
@@ -92,7 +94,6 @@ class Command(BaseCommand):
         if interactive:
             default_username = get_default_username()
             try:
-
                 # Get a username
                 while 1:
                     if not username:

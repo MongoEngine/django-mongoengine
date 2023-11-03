@@ -64,9 +64,7 @@ def save_instance(
         # see BaseDocumentForm._post_clean for an explanation
         if hasattr(form, '_delete_before_save'):
             fields = instance._fields
-            new_fields = {
-                n: f for n, f in fields.items() if n not in form._delete_before_save
-            }
+            new_fields = {n: f for n, f in fields.items() if n not in form._delete_before_save}
             if hasattr(instance, '_changed_fields'):
                 for field in form._delete_before_save:
                     instance._changed_fields.remove(field)
@@ -347,9 +345,7 @@ class BaseInlineDocumentFormSet(BaseDocumentFormSet):
         self.instance = instance
         self.save_as_new = save_as_new
 
-        super().__init__(
-            data, files, prefix=prefix, queryset=queryset, **kwargs
-        )
+        super().__init__(data, files, prefix=prefix, queryset=queryset, **kwargs)
 
     def initial_form_count(self):
         if self.save_as_new:
@@ -423,9 +419,7 @@ class EmbeddedDocumentFormSet(BaseInlineDocumentFormSet):
         **kwargs
     ):
         self.parent_document = parent_document
-        super().__init__(
-            data, files, instance, save_as_new, prefix, queryset, **kwargs
-        )
+        super().__init__(data, files, instance, save_as_new, prefix, queryset, **kwargs)
 
     def _construct_form(self, i, **kwargs):
         defaults = {'parent_document': self.parent_document}

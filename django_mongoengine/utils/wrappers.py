@@ -17,6 +17,7 @@ def copy_class(source):
     def decorator(cls):
         def f(k):
             return k not in cls.__dict__ and not k.startswith("__")
+
         for k in filter(f, source.__dict__.keys()):
             setattr(cls, k, source.__dict__[k])
         return cls

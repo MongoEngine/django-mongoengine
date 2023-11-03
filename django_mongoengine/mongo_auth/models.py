@@ -62,7 +62,6 @@ except ImportError:
 
 
 class BaseUser:
-
     is_anonymous = AbstractBaseUser.__dict__['is_anonymous']
     is_authenticated = AbstractBaseUser.__dict__['is_authenticated']
 

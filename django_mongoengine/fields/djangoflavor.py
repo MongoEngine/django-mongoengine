@@ -54,7 +54,6 @@ class DjangoField:
         self.remote_field = None
         self.is_relation = self.remote_field is not None
 
-
     def _get_verbose_name(self):
         return self._verbose_name or self.db_field.replace('_', ' ')
 
@@ -146,7 +145,6 @@ class DjangoField:
 
 class StringField(DjangoField):
     def formfield(self, form_class=forms.CharField, choices_form_class=None, **kwargs):
-
         defaults = {}
 
         if self.max_length and not self.choices:
@@ -285,7 +283,6 @@ class ListField(DjangoField):
 
 class FileField(DjangoField):
     def __init__(self, *args, **kwargs):
-
         kwargs['max_length'] = kwargs.get('max_length', 100)
         super().__init__(*args, **kwargs)
 

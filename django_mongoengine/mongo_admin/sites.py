@@ -13,7 +13,6 @@ class AdminSite(sites.AdminSite):
     index_template = "mongo_admin/index.html"
 
     def register(self, model_or_iterable, admin_class=None, **options):
-
         if isinstance(model_or_iterable, TopLevelDocumentMetaclass) and not admin_class:
             admin_class = DocumentAdmin
 

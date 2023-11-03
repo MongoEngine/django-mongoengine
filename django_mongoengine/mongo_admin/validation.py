@@ -190,7 +190,6 @@ def _validate(cls, model):
 
 
 def validate_inline(cls, parent, parent_model):
-
     # model is already verified to exist and be a Model
     if cls.fk_name:  # default value is None
         f = get_field(cls, cls.model, cls.model._meta, 'fk_name', cls.fk_name)
