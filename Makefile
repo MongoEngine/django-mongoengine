@@ -9,6 +9,7 @@ publish:
 	python setup.py sdist
 	twine check dist/*
 	twine upload dist/*
+	git push --follow-tags
 
 test:
 	poetry run python -m pytest
