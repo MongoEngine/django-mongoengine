@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.7-beta.1](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.7-beta.0...v0.5.7-beta.1) (2023-11-04)
+
+
+### Bug Fixes
+
+* Fix typing_extensions dependency ([6fa3394](https://github.com/MongoEngine/django-mongoengine/commit/6fa339407c32ae4b49589d9f5f1b1628c7458cf7))
+
 ### [0.5.7-beta.0](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.6...v0.5.7-beta.0) (2023-11-04)
 
 
