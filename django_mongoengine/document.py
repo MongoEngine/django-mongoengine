@@ -11,7 +11,6 @@ from mongoengine import DoesNotExist
 from mongoengine import document as me
 from mongoengine.base import metaclasses as mtc
 from mongoengine.errors import FieldDoesNotExist
-from typing_extensions import Self
 
 from .fields import ObjectIdField
 from .forms.document_options import DocumentMetaWrapper
@@ -19,6 +18,7 @@ from .queryset import QuerySetManager
 
 if TYPE_CHECKING:
     from mongoengine.fields import StringField
+    from typing_extensions import Self
 
 # TopLevelDocumentMetaclass is using ObjectIdField to create default pk field,
 # if one's not set explicitly.
@@ -48,8 +48,8 @@ def django_meta(meta, *top_bases):
 
 class DjangoFlavor:
     id: StringField
-    objects = QuerySetManager[Self]()
-    _default_manager = QuerySetManager[Self]()
+    objects = QuerySetManager["Self"]()
+    _default_manager = QuerySetManager["Self"]()
     _get_pk_val = Model.__dict__["_get_pk_val"]
     _meta: DocumentMetaWrapper
     DoesNotExist: type[DoesNotExist]
