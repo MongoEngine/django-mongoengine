@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.5.7-beta.0](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.6...v0.5.7-beta.0) (2023-11-04)
+
+
+### Bug Fixes
+
+* More work on typing support; add black and ruff ([b9a0e0e](https://github.com/MongoEngine/django-mongoengine/commit/b9a0e0ec420faaec30a3d6a2f37d53ecf5461c6e))
+
 ### [0.5.6](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.6-beta.0...v0.5.6) (2023-11-03)
 
 
