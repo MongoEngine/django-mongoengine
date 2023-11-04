@@ -2,6 +2,8 @@
 Django-MongoEngine
 ==================
 
+|stand-with-ukraine|
+
 |lifecycle| |gitter|
 
 .. |lifecycle| image:: https://img.shields.io/osslifecycle/MongoEngine/django-mongoengine
@@ -11,6 +13,9 @@ Django-MongoEngine
    :target: https://gitter.im/MongoEngine/django-mongoengine
    :alt: Gitter chat
 
+.. |stand-with-ukraine| image:: https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg
+   :target: https://stand-with-ukraine.pp.ua
+   :alt: Stand With Ukraine
 
 THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
