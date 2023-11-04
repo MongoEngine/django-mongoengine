@@ -36,3 +36,12 @@ select = [
     "C4",
 ]
 ignore = ["E501"]
+[tool.ruff.pyflakes]
+extend-generics = [
+    "mongoengine.queryset.QuerySetManager",
+    "mongoengine.queryset.QuerySet",
+    "mongoengine.queryset.QuerySetNoCache",
+    "django_mongoengine.queryset.QuerySetManager",
+    "django_mongoengine.queryset.QuerySet",
+    "django_mongoengine.queryset.QuerySetNoCache",
+]
