@@ -10,13 +10,13 @@ from django.contrib.auth.models import (
 from django.contrib.contenttypes.models import ContentTypeManager
 from django.db import models
 from django.utils import timezone
-from django.utils.encoding import smart_str
 from django.utils.translation import gettext_lazy as _
 from mongoengine import ImproperlyConfigured
 
 from django_mongoengine import document, fields
 from django_mongoengine.queryset import QuerySetManager
 
+from django.contrib.auth.hashers import check_password, make_password
 from .managers import MongoUserManager
 
 
@@ -33,33 +33,6 @@ ContentTypeManager = type(
         __init__=ct_init,
     ),
 )
-
-try:
-    from django.contrib.auth.hashers import check_password, make_password
-except ImportError:
-    """Handle older versions of Django"""
-    from django.utils.hashcompat import md5_constructor, sha_constructor
-
-    def get_hexdigest(algorithm, salt, raw_password):
-        raw_password, salt = smart_str(raw_password), smart_str(salt)
-        if algorithm == 'md5':
-            return md5_constructor(salt + raw_password).hexdigest()
-        elif algorithm == 'sha1':
-            return sha_constructor(salt + raw_password).hexdigest()
-        raise ValueError('Got unknown password algorithm type in password')
-
-    def check_password(raw_password, password):
-        algo, salt, hash = password.split('$')
-        return hash == get_hexdigest(algo, salt, raw_password)
-
-    def make_password(raw_password):
-        from random import random
-
-        algo = 'sha1'
-        salt = get_hexdigest(algo, str(random()), str(random()))[:5]
-        hash = get_hexdigest(algo, salt, raw_password)
-        return '%s$%s$%s' % (algo, salt, hash)
-
 
 class BaseUser:
     is_anonymous = AbstractBaseUser.__dict__['is_anonymous']
@@ -208,22 +181,23 @@ class AbstractUser(BaseUser, document.Document):
         max_length=150,
         verbose_name=_('username'),
         help_text=_("Required. 150 characters or fewer. Letters, numbers and @/./+/-/_ characters"),
+        required=True,
     )
 
     first_name = fields.StringField(
         max_length=30,
-        blank=True,
         verbose_name=_('first name'),
     )
 
-    last_name = fields.StringField(max_length=30, blank=True, verbose_name=_('last name'))
-    email = fields.EmailField(verbose_name=_('e-mail address'), blank=True)
+    last_name = fields.StringField(max_length=30, verbose_name=_('last name'))
+    email = fields.EmailField(verbose_name=_('e-mail address'), required=True)
     password = fields.StringField(
         max_length=128,
         verbose_name=_('password'),
         help_text=_(
             "Use '[algo]$[iterations]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
         ),
+        required=True,
     )
     is_staff = fields.BooleanField(
         default=False,
@@ -250,7 +224,6 @@ class AbstractUser(BaseUser, document.Document):
     user_permissions = fields.ListField(
         fields.ReferenceField(Permission),
         verbose_name=_('user permissions'),
-        blank=True,
         help_text=_('Permissions for the user.'),
     )
 
