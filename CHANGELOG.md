@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0-beta.0](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.7-beta.1...v0.6.0-beta.0) (2023-11-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removed `blank` argument support for fields, use mongoengine `required` instead.
+
+* Switch to mongoengine style field arguments. Drop old django ([#200](https://github.com/MongoEngine/django-mongoengine/issues/200)) ([9d56f6a](https://github.com/MongoEngine/django-mongoengine/commit/9d56f6a58ccee93e2acae7af0a8d81d9aa43ae5b))
+
 ### [0.5.7-beta.1](https://github.com/MongoEngine/django-mongoengine/compare/v0.5.7-beta.0...v0.5.7-beta.1) (2023-11-04)
 
 
