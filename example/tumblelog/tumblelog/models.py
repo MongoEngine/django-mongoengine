@@ -34,7 +34,7 @@ class Post(Document):
     def get_absolute_url(self):
         return reverse('post', kwargs={"slug": self.slug})
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     @property

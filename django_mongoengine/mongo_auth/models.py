@@ -88,7 +88,7 @@ class ContentType(document.Document):
         # ordering = ('name',)
         # unique_together = (('app_label', 'model'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def model_class(self):
@@ -158,7 +158,7 @@ class Permission(document.Document):
         # unique_together = (('content_type', 'codename'),)
         # ordering = ('content_type__app_label', 'content_type__model', 'codename')
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s | %s | %s" % (
             self.content_type.app_label,
             self.content_type,
@@ -195,7 +195,7 @@ class Group(document.Document):
         verbose_name = _('group')
         verbose_name_plural = _('groups')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -259,7 +259,7 @@ class AbstractUser(BaseUser, document.Document):
 
     meta = {'abstract': True, 'indexes': [{'fields': ['username'], 'unique': True, 'sparse': True}]}
 
-    def __unicode__(self):
+    def __str__(self):
         return self.username
 
     def get_full_name(self):
