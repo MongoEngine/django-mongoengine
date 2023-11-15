@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from bson.objectid import ObjectId
 from django.db.models import Model
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 # TopLevelDocumentMetaclass is using ObjectIdField to create default pk field,
 # if one's not set explicitly.
 # We need to know it's not editable and auto_created.
-mtc.ObjectIdField = partial(ObjectIdField, editable=False, auto_created=True, blank=True)
+mtc.ObjectIdField = partial(ObjectIdField, editable=False, auto_created=True)
 
 
 def django_meta(meta, *top_bases):
@@ -51,7 +51,7 @@ class DjangoFlavor:
     objects = QuerySetManager["Self"]()
     _default_manager = QuerySetManager["Self"]()
     _get_pk_val = Model.__dict__["_get_pk_val"]
-    _meta: DocumentMetaWrapper
+    _meta: DocumentMetaWrapper | dict[str, Any]
     DoesNotExist: type[DoesNotExist]
 
     def __init__(self, *args, **kwargs):

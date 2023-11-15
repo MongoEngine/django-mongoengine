@@ -10,13 +10,12 @@ from django_mongoengine.forms import fields as formfields
 
 from .internal import INTERNAL_DJANGO_FIELDS_MAP
 
-_field_defaults = (
-    ("blank", False),
-    ("null", False),
-    ("help_text", ""),
-    ("editable", True),
-    ("auto_created", False),
-)
+# Add some default values, required for django.
+_field_defaults = {
+    "help_text": "",
+    "editable": True,
+    "auto_created": False,
+}
 
 
 class DjangoField:
@@ -37,13 +36,13 @@ class DjangoField:
     flatchoices = property(_get_flatchoices)
 
     def __init__(self, *args, **kwargs):
-        for k, v in _field_defaults:
-            kwargs.setdefault(k, v)
-        if "required" in kwargs:
+        kwargs = _field_defaults | kwargs
+
+        if "blank" in kwargs:
             raise ImproperlyConfigured(
-                "`required` option is not supported. Use Django-style `blank` instead."
+                "`blank` option is not supported. Use Mongoengine-style `required` instead."
             )
-        kwargs["required"] = not kwargs["blank"]
+
         if hasattr(self, "auto_created"):
             kwargs.pop("auto_created")
         self._verbose_name = kwargs.pop("verbose_name", None)
@@ -53,6 +52,9 @@ class DjangoField:
 
         self.remote_field = None
         self.is_relation = self.remote_field is not None
+        # This is needed for django, but we use mongoengine style in __init__
+        # to not confuse type checker.
+        self.blank = not self.required
 
     def _get_verbose_name(self):
         return self._verbose_name or self.db_field.replace('_', ' ')
@@ -272,7 +274,7 @@ class ListField(DjangoField):
         elif isinstance(self.field, fields.ReferenceField):
             defaults = {
                 'form_class': formfields.DocumentMultipleChoiceField,
-                'queryset': self.field.document_type.objects,
+                'queryset': self.field.document_type.objects,  # type: ignore
             }
         else:
             defaults = {}

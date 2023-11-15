@@ -24,7 +24,7 @@ Right now we're targeting to get things working on Django 4.2;
 WARNING: This project is not in good state, and is likely to break with django updates.
 It's better to use raw mongoengine.
 
-Working / Django 3.2-4.2
+Working / Django 4.2
 ------------------------
 
 * [ok] sessions
@@ -50,9 +50,9 @@ It get's replaced after class creation via some metaclass magick.
 Fields notes
 ------------
 
-* mongo defaults Field(required=False), changed to django-style defaults
-  -> Field(blank=False), and setting required = not blank in Field.__init__
-
+* Project uses mongoengine style argument `required=False`, not django style `blank=False`,
+  to be compatible with mongo-types.
+  **All your fields are optional by default.**
 
 
 TODO
