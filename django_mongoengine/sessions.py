@@ -12,32 +12,28 @@ from mongoengine.document import Document
 from mongoengine.queryset import OperationError
 
 MONGOENGINE_SESSION_DB_ALIAS = getattr(
-    settings, 'MONGOENGINE_SESSION_DB_ALIAS', DEFAULT_CONNECTION_NAME
+    settings, "MONGOENGINE_SESSION_DB_ALIAS", DEFAULT_CONNECTION_NAME
 )
 
 # a setting for the name of the collection used to store sessions
 MONGOENGINE_SESSION_COLLECTION = getattr(
-    settings, 'MONGOENGINE_SESSION_COLLECTION', 'django_session'
+    settings, "MONGOENGINE_SESSION_COLLECTION", "django_session"
 )
 
 # a setting for whether session data is stored encoded or not
-MONGOENGINE_SESSION_DATA_ENCODE = getattr(settings, 'MONGOENGINE_SESSION_DATA_ENCODE', True)
+MONGOENGINE_SESSION_DATA_ENCODE = getattr(settings, "MONGOENGINE_SESSION_DATA_ENCODE", True)
 
 
 class MongoSession(Document):
     session_key = fields.StringField(primary_key=True, max_length=40)
-    session_data = (
-        fields.StringField(required=True)
-        if MONGOENGINE_SESSION_DATA_ENCODE
-        else fields.DictField(required=True)
-    )
-    expire_date = fields.DateTimeField(required=True)
+    session_data = fields.StringField() if MONGOENGINE_SESSION_DATA_ENCODE else fields.DictField()
+    expire_date = fields.DateTimeField()
 
     meta = {
-        'collection': MONGOENGINE_SESSION_COLLECTION,
-        'db_alias': MONGOENGINE_SESSION_DB_ALIAS,
-        'allow_inheritance': False,
-        'indexes': [{'fields': ['expire_date'], 'expireAfterSeconds': 0}],
+        "collection": MONGOENGINE_SESSION_COLLECTION,
+        "db_alias": MONGOENGINE_SESSION_DB_ALIAS,
+        "allow_inheritance": False,
+        "indexes": [{"fields": ["expire_date"], "expireAfterSeconds": 0}],
     }
 
     def get_decoded(self):
@@ -56,7 +52,7 @@ class SessionStore(SessionBase):
                 return s.session_data
         except (IndexError, SuspiciousOperation) as e:
             if isinstance(e, SuspiciousOperation):
-                logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
+                logger = logging.getLogger("django.security.%s" % e.__class__.__name__)
                 logger.warning(force_str(e))
             self._session_key = None
             return {}
@@ -105,7 +101,7 @@ class BSONSerializer:
     """
 
     def dumps(self, obj):
-        return json_util.dumps(obj, separators=(',', ':')).encode('ascii')
+        return json_util.dumps(obj, separators=(",", ":")).encode("ascii")
 
     def loads(self, data):
-        return json_util.loads(data.decode('ascii'))
+        return json_util.loads(data.decode("ascii"))

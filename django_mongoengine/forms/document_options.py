@@ -28,7 +28,7 @@ class PkWrapper:
         raise AttributeError(f"{self} has no {attr}")
 
     def __setattr__(self, attr, value):
-        if attr != 'obj' and hasattr(self.obj, attr):
+        if attr != "obj" and hasattr(self.obj, attr):
             setattr(self.obj, attr, value)
         super().__setattr__(attr, value)
 
@@ -106,7 +106,7 @@ class DocumentMetaWrapper:
 
         # EmbeddedDocuments don't have an id field.
         try:
-            self.pk_name = self._meta['id_field']
+            self.pk_name = self._meta["id_field"]
             self._init_pk()
         except KeyError:
             pass
@@ -121,11 +121,11 @@ class DocumentMetaWrapper:
 
     @property
     def app_label(self) -> str:
-        if 'app_label' in self._meta:
-            return self._meta['app_label']
+        if "app_label" in self._meta:
+            return self._meta["app_label"]
         else:
             model_module = sys.modules[self.document.__module__]
-            return model_module.__name__.split('.')[-2]
+            return model_module.__name__.split(".")[-2]
 
     def get_path_to_parent(self, parent):
         # This is just placeholders.
@@ -142,8 +142,8 @@ class DocumentMetaWrapper:
         Checks the original meta dict first. If it is not found
         then generates a verbose name from from the object name.
         """
-        if 'verbose_name' in self._meta:
-            return self._meta['verbose_name']
+        if "verbose_name" in self._meta:
+            return self._meta["verbose_name"]
         else:
             return capfirst(camel_case_to_spaces(self.object_name))
 
@@ -153,14 +153,14 @@ class DocumentMetaWrapper:
 
     @property
     def verbose_name_plural(self):
-        if 'verbose_name_plural' in self._meta:
-            return self.meta['verbose_name_plural']
+        if "verbose_name_plural" in self._meta:
+            return self.meta["verbose_name_plural"]
         else:
             return format_lazy("{}s", self.verbose_name)
 
     @property
     def pk(self):
-        if not hasattr(self._pk, 'attname'):
+        if not hasattr(self._pk, "attname"):
             self._init_pk()
         return self._pk
 
@@ -187,13 +187,13 @@ class DocumentMetaWrapper:
             return
 
     def get_add_permission(self):
-        return 'add_%s' % self.object_name.lower()
+        return "add_%s" % self.object_name.lower()
 
     def get_change_permission(self):
-        return 'change_%s' % self.object_name.lower()
+        return "change_%s" % self.object_name.lower()
 
     def get_delete_permission(self):
-        return 'delete_%s' % self.object_name.lower()
+        return "delete_%s" % self.object_name.lower()
 
     def get_ordered_objects(self):
         return []
@@ -217,7 +217,7 @@ class DocumentMetaWrapper:
                 self._init_field_cache()
                 return self._field_cache[name]
         except KeyError:
-            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, name))
+            raise FieldDoesNotExist("%s has no field named %r" % (self.object_name, name))
 
     def _init_field_cache(self):
         if self._field_cache is None:

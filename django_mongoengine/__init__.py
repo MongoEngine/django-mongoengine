@@ -14,6 +14,6 @@ try:
     from django import VERSION as _django_version
 
     if _django_version < (3, 2):
-        default_app_config = 'django_mongoengine.apps.DjangoMongoEngineConfig'
+        default_app_config = "django_mongoengine.apps.DjangoMongoEngineConfig"
 except ImportError:
     pass

@@ -42,7 +42,7 @@ def construct_instance(form, instance, fields=None, exclude=None):
 
 
 def save_instance(
-    form, instance, fields=None, fail_message='saved', commit=True, exclude=None, construct=True
+    form, instance, fields=None, fail_message="saved", commit=True, exclude=None, construct=True
 ):
     """
     Saves bound Form ``form``'s cleaned_data into document instance ``instance``.
@@ -60,12 +60,12 @@ def save_instance(
             " validate." % (instance.__class__.__name__, fail_message)
         )
 
-    if commit and hasattr(instance, 'save'):
+    if commit and hasattr(instance, "save"):
         # see BaseDocumentForm._post_clean for an explanation
-        if hasattr(form, '_delete_before_save'):
+        if hasattr(form, "_delete_before_save"):
             fields = instance._fields
             new_fields = {n: f for n, f in fields.items() if n not in form._delete_before_save}
-            if hasattr(instance, '_changed_fields'):
+            if hasattr(instance, "_changed_fields"):
                 for field in form._delete_before_save:
                     instance._changed_fields.remove(field)
             instance._fields = new_fields
@@ -80,36 +80,36 @@ def save_instance(
 class DocumentFormOptions(model_forms.ModelFormOptions):
     def __init__(self, options=None):
         super().__init__(options)
-        self.model = getattr(options, 'document', None) or getattr(options, 'model', None)
+        self.model = getattr(options, "document", None) or getattr(options, "model", None)
         if self.model is not None:
             options.model = self.model
-        self.embedded_field = getattr(options, 'embedded_field', None)
+        self.embedded_field = getattr(options, "embedded_field", None)
 
 
 class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
     def __new__(mcs, name, bases, attrs):
-        formfield_callback = attrs.pop('formfield_callback', None)
+        formfield_callback = attrs.pop("formfield_callback", None)
 
         new_class = super().__new__(mcs, name, bases, attrs)
 
         if bases == (BaseDocumentForm,):
             return new_class
 
-        opts = new_class._meta = DocumentFormOptions(getattr(new_class, 'Meta', None))
+        opts = new_class._meta = DocumentFormOptions(getattr(new_class, "Meta", None))
 
         # We check if a string was passed to `fields` or `exclude`,
         # which is likely to be a mistake where the user typed ('foo') instead
         # of ('foo',)
-        for opt in ['fields', 'exclude', 'localized_fields']:
+        for opt in ["fields", "exclude", "localized_fields"]:
             value = getattr(opts, opt)
             if isinstance(value, str) and value != ALL_FIELDS:
                 msg = (
                     "%(model)s.Meta.%(opt)s cannot be a string. "
                     "Did you mean to type: ('%(value)s',)?"
                     % {
-                        'model': new_class.__name__,
-                        'opt': opt,
-                        'value': value,
+                        "model": new_class.__name__,
+                        "opt": opt,
+                        "value": value,
                     }
                 )
                 raise TypeError(msg)
@@ -145,8 +145,8 @@ class DocumentFormMetaclass(DeclarativeFieldsMetaclass):
             none_model_fields = [k for k, v in fields.items() if not v]
             missing_fields = set(none_model_fields) - set(new_class.declared_fields.keys())
             if missing_fields:
-                message = 'Unknown field(s) (%s) specified for %s'
-                message = message % (', '.join(missing_fields), opts.model.__name__)
+                message = "Unknown field(s) (%s) specified for %s"
+                message = message % (", ".join(missing_fields), opts.model.__name__)
                 raise FieldError(message)
             # Override default model fields with any custom declared ones
             # (plus, include all the other declared fields).
@@ -188,11 +188,11 @@ class BaseDocumentForm(model_forms.BaseModelForm):
         if self.errors:
             try:
                 if self.instance.pk is None:
-                    fail_message = 'created'
+                    fail_message = "created"
                 else:
-                    fail_message = 'changed'
+                    fail_message = "changed"
             except (KeyError, AttributeError):
-                fail_message = 'embedded document saved'
+                fail_message = "embedded document saved"
             raise ValueError(
                 "The %s could not be %s because the data didn't"
                 " validate." % (self.instance.__class__.__name__, fail_message)
@@ -224,7 +224,7 @@ def documentform_factory(
     help_texts=None,
     error_messages=None,
     *args,
-    **kwargs
+    **kwargs,
 ):
     return model_forms.modelform_factory(
         model,
@@ -238,7 +238,7 @@ def documentform_factory(
         help_texts,
         error_messages,
         *args,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -299,7 +299,7 @@ def documentformset_factory(
     min_num=None,
     validate_min=False,
     *args,
-    **kwargs
+    **kwargs,
 ):
     return model_forms.modelformset_factory(
         model,
@@ -321,7 +321,7 @@ def documentformset_factory(
         min_num,
         validate_min,
         *args,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -340,7 +340,7 @@ class BaseInlineDocumentFormSet(BaseDocumentFormSet):
         save_as_new=False,
         prefix=None,
         queryset=[],
-        **kwargs
+        **kwargs,
     ):
         self.instance = instance
         self.save_as_new = save_as_new
@@ -392,15 +392,15 @@ def inlineformset_factory(
     to ``parent_model``.
     """
     kwargs = {
-        'form': form,
-        'formfield_callback': formfield_callback,
-        'formset': formset,
-        'extra': extra,
-        'can_delete': can_delete,
-        'can_order': can_order,
-        'fields': fields,
-        'exclude': exclude,
-        'max_num': max_num,
+        "form": form,
+        "formfield_callback": formfield_callback,
+        "formset": formset,
+        "extra": extra,
+        "can_delete": can_delete,
+        "can_order": can_order,
+        "fields": fields,
+        "exclude": exclude,
+        "max_num": max_num,
     }
     FormSet = documentformset_factory(document, **kwargs)
     return FormSet
@@ -416,13 +416,13 @@ class EmbeddedDocumentFormSet(BaseInlineDocumentFormSet):
         save_as_new=False,
         prefix=None,
         queryset=[],
-        **kwargs
+        **kwargs,
     ):
         self.parent_document = parent_document
         super().__init__(data, files, instance, save_as_new, prefix, queryset, **kwargs)
 
     def _construct_form(self, i, **kwargs):
-        defaults = {'parent_document': self.parent_document}
+        defaults = {"parent_document": self.parent_document}
         defaults.update(kwargs)
         form = super(BaseDocumentFormSet, self)._construct_form(i, **defaults)
         return form
@@ -448,15 +448,15 @@ def embeddedformset_factory(
     to ``parent_model``.
     """
     kwargs = {
-        'form': form,
-        'formfield_callback': formfield_callback,
-        'formset': formset,
-        'extra': extra,
-        'can_delete': can_delete,
-        'can_order': can_order,
-        'fields': fields,
-        'exclude': exclude,
-        'max_num': max_num,
+        "form": form,
+        "formfield_callback": formfield_callback,
+        "formset": formset,
+        "extra": extra,
+        "can_delete": can_delete,
+        "can_order": can_order,
+        "fields": fields,
+        "exclude": exclude,
+        "max_num": max_num,
     }
     FormSet = inlineformset_factory(document, **kwargs)
     FormSet.parent_document = parent_document

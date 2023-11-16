@@ -7,11 +7,11 @@ from mongoengine import connection
 class DjangoMongoEngineConfig(AppConfig):
     """Simple AppConfig which does not do automatic discovery."""
 
-    name = 'django_mongoengine'
+    name = "django_mongoengine"
     verbose_name = "Django-MongoEngine"
 
     def ready(self):
-        if not hasattr(settings, 'MONGODB_DATABASES'):
+        if not hasattr(settings, "MONGODB_DATABASES"):
             raise ImproperlyConfigured("Missing `MONGODB_DATABASES` in settings.py")
 
         for alias, conn_settings in settings.MONGODB_DATABASES.items():

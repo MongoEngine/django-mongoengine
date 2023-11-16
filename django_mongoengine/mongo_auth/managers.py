@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from mongoengine.errors import DoesNotExist
 
 MONGOENGINE_USER_DOCUMENT = getattr(
-    settings, 'MONGOENGINE_USER_DOCUMENT', 'django_mongoengine.mongo_auth.models.User'
+    settings, "MONGOENGINE_USER_DOCUMENT", "django_mongoengine.mongo_auth.models.User"
 )
 
 
@@ -20,7 +20,7 @@ def get_user_document():
     """
 
     name = MONGOENGINE_USER_DOCUMENT
-    dot = name.rindex('.')
+    dot = name.rindex(".")
     module = import_module(name[:dot])
     return getattr(module, name[dot + 1 :])
 
@@ -59,7 +59,7 @@ class MongoUserManager(UserManager):
         self.model = get_user_document()
 
         self.dj_model.USERNAME_FIELD = self.model.USERNAME_FIELD
-        username = CharField(_('username'), max_length=30, unique=True)
+        username = CharField(_("username"), max_length=30, unique=True)
         username.contribute_to_class(self.dj_model, self.dj_model.USERNAME_FIELD)
 
         self.dj_model.REQUIRED_FIELDS = self.model.REQUIRED_FIELDS
@@ -67,20 +67,20 @@ class MongoUserManager(UserManager):
             field = CharField(_(name), max_length=30)
             field.contribute_to_class(self.dj_model, name)
 
-        is_staff = BooleanField(_('is_staff'), default=False)
-        is_staff.contribute_to_class(self.dj_model, 'is_staff')
+        is_staff = BooleanField(_("is_staff"), default=False)
+        is_staff.contribute_to_class(self.dj_model, "is_staff")
 
-        is_active = BooleanField(_('is_active'), default=False)
-        is_active.contribute_to_class(self.dj_model, 'is_active')
+        is_active = BooleanField(_("is_active"), default=False)
+        is_active.contribute_to_class(self.dj_model, "is_active")
 
-        is_superuser = BooleanField(_('is_superuser'), default=False)
-        is_superuser.contribute_to_class(self.dj_model, 'is_superuser')
+        is_superuser = BooleanField(_("is_superuser"), default=False)
+        is_superuser.contribute_to_class(self.dj_model, "is_superuser")
 
-        last_login = DateTimeField(_('last_login'), auto_now_add=True)
-        last_login.contribute_to_class(self.dj_model, 'last_login')
+        last_login = DateTimeField(_("last_login"), auto_now_add=True)
+        last_login.contribute_to_class(self.dj_model, "last_login")
 
-        date_joined = DateTimeField(_('date_joined'), auto_now_add=True)
-        date_joined.contribute_to_class(self.dj_model, 'date_joined')
+        date_joined = DateTimeField(_("date_joined"), auto_now_add=True)
+        date_joined.contribute_to_class(self.dj_model, "date_joined")
 
     def get(self, *args, **kwargs):
         try:

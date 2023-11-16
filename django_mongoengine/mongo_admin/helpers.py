@@ -27,7 +27,7 @@ class AdminForm(DjangoAdminForm):
                 name,
                 readonly_fields=self.readonly_fields,
                 model_admin=self.model_admin,
-                **options
+                **options,
             )
 
 
@@ -55,14 +55,14 @@ class AdminReadonlyField(DjangoAdminReadonlyField):
         # {{ field.name }} must be a useful class name to identify the field.
         # For convenience, store other field-related data here too.
         if callable(field):
-            class_name = field.__name__ != '<lambda>' and field.__name__ or ''
+            class_name = field.__name__ != "<lambda>" and field.__name__ or ""
         else:
             class_name = field
         self.field = {
-            'name': class_name,
-            'label': label,
-            'field': field,
-            'help_text': help_text_for_field(class_name, form._meta.model),
+            "name": class_name,
+            "label": label,
+            "field": field,
+            "help_text": help_text_for_field(class_name, form._meta.model),
         }
         self.form = form
         self.model_admin = model_admin
@@ -73,7 +73,7 @@ class AdminReadonlyField(DjangoAdminReadonlyField):
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
 
-        field, obj, model_admin = self.field['field'], self.form.instance, self.model_admin
+        field, obj, model_admin = self.field["field"], self.form.instance, self.model_admin
         try:
             f, attr, value = lookup_field(field, obj, model_admin)
         except (AttributeError, ValueError, ObjectDoesNotExist):
@@ -153,7 +153,7 @@ class InlineAdminForm(DjangoInlineAdminForm, AdminForm):
         self.formset = formset
         self.model_admin = model_admin
         self.original = original
-        self.show_url = original and hasattr(original, 'get_absolute_url')
+        self.show_url = original and hasattr(original, "get_absolute_url")
         AdminForm.__init__(self, form, fieldsets, prepopulated_fields, readonly_fields, model_admin)
 
     def pk_field(self):
@@ -171,7 +171,7 @@ class InlineAdminForm(DjangoInlineAdminForm, AdminForm):
                 name,
                 self.readonly_fields,
                 model_admin=self.model_admin,
-                **options
+                **options,
             )
 
 

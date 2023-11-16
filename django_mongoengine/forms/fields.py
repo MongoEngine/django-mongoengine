@@ -19,39 +19,39 @@ class DictField(forms.Field):
     """
 
     error_messages = {
-        'length': _('Ensure the keys length is less than or equal to %s.'),
-        'invalid_key': _('Ensure the keys are not : %s.'),
-        'illegal': _('Ensure the keys does not contain any illegal character : %s.'),
-        'depth': _('Ensure the dictionary depth is less than or equal to %s.'),
+        "length": _("Ensure the keys length is less than or equal to %s."),
+        "invalid_key": _("Ensure the keys are not : %s."),
+        "illegal": _("Ensure the keys does not contain any illegal character : %s."),
+        "depth": _("Ensure the dictionary depth is less than or equal to %s."),
     }
 
     # Mongo reserved keywords
-    invalid_keys = ['err', 'errmsg']
+    invalid_keys = ["err", "errmsg"]
     # Mongo prohibit . in keys
-    illegal_characters = ['.']
+    illegal_characters = ["."]
     # limit key length for efficiency
     key_limit = 200
     # limit depth for dictionaries
     max_depth = None
 
     def __init__(self, max_depth=None, flags=None, sub_attrs=None, attrs=None, *args, **kwargs):
-        if 'error_messages' in kwargs.keys():
-            kwargs['error_messages'].update(self.error_messages)
+        if "error_messages" in kwargs.keys():
+            kwargs["error_messages"].update(self.error_messages)
         else:
-            kwargs['error_messages'] = self.error_messages
+            kwargs["error_messages"] = self.error_messages
 
         self.max_depth = max_depth if max_depth and max_depth >= 0 else None
 
-        if 'widget' not in kwargs.keys():
+        if "widget" not in kwargs.keys():
             schema = None
             # Here it needs to be clearer, because this is only useful when creating an object,
             # if no default value is provided, default is callable
-            if 'initial' in kwargs and not callable(kwargs['initial']):
-                if isinstance(kwargs['initial'], dict):
-                    schema = kwargs['initial']
+            if "initial" in kwargs and not callable(kwargs["initial"]):
+                if isinstance(kwargs["initial"], dict):
+                    schema = kwargs["initial"]
 
             # here if other parameters are passed, like max_depth and flags, then we hand them to the dict
-            kwargs['widget'] = Dictionary(
+            kwargs["widget"] = Dictionary(
                 max_depth=max_depth, flags=flags, schema=schema, sub_attrs=sub_attrs
             )
 
@@ -86,16 +86,16 @@ class DictField(forms.Field):
     def validate(self, value, depth=0):
         # we should not use the super.validate method
         if self.max_depth is not None and depth > self.max_depth:
-            raise ValidationError(self.error_messages['depth'] % self.max_depth)
+            raise ValidationError(self.error_messages["depth"] % self.max_depth)
         for k, v in value.items():
             self.run_validators(k)
             if k in self.invalid_keys:
-                raise ValidationError(self.error_messages['invalid_key'] % self.invalid_keys)
+                raise ValidationError(self.error_messages["invalid_key"] % self.invalid_keys)
             if len(k) > self.key_limit:
-                raise ValidationError(self.error_messages['length'] % self.key_limit)
+                raise ValidationError(self.error_messages["length"] % self.key_limit)
             for u in self.illegal_characters:
                 if u in k:
-                    raise ValidationError(self.error_messages['illegal'] % self.illegal_characters)
+                    raise ValidationError(self.error_messages["illegal"] % self.illegal_characters)
             if isinstance(v, dict):
                 self.validate(v, depth + 1)
 
@@ -104,9 +104,9 @@ class EmbeddedDocumentField(forms.MultiValueField):
     def __init__(self, form, *args, **kwargs):
         self.form = form()
         # Set the widget and initial data
-        kwargs['widget'] = EmbeddedFieldWidget(self.form.fields)
-        kwargs['initial'] = [f.initial for f in self.form.fields.values()]
-        kwargs['require_all_fields'] = False
+        kwargs["widget"] = EmbeddedFieldWidget(self.form.fields)
+        kwargs["initial"] = [f.initial for f in self.form.fields.values()]
+        kwargs["require_all_fields"] = False
         super().__init__(fields=tuple(self.form.fields.values()), *args, **kwargs)
 
     def bound_data(self, data, initial):

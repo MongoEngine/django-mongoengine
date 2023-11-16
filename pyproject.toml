@@ -18,15 +18,10 @@ pytest-django = "*"
 pytest-sugar = "*"
 ruff = "^0.1.3"
 sphinx = "*"
-black = "^23.10.1"
 typing-extensions = "^4.8.0"
 #mongo-types = { git = "https://github.com/sbdchd/mongo-types.git", branch = "main" }
 mongo-types = { git = "https://github.com/last-partizan/mongo-types.git", branch = "fix-embedded-types" }
 django-types = "^0.19.1"
-
-[tool.black]
-line-length = 100
-skip-string-normalization = true
 
 [tool.ruff]
 line-length = 100
@@ -48,3 +43,6 @@ extend-generics = [
     "django_mongoengine.queryset.QuerySet",
     "django_mongoengine.queryset.QuerySetNoCache",
 ]
+[tool.ruff.format]
+# Use `\n` line endings for all files
+line-ending = "lf"
