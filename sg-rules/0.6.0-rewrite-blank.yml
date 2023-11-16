@@ -1,0 +1,33 @@
+id: fix-blank
+language: Python
+rule:
+  all:
+    - kind: keyword_argument
+    - regex: blank=True
+    - inside:
+        kind: assignment
+        stopBy: end
+fix: required=False
+
+---
+
+id: add-required-by-default
+language: Python
+rule:
+  all:
+    - pattern: fields.$C($$$A)
+    - regex: '[A-Z]\w+'
+    - not:
+        any:
+          - regex: required=
+          - regex: blank=
+          - regex: primary_key=
+          - regex: default=
+          - regex: null=True
+transform:
+  MAYBE_COMMA:
+    replace:
+      source: $$$A
+      replace: '^.+'
+      by: ', '
+fix: fields.$C($$$A$MAYBE_COMMArequired=True)

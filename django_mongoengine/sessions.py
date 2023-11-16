@@ -26,8 +26,12 @@ MONGOENGINE_SESSION_DATA_ENCODE = getattr(settings, 'MONGOENGINE_SESSION_DATA_EN
 
 class MongoSession(Document):
     session_key = fields.StringField(primary_key=True, max_length=40)
-    session_data = fields.StringField() if MONGOENGINE_SESSION_DATA_ENCODE else fields.DictField()
-    expire_date = fields.DateTimeField()
+    session_data = (
+        fields.StringField(required=True)
+        if MONGOENGINE_SESSION_DATA_ENCODE
+        else fields.DictField(required=True)
+    )
+    expire_date = fields.DateTimeField(required=True)
 
     meta = {
         'collection': MONGOENGINE_SESSION_COLLECTION,
