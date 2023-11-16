@@ -101,7 +101,7 @@ and define fields using ``django_mongoengine.fields``.::
         title = fields.StringField(max_length=255)
         slug = fields.StringField(max_length=255, primary_key=True)
         comments = fields.ListField(
-            fields.EmbeddedDocumentField('Comment'), blank=True,
+            fields.EmbeddedDocumentField('Comment'), required=False,
         )
 
 
