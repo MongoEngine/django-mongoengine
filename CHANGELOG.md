@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0-beta.2](https://github.com/MongoEngine/django-mongoengine/compare/v0.6.0-beta.1...v0.6.0-beta.2) (2023-11-16)
+
+
+### Bug Fixes
+
+* Fix BooleanField ([e5a87c6](https://github.com/MongoEngine/django-mongoengine/commit/e5a87c6ed7b23018410903524915ad7a0e182ead))
+
 ## [0.6.0-beta.1](https://github.com/MongoEngine/django-mongoengine/compare/v0.6.0-beta.0...v0.6.0-beta.1) (2023-11-16)
 
 
