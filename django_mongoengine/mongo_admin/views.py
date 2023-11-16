@@ -71,10 +71,10 @@ class DocumentChangeList(ChangeList):
         if ORDER_VAR in params:
             # Clear ordering and used params
             ordering = []
-            order_params = params[ORDER_VAR].split('.')
+            order_params = params[ORDER_VAR].split(".")
             for p in order_params:
                 try:
-                    none, pfx, idx = p.rpartition('-')
+                    none, pfx, idx = p.rpartition("-")
                     field_name = self.list_display[int(idx)]
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
@@ -87,7 +87,7 @@ class DocumentChangeList(ChangeList):
         try:
 
             def sign(t):
-                return t[1] > 0 and '+' or '-'
+                return t[1] > 0 and "+" or "-"
 
             qs_ordering = [sign(t) + t[0] for t in queryset._ordering]
             ordering.extend(qs_ordering)
@@ -98,10 +98,10 @@ class DocumentChangeList(ChangeList):
         # ordering fields so we can guarantee a deterministic order across all
         # database backends.
         pk_name = self.lookup_opts.pk.name
-        if not (set(ordering) & {'pk', '-pk', pk_name, '-' + pk_name}):
+        if not (set(ordering) & {"pk", "-pk", pk_name, "-" + pk_name}):
             # The two sets do not intersect, meaning the pk isn't present. So
             # we add it.
-            ordering.append('pk')
+            ordering.append("pk")
         return ordering
 
     def get_queryset(self, request=None):

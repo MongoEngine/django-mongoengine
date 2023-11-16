@@ -50,5 +50,5 @@ jobs:
       - name: Run tests
         run: |
           poetry run ruff .
-          poetry run black --check .
+          poetry run ruff format --check .
           poetry run python -m pytest

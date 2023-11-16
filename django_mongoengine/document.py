@@ -35,7 +35,7 @@ def django_meta(meta, *top_bases):
             else:
                 new_bases = ()
                 for b in bases:
-                    if getattr(b, 'swap_base', False):
+                    if getattr(b, "swap_base", False):
                         new_bases += top_bases
                     else:
                         new_bases += (b,)
@@ -43,7 +43,7 @@ def django_meta(meta, *top_bases):
             new_cls._meta = DocumentMetaWrapper(new_cls)
             return new_cls
 
-    return type.__new__(metaclass, 'temporary_meta', (), {})
+    return type.__new__(metaclass, "temporary_meta", (), {})
 
 
 class DjangoFlavor:

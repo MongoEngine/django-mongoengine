@@ -32,11 +32,11 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
     # order to preserve the correct order of fields.
     if with_base_fields:
         for base in bases[::-1]:
-            if hasattr(base, 'base_fields'):
+            if hasattr(base, "base_fields"):
                 fields = list(base.base_fields.items()) + fields
     else:
         for base in bases[::-1]:
-            if hasattr(base, 'declared_fields'):
+            if hasattr(base, "declared_fields"):
                 fields = list(base.declared_fields.items()) + fields
 
     return OrderedDict(fields)

@@ -6,84 +6,84 @@ from .tests import TestCase
 
 class DetailViewTest(TestCase):
     def test_simple_object(self):
-        res = self.client.get('/detail/obj/')
+        res = self.client.get("/detail/obj/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], {'foo': 'bar'})
-        self.assertTemplateUsed(res, 'views/detail.html')
+        self.assertEqual(res.context["object"], {"foo": "bar"})
+        self.assertTemplateUsed(res, "views/detail.html")
 
     def test_detail_by_pk(self):
-        res = self.client.get('/detail/author/1/')
+        res = self.client.get("/detail/author/1/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk='1'))
-        self.assertEqual(res.context['author'], Author.objects.get(pk='1'))
-        self.assertTemplateUsed(res, 'views/author_detail.html')
+        self.assertEqual(res.context["object"], Author.objects.get(pk="1"))
+        self.assertEqual(res.context["author"], Author.objects.get(pk="1"))
+        self.assertTemplateUsed(res, "views/author_detail.html")
 
     def test_detail_by_custom_pk(self):
-        res = self.client.get('/detail/author/bycustompk/1/')
+        res = self.client.get("/detail/author/bycustompk/1/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk='1'))
-        self.assertEqual(res.context['author'], Author.objects.get(pk='1'))
-        self.assertTemplateUsed(res, 'views/author_detail.html')
+        self.assertEqual(res.context["object"], Author.objects.get(pk="1"))
+        self.assertEqual(res.context["author"], Author.objects.get(pk="1"))
+        self.assertTemplateUsed(res, "views/author_detail.html")
 
     def test_detail_by_slug(self):
-        res = self.client.get('/detail/author/byslug/scott-rosenberg/')
+        res = self.client.get("/detail/author/byslug/scott-rosenberg/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(slug='scott-rosenberg'))
-        self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
-        self.assertTemplateUsed(res, 'views/author_detail.html')
+        self.assertEqual(res.context["object"], Author.objects.get(slug="scott-rosenberg"))
+        self.assertEqual(res.context["author"], Author.objects.get(slug="scott-rosenberg"))
+        self.assertTemplateUsed(res, "views/author_detail.html")
 
     def test_detail_by_custom_slug(self):
-        res = self.client.get('/detail/author/bycustomslug/scott-rosenberg/')
+        res = self.client.get("/detail/author/bycustomslug/scott-rosenberg/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(slug='scott-rosenberg'))
-        self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
-        self.assertTemplateUsed(res, 'views/author_detail.html')
+        self.assertEqual(res.context["object"], Author.objects.get(slug="scott-rosenberg"))
+        self.assertEqual(res.context["author"], Author.objects.get(slug="scott-rosenberg"))
+        self.assertTemplateUsed(res, "views/author_detail.html")
 
     def test_verbose_name(self):
-        res = self.client.get('/detail/artist/1/')
+        res = self.client.get("/detail/artist/1/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Artist.objects.get(pk='1'))
-        self.assertEqual(res.context['artist'], Artist.objects.get(pk='1'))
-        self.assertTemplateUsed(res, 'views/artist_detail.html')
+        self.assertEqual(res.context["object"], Artist.objects.get(pk="1"))
+        self.assertEqual(res.context["artist"], Artist.objects.get(pk="1"))
+        self.assertTemplateUsed(res, "views/artist_detail.html")
 
     def test_template_name(self):
-        res = self.client.get('/detail/author/1/template_name/')
+        res = self.client.get("/detail/author/1/template_name/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk='1'))
-        self.assertEqual(res.context['author'], Author.objects.get(pk='1'))
-        self.assertTemplateUsed(res, 'views/about.html')
+        self.assertEqual(res.context["object"], Author.objects.get(pk="1"))
+        self.assertEqual(res.context["author"], Author.objects.get(pk="1"))
+        self.assertTemplateUsed(res, "views/about.html")
 
     def test_template_name_suffix(self):
-        res = self.client.get('/detail/author/1/template_name_suffix/')
+        res = self.client.get("/detail/author/1/template_name_suffix/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk='1'))
-        self.assertEqual(res.context['author'], Author.objects.get(pk='1'))
-        self.assertTemplateUsed(res, 'views/author_view.html')
+        self.assertEqual(res.context["object"], Author.objects.get(pk="1"))
+        self.assertEqual(res.context["author"], Author.objects.get(pk="1"))
+        self.assertTemplateUsed(res, "views/author_view.html")
 
     def test_template_name_field(self):
-        res = self.client.get('/detail/page/1/field/')
+        res = self.client.get("/detail/page/1/field/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Page.objects.get(pk='1'))
-        self.assertEqual(res.context['page'], Page.objects.get(pk='1'))
-        self.assertTemplateUsed(res, 'views/page_template.html')
+        self.assertEqual(res.context["object"], Page.objects.get(pk="1"))
+        self.assertEqual(res.context["page"], Page.objects.get(pk="1"))
+        self.assertTemplateUsed(res, "views/page_template.html")
 
     def test_context_object_name(self):
-        res = self.client.get('/detail/author/1/context_object_name/')
+        res = self.client.get("/detail/author/1/context_object_name/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk='1'))
-        self.assertEqual(res.context['thingy'], Author.objects.get(pk='1'))
-        self.assertFalse('author' in res.context)
-        self.assertTemplateUsed(res, 'views/author_detail.html')
+        self.assertEqual(res.context["object"], Author.objects.get(pk="1"))
+        self.assertEqual(res.context["thingy"], Author.objects.get(pk="1"))
+        self.assertFalse("author" in res.context)
+        self.assertTemplateUsed(res, "views/author_detail.html")
 
     def test_duplicated_context_object_name(self):
-        res = self.client.get('/detail/author/1/dupe_context_object_name/')
+        res = self.client.get("/detail/author/1/dupe_context_object_name/")
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['object'], Author.objects.get(pk='1'))
-        self.assertFalse('author' in res.context)
-        self.assertTemplateUsed(res, 'views/author_detail.html')
+        self.assertEqual(res.context["object"], Author.objects.get(pk="1"))
+        self.assertFalse("author" in res.context)
+        self.assertTemplateUsed(res, "views/author_detail.html")
 
     def test_invalid_url(self):
-        self.assertRaises(AttributeError, self.client.get, '/detail/author/invalid/url/')
+        self.assertRaises(AttributeError, self.client.get, "/detail/author/invalid/url/")
 
     def test_invalid_queryset(self):
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/detail/author/invalid/qs/')
+        self.assertRaises(ImproperlyConfigured, self.client.get, "/detail/author/invalid/qs/")

@@ -36,31 +36,28 @@ ContentTypeManager = type(
 
 
 class BaseUser:
-    is_anonymous = AbstractBaseUser.__dict__['is_anonymous']
-    is_authenticated = AbstractBaseUser.__dict__['is_authenticated']
+    is_anonymous = AbstractBaseUser.__dict__["is_anonymous"]
+    is_authenticated = AbstractBaseUser.__dict__["is_authenticated"]
 
     @classmethod
     def get_email_field_name(cls):
         try:
             return cls.EMAIL_FIELD
         except AttributeError:
-            return 'email'
+            return "email"
 
 
 class ContentType(document.Document):
-    name = fields.StringField(max_length=100, required=True)
-    app_label = fields.StringField(max_length=100, required=True)
+    name = fields.StringField(max_length=100)
+    app_label = fields.StringField(max_length=100)
     model = fields.StringField(
-        max_length=100,
-        verbose_name=_('python model class name'),
-        unique_with='app_label',
-        required=True,
+        max_length=100, verbose_name=_("python model class name"), unique_with="app_label"
     )
     objects = ContentTypeManager()
 
     class Meta:
-        verbose_name = _('content type')
-        verbose_name_plural = _('content types')
+        verbose_name = _("content type")
+        verbose_name_plural = _("content types")
         # db_table = 'django_content_type'
         # ordering = ('name',)
         # unique_together = (('app_label', 'model'),)
@@ -121,17 +118,17 @@ class Permission(document.Document):
     created for each Django model.
     """
 
-    name = fields.StringField(max_length=50, verbose_name=_('username'), required=True)
-    content_type = fields.ReferenceField(ContentType, required=True)
-    codename = fields.StringField(max_length=100, verbose_name=_('codename'), required=True)
+    name = fields.StringField(max_length=50, verbose_name=_("username"))
+    content_type = fields.ReferenceField(ContentType)
+    codename = fields.StringField(max_length=100, verbose_name=_("codename"))
     # FIXME: don't access field of the other class
     # unique_with=['content_type__app_label', 'content_type__model'])
 
     objects = PermissionManager()
 
     class Meta:
-        verbose_name = _('permission')
-        verbose_name_plural = _('permissions')
+        verbose_name = _("permission")
+        verbose_name_plural = _("permissions")
         # unique_together = (('content_type', 'codename'),)
         # ordering = ('content_type__app_label', 'content_type__model', 'codename')
 
@@ -145,7 +142,7 @@ class Permission(document.Document):
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
 
-    natural_key.dependencies = ['contenttypes.contenttype']
+    natural_key.dependencies = ["contenttypes.contenttype"]
 
 
 class Group(document.Document):
@@ -165,14 +162,12 @@ class Group(document.Document):
     e-mail messages.
     """
 
-    name = fields.StringField(max_length=80, unique=True, verbose_name=_('name'))
-    permissions = fields.ListField(
-        fields.ReferenceField(Permission, verbose_name=_('permissions'), required=True)
-    )
+    name = fields.StringField(max_length=80, unique=True, verbose_name=_("name"))
+    permissions = fields.ListField(fields.ReferenceField(Permission, verbose_name=_("permissions")))
 
     class Meta:
-        verbose_name = _('group')
-        verbose_name_plural = _('groups')
+        verbose_name = _("group")
+        verbose_name_plural = _("groups")
 
     def __str__(self):
         return self.name
@@ -185,21 +180,21 @@ class AbstractUser(BaseUser, document.Document):
 
     username = fields.StringField(
         max_length=150,
-        verbose_name=_('username'),
+        verbose_name=_("username"),
         help_text=_("Required. 150 characters or fewer. Letters, numbers and @/./+/-/_ characters"),
         required=True,
     )
 
     first_name = fields.StringField(
         max_length=30,
-        verbose_name=_('first name'),
+        verbose_name=_("first name"),
     )
 
-    last_name = fields.StringField(max_length=30, verbose_name=_('last name'))
-    email = fields.EmailField(verbose_name=_('e-mail address'), required=True)
+    last_name = fields.StringField(max_length=30, verbose_name=_("last name"))
+    email = fields.EmailField(verbose_name=_("e-mail address"), required=True)
     password = fields.StringField(
         max_length=128,
-        verbose_name=_('password'),
+        verbose_name=_("password"),
         help_text=_(
             "Use '[algo]$[iterations]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."
         ),
@@ -207,43 +202,43 @@ class AbstractUser(BaseUser, document.Document):
     )
     is_staff = fields.BooleanField(
         default=False,
-        verbose_name=_('staff status'),
+        verbose_name=_("staff status"),
         help_text=_("Designates whether the user can log into this admin site."),
     )
     is_active = fields.BooleanField(
         default=True,
-        verbose_name=_('active'),
+        verbose_name=_("active"),
         help_text=_(
             "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
         ),
     )
     is_superuser = fields.BooleanField(
         default=False,
-        verbose_name=_('superuser status'),
+        verbose_name=_("superuser status"),
         help_text=_(
             "Designates that this user has all permissions without explicitly assigning them."
         ),
     )
-    last_login = fields.DateTimeField(default=timezone.now, verbose_name=_('last login'))
-    date_joined = fields.DateTimeField(default=timezone.now, verbose_name=_('date joined'))
+    last_login = fields.DateTimeField(default=timezone.now, verbose_name=_("last login"))
+    date_joined = fields.DateTimeField(default=timezone.now, verbose_name=_("date joined"))
 
     user_permissions = fields.ListField(
-        fields.ReferenceField(Permission, required=True),
-        verbose_name=_('user permissions'),
-        help_text=_('Permissions for the user.'),
+        fields.ReferenceField(Permission),
+        verbose_name=_("user permissions"),
+        help_text=_("Permissions for the user."),
     )
 
-    USERNAME_FIELD = getattr(settings, 'MONGOENGINE_USERNAME_FIELDS', 'username')
-    REQUIRED_FIELDS = getattr(settings, 'MONGOENGINE_USER_REQUIRED_FIELDS', ['email'])
+    USERNAME_FIELD = getattr(settings, "MONGOENGINE_USERNAME_FIELDS", "username")
+    REQUIRED_FIELDS = getattr(settings, "MONGOENGINE_USER_REQUIRED_FIELDS", ["email"])
 
-    meta = {'abstract': True, 'indexes': [{'fields': ['username'], 'unique': True, 'sparse': True}]}
+    meta = {"abstract": True, "indexes": [{"fields": ["username"], "unique": True, "sparse": True}]}
 
     def __str__(self):
         return self.username
 
     def get_full_name(self):
         """Returns the users first and last names, separated by a space."""
-        full_name = '%s %s' % (self.first_name or '', self.last_name or '')
+        full_name = "%s %s" % (self.first_name or "", self.last_name or "")
         return full_name.strip()
 
     def set_password(self, raw_password):
@@ -274,11 +269,11 @@ class AbstractUser(BaseUser, document.Document):
         # address.
         if email is not None:
             try:
-                email_name, domain_part = email.strip().split('@', 1)
+                email_name, domain_part = email.strip().split("@", 1)
             except ValueError:
                 pass
             else:
-                email = '@'.join([email_name, domain_part.lower()])
+                email = "@".join([email_name, domain_part.lower()])
 
         user = cls(username=username, email=email, date_joined=now)
         user.set_password(password)
@@ -309,7 +304,7 @@ class AbstractUser(BaseUser, document.Document):
         return permissions
 
     def get_all_permissions(self, obj=None):
-        return _user_get_permissions(self, obj, 'all')
+        return _user_get_permissions(self, obj, "all")
 
     def has_perm(self, perm, obj=None):
         """
@@ -360,27 +355,27 @@ class AbstractUser(BaseUser, document.Document):
         Returns site-specific profile for this user. Raises
         SiteProfileNotAvailable if this site does not allow profiles.
         """
-        if not hasattr(self, '_profile_cache'):
-            if not getattr(settings, 'AUTH_PROFILE_MODULE', False):
+        if not hasattr(self, "_profile_cache"):
+            if not getattr(settings, "AUTH_PROFILE_MODULE", False):
                 raise SiteProfileNotAvailable(
-                    'You need to set AUTH_PROFILE_MO' 'DULE in your project settings'
+                    "You need to set AUTH_PROFILE_MO" "DULE in your project settings"
                 )
             try:
-                app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
+                app_label, model_name = settings.AUTH_PROFILE_MODULE.split(".")
             except ValueError:
                 raise SiteProfileNotAvailable(
-                    'app_label and model_name should'
-                    ' be separated by a dot in the AUTH_PROFILE_MODULE set'
-                    'ting'
+                    "app_label and model_name should"
+                    " be separated by a dot in the AUTH_PROFILE_MODULE set"
+                    "ting"
                 )
 
             try:
                 model = models.get_model(app_label, model_name)
                 if model is None:
                     raise SiteProfileNotAvailable(
-                        'Unable to load the profile '
-                        'model, check AUTH_PROFILE_MODULE in your project sett'
-                        'ings'
+                        "Unable to load the profile "
+                        "model, check AUTH_PROFILE_MODULE in your project sett"
+                        "ings"
                     )
                 self._profile_cache = model._default_manager.using(self._state.db).get(
                     user__id__exact=self.id
@@ -392,7 +387,7 @@ class AbstractUser(BaseUser, document.Document):
 
 
 class User(AbstractUser):
-    meta = {'allow_inheritance': True}
+    meta = {"allow_inheritance": True}
 
 
 class MongoUser(BaseUser, models.Model):
@@ -410,7 +405,7 @@ class MongoUser(BaseUser, models.Model):
     objects = MongoUserManager()
 
     class Meta:
-        app_label = 'mongo_auth'
+        app_label = "mongo_auth"
 
     def set_password(self, password):
         """Doesn't do anything, but works around the issue with Django 1.6."""

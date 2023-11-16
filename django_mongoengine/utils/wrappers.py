@@ -7,9 +7,9 @@ class WrapDocument(type):
         document = attrs.get("document")
         if document:
             try:
-                attrs['model'] = document
+                attrs["model"] = document
             except AttributeError:
-                attrs['model'] = property(lambda self: self.document)
+                attrs["model"] = property(lambda self: self.document)
         return super().__new__(cls, name, bases, attrs)
 
 

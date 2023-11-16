@@ -10,7 +10,7 @@ class EmbeddedFormMixin(djmod.FormMixin):
     """
 
     embedded_form_class = None
-    embedded_context_name = 'embedded_form'
+    embedded_context_name = "embedded_form"
 
     def get_form_class(self):
         """
@@ -36,7 +36,7 @@ class EmbeddedFormMixin(djmod.FormMixin):
         Returns an instance of the embedded object. By default this is a freshly created
         instance. Override for something cooler.
         """
-        if hasattr(self, 'embedded_object'):
+        if hasattr(self, "embedded_object"):
             return self.embedded_object()
         else:
             klass = self.get_form_class()
@@ -47,13 +47,13 @@ class EmbeddedFormMixin(djmod.FormMixin):
         Returns the keyword arguments for instantiating the form.
         """
         kwargs = super().get_form_kwargs()
-        kwargs.update({'instance': self.get_embedded_object()})
-        if 'initial' not in kwargs:
-            kwargs['initial'] = {}
+        kwargs.update({"instance": self.get_embedded_object()})
+        if "initial" not in kwargs:
+            kwargs["initial"] = {}
         return kwargs
 
     def get_success_url(self):
-        object = getattr(self, 'object', self.get_object())
+        object = getattr(self, "object", self.get_object())
         if self.success_url:
             url = self.success_url % object.__dict__
         else:
@@ -73,9 +73,9 @@ class EmbeddedFormMixin(djmod.FormMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        self.object = getattr(self, 'object', self.get_object())
-        if 'form' in kwargs:
-            form = kwargs['form']
+        self.object = getattr(self, "object", self.get_object())
+        if "form" in kwargs:
+            form = kwargs["form"]
         else:
             form = self.get_form(self.get_form_class())
         context[self.embedded_context_name] = form

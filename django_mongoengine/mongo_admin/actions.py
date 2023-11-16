@@ -47,7 +47,7 @@ def _delete_selected(modeladmin, request, queryset):
 
     # The user has already confirmed the deletion.
     # Do the deletion and return a None to display the change list view again.
-    if request.POST.get('post'):
+    if request.POST.get("post"):
         if perms_needed:
             raise PermissionDenied
         n = len(queryset)
@@ -86,13 +86,13 @@ def _delete_selected(modeladmin, request, queryset):
         "title": title,
         "objects_name": objects_name,
         "deletable_objects": [deletable_objects],
-        'queryset': queryset,
+        "queryset": queryset,
         "perms_lacking": perms_needed,
         "protected": protected,
         "opts": opts,
         "root_path": modeladmin.admin_site.root_path,
         "app_label": app_label,
-        'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+        "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
     }
 
     # Display the confirmation page
