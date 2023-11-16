@@ -48,10 +48,13 @@ class BaseUser:
 
 
 class ContentType(document.Document):
-    name = fields.StringField(max_length=100)
-    app_label = fields.StringField(max_length=100)
+    name = fields.StringField(max_length=100, required=True)
+    app_label = fields.StringField(max_length=100, required=True)
     model = fields.StringField(
-        max_length=100, verbose_name=_('python model class name'), unique_with='app_label'
+        max_length=100,
+        verbose_name=_('python model class name'),
+        unique_with='app_label',
+        required=True,
     )
     objects = ContentTypeManager()
 
@@ -118,9 +121,9 @@ class Permission(document.Document):
     created for each Django model.
     """
 
-    name = fields.StringField(max_length=50, verbose_name=_('username'))
-    content_type = fields.ReferenceField(ContentType)
-    codename = fields.StringField(max_length=100, verbose_name=_('codename'))
+    name = fields.StringField(max_length=50, verbose_name=_('username'), required=True)
+    content_type = fields.ReferenceField(ContentType, required=True)
+    codename = fields.StringField(max_length=100, verbose_name=_('codename'), required=True)
     # FIXME: don't access field of the other class
     # unique_with=['content_type__app_label', 'content_type__model'])
 
@@ -163,7 +166,9 @@ class Group(document.Document):
     """
 
     name = fields.StringField(max_length=80, unique=True, verbose_name=_('name'))
-    permissions = fields.ListField(fields.ReferenceField(Permission, verbose_name=_('permissions')))
+    permissions = fields.ListField(
+        fields.ReferenceField(Permission, verbose_name=_('permissions'), required=True)
+    )
 
     class Meta:
         verbose_name = _('group')
@@ -223,7 +228,7 @@ class AbstractUser(BaseUser, document.Document):
     date_joined = fields.DateTimeField(default=timezone.now, verbose_name=_('date joined'))
 
     user_permissions = fields.ListField(
-        fields.ReferenceField(Permission),
+        fields.ReferenceField(Permission, required=True),
         verbose_name=_('user permissions'),
         help_text=_('Permissions for the user.'),
     )
