@@ -22,7 +22,7 @@ Embedded Fields
         phone = fields.StringField(verbose_name=_('phone number'))
 
     class Application(Document):
-        name = fields.StringField(max_length=255, blank=False)
+        name = fields.StringField(max_length=255, required=True)
         contact = fields.EmbeddedDocumentField(ContactInfo)
         LOCALES = (('es', 'Spanish'), ('en', 'English'), ('de', 'German'), ('fr', 'French'), ('it', 'Italian'), ('ru', 'Russian'))
         locales = fields.ListField(fields.StringField(choices=LOCALES), help_text=_("""List of languages for your application (the first one will be the default language)"""))
