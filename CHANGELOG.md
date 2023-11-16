@@ -27,8 +27,7 @@ All notable changes to this project will be documented in this file. See [standa
   ```
   ast-grep scan -r sg-rules/0.6.0-rewrite-blank.yml . -i
   ```
-  It's not 100% safe, as it can introduce `,,` in your code, so be careful to
-  review, clean it up and test.
+  Be careful to review, clean it up and test.
 
 * Switch to mongoengine style field arguments. Drop old django ([#200](https://github.com/MongoEngine/django-mongoengine/issues/200)) ([9d56f6a](https://github.com/MongoEngine/django-mongoengine/commit/9d56f6a58ccee93e2acae7af0a8d81d9aa43ae5b))
 

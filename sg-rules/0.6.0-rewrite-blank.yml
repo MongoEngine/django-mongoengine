@@ -28,6 +28,6 @@ transform:
   MAYBE_COMMA:
     replace:
       source: $$$A
-      replace: '^.+'
+      replace: '^.+[^,]$'
       by: ', '
 fix: fields.$C($$$A$MAYBE_COMMArequired=True)
