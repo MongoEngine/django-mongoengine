@@ -16,5 +16,5 @@ test:
 
 codegen:
 	python codegen.py
-	black django_mongoengine/fields/__init__.py
+	ruff format django_mongoengine/fields/__init__.py
 	ruff django_mongoengine/ --fix  # It doesn't work with filename.
