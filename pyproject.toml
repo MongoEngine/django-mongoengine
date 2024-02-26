@@ -19,8 +19,7 @@ pytest-sugar = "*"
 ruff = "^0.1.3"
 sphinx = "*"
 typing-extensions = "^4.8.0"
-#mongo-types = { git = "https://github.com/sbdchd/mongo-types.git", branch = "main" }
-mongo-types = { git = "https://github.com/last-partizan/mongo-types.git", branch = "fix-embedded-types" }
+mongo-types = { git = "https://github.com/sbdchd/mongo-types.git", branch = "main" }
 django-types = "^0.19.1"
 
 [tool.ruff]
