@@ -17,10 +17,22 @@ jobs:
           - "3.10"
           - "3.11"
           - "3.12"
+          - "3.13"
           - "pypy3.9"
           - "pypy3.10"
         django:
           - "Django>=4.2,<4.3"
+          - "Django>=5.0,<5.1"
+          - "Django>=5.1,<5.2"
+        exclude:
+          - python: "3.9"
+            django: "Django>=5.0,<5.1"
+          - python: "3.9"
+            django: "Django>=5.1,<5.2"
+          - python: "pypy3.9"
+            django: "Django>=5.0,<5.1"
+          - python: "pypy3.9"
+            django: "Django>=5.1,<5.2"
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DJANGO: ${{ matrix.django }}

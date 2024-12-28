@@ -5,8 +5,8 @@ description = "Django support for MongoDB via MongoEngine"
 authors = ["Ross Lawley <ross.lawley@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4.0"
-django = ">=3.2,<5"
+python = ">=3.9,<4.0"
+django = ">=4.2,<5"
 mongoengine = ">=0.14"
 
 [tool.poetry.group.dev.dependencies]
