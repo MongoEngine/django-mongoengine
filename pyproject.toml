@@ -47,6 +47,7 @@ dev = [
 
 [tool.ruff]
 line-length = 100
+[tool.ruff.lint]
 select = [
     "E",
     "F",
@@ -56,7 +57,7 @@ select = [
     "C4",
 ]
 ignore = ["E501"]
-[tool.ruff.pyflakes]
+[tool.ruff.lint.pyflakes]
 extend-generics = [
     "mongoengine.queryset.QuerySetManager",
     "mongoengine.queryset.QuerySet",

@@ -49,6 +49,6 @@ jobs:
           uv pip install -q "${{ matrix.django }}"
       - name: Run tests
         run: |
-          uv run ruff .
+          uv run ruff check .
           uv run ruff format --check .
           uv run python -m pytest
