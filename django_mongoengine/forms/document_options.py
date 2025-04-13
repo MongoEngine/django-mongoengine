@@ -51,7 +51,6 @@ class DocumentMetaWrapper:
 
     _pk = None
     pk_name = None
-    app_label = None
     object_name = None
     model_name = None
     verbose_name = None

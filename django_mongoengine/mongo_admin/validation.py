@@ -297,7 +297,7 @@ def validate_base(cls, model):
             for fields in fieldset[1]["fields"]:
                 # The entry in fields might be a tuple. If it is a standalone
                 # field, make it into a tuple to make processing easier.
-                if type(fields) != tuple:
+                if not isinstance(fields, tuple):
                     fields = (fields,)
                 for field in fields:
                     if field in cls.readonly_fields:
