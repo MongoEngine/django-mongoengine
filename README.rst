@@ -21,8 +21,9 @@ THIS IS UNSTABLE PROJECT, IF YOU WANT TO USE IT - FIX WHAT YOU NEED
 
 Right now we're targeting to get things working on Django 4.2;
 
-WARNING: This project is not in good state, and is likely to break with django updates.
-It's better to use raw mongoengine.
+WARNING: This project is not in good state, and is likely to break with django updates. Do not use it for any new projects.
+
+Recommended way for new projects is `django-mongodb-backend <https://github.com/mongodb/django-mongodb-backend>`_.
 
 Working / Django 4.2
 ------------------------
