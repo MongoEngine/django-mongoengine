@@ -1,29 +1,53 @@
-[tool.poetry]
+[project]
 name = "django-mongoengine"
-version = "0.4.6"
 description = "Django support for MongoDB via MongoEngine"
-authors = ["Ross Lawley <ross.lawley@gmail.com>"]
+readme = {file = "README.rst", content-type = "text/x-rst"}
+authors = [
+    {name = "Ross Lawley", email = "ross.lawley@gmail.com"},
+]
+dynamic = ["version"]
+license = {text = "BSD"}
+requires-python = "<4.0,>=3.9"
 
-[tool.poetry.dependencies]
-python = ">=3.9,<4.0"
-django = ">=4.2,<5"
-mongoengine = ">=0.14"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: Django"
+]
+dependencies = [
+    "django<5,>=4.2",
+    "mongoengine>=0.14",
+]
 
-[tool.poetry.group.dev.dependencies]
-flake8 = "*"
-pdbpp = "*"
-pytest = "*"
-pytest-cov = "*"
-pytest-django = "*"
-pytest-sugar = "*"
-ruff = "^0.1.3"
-sphinx = "*"
-typing-extensions = "^4.8.0"
-mongo-types = { git = "https://github.com/sbdchd/mongo-types.git", branch = "main" }
-django-types = "^0.19.1"
+[project.urls]
+"Homepage" = "https://github.com/mongoengine/django-mongoengine"
+"Download" = "https://github.com/mongoengine/django-mongoengine/tarball/master"
+
+[dependency-groups]
+dev = [
+    "flake8",
+    "pdbpp",
+    "pytest",
+    "pytest-cov",
+    "pytest-django",
+    "pytest-sugar",
+    "ruff",
+    "sphinx",
+    "typing-extensions",
+    "mongo-types @ git+https://github.com/sbdchd/mongo-types.git@main",
+    "django-types",
+]
 
 [tool.ruff]
 line-length = 100
+[tool.ruff.lint]
 select = [
     "E",
     "F",
@@ -33,7 +57,7 @@ select = [
     "C4",
 ]
 ignore = ["E501"]
-[tool.ruff.pyflakes]
+[tool.ruff.lint.pyflakes]
 extend-generics = [
     "mongoengine.queryset.QuerySetManager",
     "mongoengine.queryset.QuerySet",
@@ -45,3 +69,17 @@ extend-generics = [
 [tool.ruff.format]
 # Use `\n` line endings for all files
 line-ending = "lf"
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+include = ["django-mongoengine/**"]
+exclude = ["doc", "docs", "tests", "example"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["django-mongoengine"]
+
+[tool.hatch.version]
+source = "vcs"

@@ -12,7 +12,7 @@ publish:
 	git push --follow-tags
 
 test:
-	poetry run python -m pytest
+	pytest
 
 codegen:
 	python codegen.py

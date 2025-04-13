@@ -132,14 +132,13 @@ How to run example app
 ----------------------
 .. code::
 
-    poetry install
-    poetry run pip install -r example/tumblelog/requirements.txt
-    poetry run python example/tumblelog/manage.py runserver
+    uv sync --group dev
+    uv pip install -r example/tumblelog/requirements.txt
+    uv run python example/tumblelog/manage.py runserver
 
 
 How to run tests
 ----------------
 .. code::
 
-    poetry install
-    poetry run python -m pytest
+    uv run python -m pytest

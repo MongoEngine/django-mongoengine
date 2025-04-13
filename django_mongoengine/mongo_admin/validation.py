@@ -172,13 +172,11 @@ def _validate(cls, model):
         for idx, inline in enumerate(cls.inlines):
             if not issubclass(inline, BaseDocumentAdmin):
                 raise ImproperlyConfigured(
-                    "'%s.inlines[%d]' does not inherit "
-                    "from BaseModelAdmin." % (cls.__name__, idx)
+                    "'%s.inlines[%d]' does not inherit from BaseModelAdmin." % (cls.__name__, idx)
                 )
             if not inline.document:
                 raise ImproperlyConfigured(
-                    "'document' is a required attribute "
-                    "of '%s.inlines[%d]'." % (cls.__name__, idx)
+                    "'document' is a required attribute of '%s.inlines[%d]'." % (cls.__name__, idx)
                 )
             if not issubclass(inline.document, BaseDocument):
                 raise ImproperlyConfigured(
@@ -195,7 +193,7 @@ def validate_inline(cls, parent, parent_model):
         f = get_field(cls, cls.model, cls.model._meta, "fk_name", cls.fk_name)
         if not isinstance(f, models.ForeignKey):
             raise ImproperlyConfigured(
-                "'%s.fk_name is not an instance of " "models.ForeignKey." % cls.__name__
+                "'%s.fk_name is not an instance of models.ForeignKey." % cls.__name__
             )
 
     if not issubclass(cls, EmbeddedDocumentAdmin):
@@ -217,7 +215,7 @@ def validate_inline(cls, parent, parent_model):
     # formset
     if hasattr(cls, "formset") and not issubclass(cls.formset, BaseDocumentFormSet):
         raise ImproperlyConfigured(
-            "'%s.formset' does not inherit from " "BaseDocumentFormSet." % cls.__name__
+            "'%s.formset' does not inherit from BaseDocumentFormSet." % cls.__name__
         )
 
     # exclude
@@ -285,8 +283,7 @@ def validate_base(cls, model):
             check_isseq(cls, "fieldsets[%d]" % idx, fieldset)
             if len(fieldset) != 2:
                 raise ImproperlyConfigured(
-                    "'%s.fieldsets[%d]' does not "
-                    "have exactly two elements." % (cls.__name__, idx)
+                    "'%s.fieldsets[%d]' does not have exactly two elements." % (cls.__name__, idx)
                 )
             check_isdict(cls, "fieldsets[%d][1]" % idx, fieldset[1])
             if "fields" not in fieldset[1]:
@@ -297,7 +294,7 @@ def validate_base(cls, model):
             for fields in fieldset[1]["fields"]:
                 # The entry in fields might be a tuple. If it is a standalone
                 # field, make it into a tuple to make processing easier.
-                if type(fields) != tuple:
+                if not isinstance(fields, tuple):
                     fields = (fields,)
                 for field in fields:
                     if field in cls.readonly_fields:
@@ -347,7 +344,7 @@ def validate_base(cls, model):
         issubclass(cls.form, BaseModelForm)
         or cls.form.__class__.__name__ == "DocumentFormMetaclass"
     ):
-        raise ImproperlyConfigured("%s.form does not inherit from " "BaseModelForm." % cls.__name__)
+        raise ImproperlyConfigured("%s.form does not inherit from BaseModelForm." % cls.__name__)
 
     # filter_vertical
     if hasattr(cls, "filter_vertical"):
@@ -356,7 +353,7 @@ def validate_base(cls, model):
             f = get_field(cls, model, opts, "filter_vertical", field)
             if not isinstance(f, models.ManyToManyField):
                 raise ImproperlyConfigured(
-                    "'%s.filter_vertical[%d]' must be " "a ManyToManyField." % (cls.__name__, idx)
+                    "'%s.filter_vertical[%d]' must be a ManyToManyField." % (cls.__name__, idx)
                 )
 
     # filter_horizontal
@@ -366,7 +363,7 @@ def validate_base(cls, model):
             f = get_field(cls, model, opts, "filter_horizontal", field)
             if not isinstance(f, ListField) and not isinstance(f.field, ReferenceField):
                 raise ImproperlyConfigured(
-                    "'%s.filter_horizontal[%d]' must be " "a ManyToManyField." % (cls.__name__, idx)
+                    "'%s.filter_horizontal[%d]' must be a ManyToManyField." % (cls.__name__, idx)
                 )
 
     # radio_fields

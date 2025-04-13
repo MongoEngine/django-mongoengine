@@ -38,24 +38,17 @@ jobs:
           - 27017:27017
     steps:
       - uses: actions/checkout@v3
-      - name: Install poetry
-        run: pipx install poetry
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: astral-sh/setup-uv@v5
         with:
+          enable-cache: true
           python-version: ${{ matrix.python }}
-          cache: 'poetry'
-      - name: Cache virtualenv
-        uses: actions/cache@v3
-        with:
-          key: venv-${{ runner.os }}-${{ steps.setup_python.outputs.python-version}}-${{ hashFiles('poetry.lock') }}
-          path: .venv
       - name: Set up env
         run: |
-          poetry install -q
-          poetry run pip install -q "${{ matrix.django }}"
+          uv sync --group dev
+          uv pip install -q "${{ matrix.django }}"
       - name: Run tests
         run: |
-          poetry run ruff .
-          poetry run ruff format --check .
-          poetry run python -m pytest
+          uv run ruff check .
+          uv run ruff format --check .
+          uv run python -m pytest

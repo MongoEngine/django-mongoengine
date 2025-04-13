@@ -248,15 +248,15 @@ class DictFieldTest(MongoTestCase):
                 self._check_structure(w, expected, hint, level=level + 1)
         else:
             wclass = structure["type"]
-            assert isinstance(
-                widget, wclass
-            ), "{hint}:{level}: widget: {widget} should be a {cls}".format(
-                **{
-                    "hint": hint,
-                    "widget": widget,
-                    "cls": wclass,
-                    "level": level,
-                }
+            assert isinstance(widget, wclass), (
+                "{hint}:{level}: widget: {widget} should be a {cls}".format(
+                    **{
+                        "hint": hint,
+                        "widget": widget,
+                        "cls": wclass,
+                        "level": level,
+                    }
+                )
             )
 
 
