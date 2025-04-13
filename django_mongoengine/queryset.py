@@ -131,5 +131,4 @@ class QuerySetManager(Generic[_M], qs.QuerySetManager):
     default = QuerySet
     if TYPE_CHECKING:
 
-        def __get__(self, instance: object, cls: type[_M]) -> QuerySet[_M]:
-            ...
+        def __get__(self, instance: object, cls: type[_M]) -> QuerySet[_M]: ...

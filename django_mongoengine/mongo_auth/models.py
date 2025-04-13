@@ -358,7 +358,7 @@ class AbstractUser(BaseUser, document.Document):
         if not hasattr(self, "_profile_cache"):
             if not getattr(settings, "AUTH_PROFILE_MODULE", False):
                 raise SiteProfileNotAvailable(
-                    "You need to set AUTH_PROFILE_MO" "DULE in your project settings"
+                    "You need to set AUTH_PROFILE_MODULE in your project settings"
                 )
             try:
                 app_label, model_name = settings.AUTH_PROFILE_MODULE.split(".")
