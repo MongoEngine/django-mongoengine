@@ -6,7 +6,7 @@ release-beta:
 
 publish:
 	rm -rf dist
-	python setup.py sdist
+	python -m build --installer uv
 	twine check dist/*
 	twine upload dist/*
 	git push --follow-tags

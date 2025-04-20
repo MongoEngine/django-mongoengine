@@ -43,6 +43,7 @@ dev = [
     "typing-extensions",
     "mongo-types @ git+https://github.com/sbdchd/mongo-types.git@main",
     "django-types",
+    "build>=1.2.2.post1",
 ]
 
 [tool.ruff]
@@ -75,8 +76,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build]
-include = ["django-mongoengine/**"]
-exclude = ["doc", "docs", "tests", "example"]
+include = ["django_mongoengine/**"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["django-mongoengine"]
