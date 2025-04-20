@@ -79,7 +79,7 @@ build-backend = "hatchling.build"
 include = ["django_mongoengine/**"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["django-mongoengine"]
+packages = ["django_mongoengine"]
 
 [tool.hatch.version]
 source = "vcs"
