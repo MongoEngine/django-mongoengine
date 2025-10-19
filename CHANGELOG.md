@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0-beta.6](https://github.com/MongoEngine/django-mongoengine/compare/v0.6.0-beta.5...v0.6.0-beta.6) (2025-10-19)
+
+
+### Features
+
+* Drop python 3.9 and Django 4.2,5.0; add python 3.14, Django 5.2 ([#219](https://github.com/MongoEngine/django-mongoengine/issues/219)) ([792fe41](https://github.com/MongoEngine/django-mongoengine/commit/792fe4153a6975f7e4750e20fbe70a79a4ab1e52))
+
 ## [0.6.0-beta.5](https://github.com/MongoEngine/django-mongoengine/compare/v0.6.0-beta.4...v0.6.0-beta.5) (2025-04-20)
 
 ## [0.6.0-beta.4](https://github.com/MongoEngine/django-mongoengine/compare/v0.6.0-beta.3...v0.6.0-beta.4) (2025-04-20)
