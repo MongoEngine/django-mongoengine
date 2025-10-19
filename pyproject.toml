@@ -7,7 +7,7 @@ authors = [
 ]
 dynamic = ["version"]
 license = {text = "BSD"}
-requires-python = "<4.0,>=3.9"
+requires-python = "<4.0,>=3.10"
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -22,7 +22,7 @@ classifiers = [
     "Framework :: Django"
 ]
 dependencies = [
-    "django<5,>=4.2",
+    "django<6,>=5.1",
     "mongoengine>=0.14",
 ]
 
