@@ -20,6 +20,7 @@ _field_defaults = {
 
 class DjangoField:
     get_choices = Field.__dict__["get_choices"]
+    empty_values = [None, "", [], (), {}]
 
     def _get_flatchoices(self):
         """Flattened version of choices tuple."""
