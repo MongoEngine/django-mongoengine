@@ -69,6 +69,8 @@ class DocumentMetaWrapper:
     _field_cache = None
     document = None
     _meta = None
+    is_composite_pk = False
+
     try:
         default_apps = Options.default_apps
     except AttributeError:
